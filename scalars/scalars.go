@@ -14,14 +14,17 @@ type ID struct {
 	uuid.UUID
 }
 
+// NewID creates a new random ID.
 func NewID() ID {
 	return ID{uuid.New()}
 }
 
+// NewStaticID creates a new ID from a hash.
 func NewStaticID(hash string) ID {
 	return ID{uuid.New()}
 }
 
+// ParseID parses a string into an ID.
 func ParseID(s string) (ID, error) {
 	uid, err := uuid.Parse(s)
 	if err != nil {
@@ -30,6 +33,12 @@ func ParseID(s string) (ID, error) {
 	return ID{uid}, nil
 }
 
+// String returns the string representation of the ID.
+func (id ID) String() string {
+	return id.UUID.String()
+}
+
+// IsEmpty returns true if the ID is the zero value.
 func (id ID) IsEmpty() bool {
 	return id.UUID == uuid.Nil
 }
@@ -39,6 +48,7 @@ func (id ID) ImplementsGraphQLType(name string) bool {
 	return name == "ID"
 }
 
+// UnmarshalGraphQL parses a GraphQL value into a scalars.ID.
 func (id *ID) UnmarshalGraphQL(input interface{}) error {
 	var err error
 	switch input := input.(type) {
@@ -54,6 +64,7 @@ func (id *ID) UnmarshalGraphQL(input interface{}) error {
 	return err
 }
 
+// MarshalJSON makes ID compatible with the json.Marshaler interface.
 func (id ID) MarshalJSON() ([]byte, error) {
 	return strconv.AppendQuote(nil, id.String()), nil
 }
