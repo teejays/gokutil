@@ -1,0 +1,4 @@
+github.com/teejays/clog v0.0.0-20240330223723-2114569c05a4 h1:feBHL+8pD/J6MD5emp4iGTREITUXwQhOWiUq/8sHGx4=
+github.com/teejays/clog v0.0.0-20240330223723-2114569c05a4/go.mod h1:zZj4eob6D1DIUL6h+X+kRT6nbWM+Hiy1iupSz7Eu0HQ=
+github.com/teejays/goku-util/panics v0.0.0-20240725204228-e1905d4f3f26 h1:wKnEHp76PMbRu7FoHFRBIEANjE0Pgi9rDgicQgzwGPA=
+github.com/teejays/goku-util/panics v0.0.0-20240725204228-e1905d4f3f26/go.mod h1:AoRMLo9B+tTcdW9MGd8pzS7TRGJmZYEXJ5ow5qRh9yU=
