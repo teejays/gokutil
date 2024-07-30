@@ -18,10 +18,10 @@ github.com/stretchr/testify v1.8.4 h1:CcVxjf3Q8PM0mHUKJCdn+eZZtm5yQwehR5yeSVQQcU
 github.com/stretchr/testify v1.8.4/go.mod h1:sz/lmYIOXD/1dqDmKjjqLyZ2RngseejIcXlSw2iwfAo=
 github.com/teejays/clog v0.0.0-20240330223723-2114569c05a4 h1:feBHL+8pD/J6MD5emp4iGTREITUXwQhOWiUq/8sHGx4=
 github.com/teejays/clog v0.0.0-20240330223723-2114569c05a4/go.mod h1:zZj4eob6D1DIUL6h+X+kRT6nbWM+Hiy1iupSz7Eu0HQ=
-github.com/teejays/goku-util/errutil v0.0.0-20240725204228-e1905d4f3f26 h1:8QTQPwWS1TEJcD3VXapk4SNnOmhg8f8HAXigdgEBqYs=
-github.com/teejays/goku-util/errutil v0.0.0-20240725204228-e1905d4f3f26/go.mod h1:QKxw2iMpgg7mxtEX8rE+1cxPTj5FOy4EQobTrnz6SnM=
-github.com/teejays/goku-util/panics v0.0.0-20240725204228-e1905d4f3f26 h1:wKnEHp76PMbRu7FoHFRBIEANjE0Pgi9rDgicQgzwGPA=
-github.com/teejays/goku-util/panics v0.0.0-20240725204228-e1905d4f3f26/go.mod h1:AoRMLo9B+tTcdW9MGd8pzS7TRGJmZYEXJ5ow5qRh9yU=
+github.com/teejays/gokutil/errutil v0.0.0-20240725204228-e1905d4f3f26 h1:8QTQPwWS1TEJcD3VXapk4SNnOmhg8f8HAXigdgEBqYs=
+github.com/teejays/gokutil/errutil v0.0.0-20240725204228-e1905d4f3f26/go.mod h1:QKxw2iMpgg7mxtEX8rE+1cxPTj5FOy4EQobTrnz6SnM=
+github.com/teejays/gokutil/panics v0.0.0-20240725204228-e1905d4f3f26 h1:wKnEHp76PMbRu7FoHFRBIEANjE0Pgi9rDgicQgzwGPA=
+github.com/teejays/gokutil/panics v0.0.0-20240725204228-e1905d4f3f26/go.mod h1:AoRMLo9B+tTcdW9MGd8pzS7TRGJmZYEXJ5ow5qRh9yU=
 golang.org/x/crypto v0.25.0 h1:ypSNr+bnYL2YhwoMt2zPxHFmbAN1KZs/njMG3hxUp30=
 golang.org/x/crypto v0.25.0/go.mod h1:T+wALwcMOSE0kXgUAnPAHqTLW+XHgcELELW8VaDgm/M=
 golang.org/x/net v0.27.0 h1:5K3Njcw06/l2y9vpGCSdcxWOYHOUk3dVNGDXN+FvAys=

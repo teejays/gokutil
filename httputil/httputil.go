@@ -7,7 +7,7 @@ import (
 	"net/http"
 
 	"github.com/teejays/clog"
-	"github.com/teejays/goku-util/validate"
+	"github.com/teejays/gokutil/validate"
 )
 
 // ErrEmptyBody is used when we expect to receive a request with some body but we don't

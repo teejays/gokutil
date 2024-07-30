@@ -7,7 +7,7 @@ import (
 
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
-	"github.com/teejays/goku-util/log"
+	"github.com/teejays/gokutil/log"
 )
 
 // Route represents a standard route object

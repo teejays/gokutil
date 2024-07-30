@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/teejays/goku-util/naam"
+	"github.com/teejays/gokutil/naam"
 )
 
 type TestField int

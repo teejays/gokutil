@@ -5,7 +5,7 @@ import (
 	"log/slog"
 	"os"
 
-	"github.com/teejays/goku-util/env"
+	"github.com/teejays/gokutil/env"
 )
 
 var logger *slog.Logger = slog.Default()

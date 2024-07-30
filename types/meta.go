@@ -5,8 +5,8 @@ import (
 	"slices"
 	"time"
 
-	"github.com/teejays/goku-util/naam"
-	"github.com/teejays/goku-util/scalars"
+	"github.com/teejays/gokutil/naam"
+	"github.com/teejays/gokutil/scalars"
 )
 
 type BasicTypeMeta[T BasicType, F Field] interface {

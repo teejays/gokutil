@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/go-playground/validator/v10"
-	"github.com/teejays/goku-util/errutil"
+	"github.com/teejays/gokutil/errutil"
 )
 
 // V is the singleton validator.Validate instance, it caches struct info

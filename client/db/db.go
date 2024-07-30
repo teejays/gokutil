@@ -9,9 +9,9 @@ import (
 	"github.com/doug-martin/goqu/v9"
 	_ "github.com/lib/pq"
 	"github.com/teejays/clog"
-	"github.com/teejays/goku-util/errutil"
-	"github.com/teejays/goku-util/panics"
-	"github.com/teejays/goku-util/scalars"
+	"github.com/teejays/gokutil/errutil"
+	"github.com/teejays/gokutil/panics"
+	"github.com/teejays/gokutil/scalars"
 )
 
 const SQL_DIALECT = "postgres"

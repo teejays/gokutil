@@ -22,7 +22,7 @@ In order to generate a JWT, we need a secret encryption key for the signature. W
 import (
     "log"
 
-    "github.com/teejays/goku-util/jwt"
+    "github.com/teejays/gokutil/jwt"
 )
 
 var secret = []byte("i am a very secret key")

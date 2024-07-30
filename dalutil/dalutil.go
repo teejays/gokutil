@@ -8,13 +8,13 @@ import (
 
 	"github.com/teejays/clog"
 
-	"github.com/teejays/goku-util/client/db"
-	"github.com/teejays/goku-util/errutil"
-	"github.com/teejays/goku-util/naam"
-	"github.com/teejays/goku-util/panics"
-	"github.com/teejays/goku-util/scalars"
-	"github.com/teejays/goku-util/types"
-	"github.com/teejays/goku-util/validate"
+	"github.com/teejays/gokutil/client/db"
+	"github.com/teejays/gokutil/errutil"
+	"github.com/teejays/gokutil/naam"
+	"github.com/teejays/gokutil/panics"
+	"github.com/teejays/gokutil/scalars"
+	"github.com/teejays/gokutil/types"
+	"github.com/teejays/gokutil/validate"
 )
 
 type EntityDALMetaBase[T types.BasicType, F types.Field] struct {

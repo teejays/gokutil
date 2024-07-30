@@ -1,4 +1,4 @@
-module github.com/teejays/goku-util/scalars
+module github.com/teejays/gokutil/scalars
 
 go 1.22.1
 

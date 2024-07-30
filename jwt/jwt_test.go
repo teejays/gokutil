@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
-	"github.com/teejays/goku-util/jwt"
+	"github.com/teejays/gokutil/jwt"
 )
 
 func TestClient_CreateToken(t *testing.T) {

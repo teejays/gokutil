@@ -10,10 +10,10 @@ import (
 	"strings"
 
 	"github.com/gorilla/mux"
-	"github.com/teejays/goku-util/errutil"
-	"github.com/teejays/goku-util/httputil"
-	"github.com/teejays/goku-util/log"
-	"github.com/teejays/goku-util/panics"
+	"github.com/teejays/gokutil/errutil"
+	"github.com/teejays/gokutil/httputil"
+	"github.com/teejays/gokutil/log"
+	"github.com/teejays/gokutil/panics"
 
 	"github.com/teejays/gopi/json"
 	"github.com/teejays/gopi/validator"

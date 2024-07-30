@@ -1,3 +1,3 @@
-module github.com/teejays/goku-util/filter
+module github.com/teejays/gokutil/filter
 
 go 1.22.1

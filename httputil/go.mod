@@ -1,10 +1,10 @@
-module github.com/teejays/goku-util/httputil
+module github.com/teejays/gokutil/httputil
 
 go 1.22.1
 
 require (
 	github.com/teejays/clog v0.0.0-20240330223723-2114569c05a4
-	github.com/teejays/goku-util/validate v0.0.0-20240725204228-e1905d4f3f26
+	github.com/teejays/gokutil/validate v0.0.0-20240725204228-e1905d4f3f26
 )
 
 require (
@@ -13,8 +13,8 @@ require (
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/go-playground/validator/v10 v10.22.0 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
-	github.com/teejays/goku-util/errutil v0.0.0-20240725204228-e1905d4f3f26 // indirect
-	github.com/teejays/goku-util/panics v0.0.0-20240725204228-e1905d4f3f26 // indirect
+	github.com/teejays/gokutil/errutil v0.0.0-20240725204228-e1905d4f3f26 // indirect
+	github.com/teejays/gokutil/panics v0.0.0-20240725204228-e1905d4f3f26 // indirect
 	golang.org/x/crypto v0.25.0 // indirect
 	golang.org/x/net v0.27.0 // indirect
 	golang.org/x/sys v0.22.0 // indirect

@@ -7,8 +7,8 @@ import (
 
 	_ "fmt"
 
-	"github.com/teejays/goku-util/panics"
-	"github.com/teejays/goku-util/strcase"
+	"github.com/teejays/gokutil/panics"
+	"github.com/teejays/gokutil/strcase"
 )
 
 // Named is any object/struct that has a name

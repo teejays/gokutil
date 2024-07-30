@@ -1,11 +1,11 @@
-module github.com/teejays/goku-util/naam
+module github.com/teejays/gokutil/naam
 
 go 1.22.1
 
 require (
 	github.com/stretchr/testify v1.9.0
-	github.com/teejays/goku-util/panics v0.0.0-20240725204228-e1905d4f3f26
-	github.com/teejays/goku-util/strcase v0.0.0-20240725204228-e1905d4f3f26
+	github.com/teejays/gokutil/panics v0.0.0-20240725204228-e1905d4f3f26
+	github.com/teejays/gokutil/strcase v0.0.0-20240725204228-e1905d4f3f26
 )
 
 require (

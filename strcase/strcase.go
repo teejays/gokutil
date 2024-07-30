@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	"github.com/iancoleman/strcase"
-	"github.com/teejays/goku-util/panics"
+	"github.com/teejays/gokutil/panics"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 )

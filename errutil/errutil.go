@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/teejays/goku-util/panics"
+	"github.com/teejays/gokutil/panics"
 )
 
 var ErrNotFound = fmt.Errorf("not found")

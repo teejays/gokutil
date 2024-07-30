@@ -1,4 +1,4 @@
-module github.com/teejays/goku-util/jwt
+module github.com/teejays/gokutil/jwt
 
 go 1.22.1
 

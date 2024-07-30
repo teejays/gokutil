@@ -5,8 +5,8 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/teejays/goku-util/panics"
-	"github.com/teejays/goku-util/scalars"
+	"github.com/teejays/gokutil/panics"
+	"github.com/teejays/gokutil/scalars"
 )
 
 var ErrValueNotSet = fmt.Errorf("context value is not set")

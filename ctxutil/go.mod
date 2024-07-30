@@ -1,3 +1,3 @@
-module github.com/teejays/goku-util/ctxutil
+module github.com/teejays/gokutil/ctxutil
 
 go 1.22.1

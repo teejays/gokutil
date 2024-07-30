@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/doug-martin/goqu/v9"
-	"github.com/teejays/goku-util/scalars"
+	"github.com/teejays/gokutil/scalars"
 )
 
 type Condition interface {
