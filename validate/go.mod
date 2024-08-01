@@ -5,7 +5,7 @@ go 1.22.1
 require (
 	github.com/go-playground/validator/v10 v10.22.0
 	github.com/stretchr/testify v1.9.0
-	github.com/teejays/gokutil/errutil v0.0.0-20240730034000-a4d834987b3d
+	github.com/teejays/gokutil/errutil v0.0.0-20240730042647-5936f7f638cb
 )
 
 require (
@@ -16,7 +16,7 @@ require (
 	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/teejays/clog v0.0.0-20240330223723-2114569c05a4 // indirect
-	github.com/teejays/gokutil/panics v0.0.0-20240730034000-a4d834987b3d // indirect
+	github.com/teejays/gokutil/panics v0.0.0-20240730042647-5936f7f638cb // indirect
 	golang.org/x/crypto v0.25.0 // indirect
 	golang.org/x/net v0.27.0 // indirect
 	golang.org/x/sys v0.22.0 // indirect

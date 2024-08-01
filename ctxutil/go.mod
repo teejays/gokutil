@@ -3,8 +3,8 @@ module github.com/teejays/gokutil/ctxutil
 go 1.22.1
 
 require (
-	github.com/teejays/gokutil/panics v0.0.0-20240730034000-a4d834987b3d
-	github.com/teejays/gokutil/scalars v0.0.0-20240730034000-a4d834987b3d
+	github.com/teejays/gokutil/panics v0.0.0-20240730042647-5936f7f638cb
+	github.com/teejays/gokutil/scalars v0.0.0-20240730042647-5936f7f638cb
 )
 
 require (

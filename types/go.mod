@@ -4,8 +4,8 @@ go 1.22.1
 
 require (
 	github.com/stretchr/testify v1.9.0
-	github.com/teejays/gokutil/naam v0.0.0-20240730041938-f8c74a5a7f52
-	github.com/teejays/gokutil/scalars v0.0.0-20240730034000-a4d834987b3d
+	github.com/teejays/gokutil/naam v0.0.0-20240730042647-5936f7f638cb
+	github.com/teejays/gokutil/scalars v0.0.0-20240730042647-5936f7f638cb
 )
 
 require (
@@ -14,8 +14,8 @@ require (
 	github.com/graph-gophers/graphql-go v1.5.0 // indirect
 	github.com/iancoleman/strcase v0.3.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	github.com/teejays/gokutil/panics v0.0.0-20240730034000-a4d834987b3d // indirect
-	github.com/teejays/gokutil/strcase v0.0.0-20240730034000-a4d834987b3d // indirect
+	github.com/teejays/gokutil/panics v0.0.0-20240730042647-5936f7f638cb // indirect
+	github.com/teejays/gokutil/strcase v0.0.0-20240801191737-995c8c2e8fd8 // indirect
 	golang.org/x/text v0.16.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
