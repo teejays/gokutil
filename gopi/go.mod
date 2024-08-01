@@ -1,4 +1,4 @@
-module github.com/teejays/gopi
+module github.com/teejays/gokutil/gopi
 
 go 1.22.1
 
@@ -25,7 +25,7 @@ require (
 	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/teejays/clog v0.0.0-20240330223723-2114569c05a4 // indirect
-	github.com/teejays/gokutil/env v0.0.0-20240730042647-5936f7f638cb // indirect
+	github.com/teejays/gokutil/env v0.0.0-20240801191936-9caf6e23633a // indirect
 	github.com/teejays/gokutil/validate v0.0.0-20240801191737-995c8c2e8fd8 // indirect
 	golang.org/x/crypto v0.25.0 // indirect
 	golang.org/x/sys v0.22.0 // indirect

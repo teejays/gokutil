@@ -15,8 +15,8 @@ import (
 	"github.com/teejays/gokutil/log"
 	"github.com/teejays/gokutil/panics"
 
-	"github.com/teejays/gopi/json"
-	"github.com/teejays/gopi/validator"
+	"github.com/teejays/gokutil/gopi/json"
+	"github.com/teejays/gokutil/gopi/validator"
 )
 
 // GetQueryParamInt extracts the param value with given name out of the URL query

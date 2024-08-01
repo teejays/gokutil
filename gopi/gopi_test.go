@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/teejays/gopi"
+	"github.com/teejays/gokutil/gopi"
 )
 
 type SampleReq struct {

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/teejays/gopi"
+	"github.com/teejays/gokutil/gopi"
 	"golang.org/x/net/context"
 )
 
