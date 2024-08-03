@@ -5,17 +5,20 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"os"
+	"strconv"
 
 	"github.com/doug-martin/goqu/v9"
 	_ "github.com/lib/pq"
 	"github.com/teejays/clog"
 	"github.com/teejays/gokutil/errutil"
+	"github.com/teejays/gokutil/log"
 	"github.com/teejays/gokutil/panics"
 	"github.com/teejays/gokutil/scalars"
 )
 
 const SQL_DIALECT = "postgres"
-const DEFAULT_POSTGRES_PORT = 5432
+const DEFAULT_POSTGRES_PORT int = 5432
 
 var databases map[string]*sql.DB
 
@@ -56,8 +59,12 @@ func InitDatabase(ctx context.Context, o Options) error {
 }
 
 func getConnectionString(o Options) (string, error) {
-	return fmt.Sprintf("host=%s port=%d dbname=%s user=%s sslmode=%s timezone=%s",
-		o.Host, o.Port, o.Database, o.User, o.SSLMode, "UTC"), nil
+	str := fmt.Sprintf("host=%s port=%d dbname=%s user=%s sslmode=%s timezone=%s",
+		o.Host, o.Port, o.Database, o.User, o.SSLMode, "UTC")
+	if o.Password != "" {
+		str += fmt.Sprintf(" password=%s", o.Password)
+	}
+	return str, nil
 }
 
 // CheckConnection ensures that the DB connection is established and working
@@ -86,7 +93,7 @@ type Connection struct {
 func NewConnection(dbname string) (Connection, error) {
 	db, exists := databases[dbname]
 	if !exists {
-		return Connection{}, fmt.Errorf("database connection for service %s not found: %w", dbname, errutil.ErrNotFound)
+		return Connection{}, fmt.Errorf("database connection for db [%s] not found: %w", dbname, errutil.ErrNotFound)
 	}
 	conn := Connection{
 		DbName:  dbname,
@@ -484,4 +491,48 @@ func PrettyPrint(i interface{}) string {
 	s, err := json.MarshalIndent(i, "", "\t")
 	panics.IfError(err, "Cannot json.MarshalIndent: %s", err)
 	return string(s)
+}
+
+// InitAndTestConnectionForDb initializes connections for the given database
+func InitAndTestConnectionForDb(ctx context.Context, dbName string) error {
+	// TEST
+	var err error
+
+	// Ensure neccessary ENV variables are set
+	if os.Getenv("DATABASE_HOST") == "" {
+		return fmt.Errorf("ENV variable DATABASE_HOST not set")
+	}
+	if os.Getenv("POSTGRES_USERNAME") == "" {
+		return fmt.Errorf("ENV variable POSTGRES_USERNAME not set")
+	}
+	if os.Getenv("POSTGRES_PASSWORD") == "" {
+		log.Warn(ctx, "Initializing Database Connection: ENV variable POSTGRES_PASSWORD not set")
+	}
+
+	portStr := os.Getenv("DATABASE_PORT")
+	port := DEFAULT_POSTGRES_PORT
+	if portStr != "" {
+		port, err = strconv.Atoi(portStr)
+		if err != nil {
+			return fmt.Errorf("Env variable [DATABASE_PORT] value [%s] is not a number: %w", portStr, err)
+		}
+	}
+	clog.Warnf("Initializing database connection to database %s", dbName)
+	err = InitDatabase(ctx, Options{
+		Host:     os.Getenv("DATABASE_HOST"),
+		Port:     port,
+		Database: dbName,
+		User:     os.Getenv("POSTGRES_USERNAME"),
+		Password: os.Getenv("POSTGRES_PASSWORD"),
+		SSLMode:  "disable",
+	})
+	if err != nil {
+		return fmt.Errorf("Initalizing database %w", err)
+	}
+	err = CheckConnection(dbName)
+	if err != nil {
+		return fmt.Errorf("Failed to verify connection to database: %w", err)
+	}
+
+	return nil
 }

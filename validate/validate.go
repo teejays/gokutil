@@ -11,7 +11,7 @@ import (
 var V *validator.Validate
 
 func init() {
-	V = validator.New()
+	V = validator.New(validator.WithRequiredStructEnabled())
 }
 
 func Struct(data interface{}) error {

@@ -1,0 +1,6 @@
+github.com/joho/godotenv v1.5.1 h1:7eLL/+HRGLY0ldzfGMeQkb7vMd0as4CfYvUVzLqw0N0=
+github.com/joho/godotenv v1.5.1/go.mod h1:f4LDr5Voq0i2e/R5DDNOoa2zzDfwtkZa6DnEwAbqwq4=
+github.com/teejays/gokutil/log v0.0.0-20240801192633-7b1958693c9b h1:uTeIGQmbXoZkTBWcR67Y6mjDPT+6cFlWZM4vdLxWtVQ=
+github.com/teejays/gokutil/log v0.0.0-20240801192633-7b1958693c9b/go.mod h1:07909genuwVhp/qTXx+0ToKoKIFqQVtKkhOrJT1n6IY=
+github.com/teejays/gokutil/panics v0.0.0-20240801192633-7b1958693c9b h1:WHMARe93L9qB/Mwjs3PLHmuub7lfFW3w9UMnTmkPngY=
+github.com/teejays/gokutil/panics v0.0.0-20240801192633-7b1958693c9b/go.mod h1:fjJOwE3RWULsehGFVv9B9/jyc9e/qa5l4QpdWf2rlpE=

@@ -2,15 +2,19 @@ package env
 
 import (
 	"os"
+
+	"github.com/teejays/gokutil/panics"
 )
 
-type Environment int
+type Environment ENV
+
+type ENV string
 
 const (
-	_ = iota
-	DEV
-	STG
-	PROD
+	DEV  = "development"
+	TEST = "testing" // For running tests
+	STG  = "staging"
+	PROD = "production"
 )
 
 var (
@@ -20,15 +24,19 @@ var (
 
 func Init() {
 	switch os.Getenv("APP_ENV") {
-	case "PROD":
+	case "production":
 		env = PROD
-	case "STG":
+	case "staging":
 		env = STG
-	case "DEV":
+	case "development":
+		env = DEV
+	case "testing":
+		env = TEST
+	case "":
 		env = DEV
 	default:
 		// Could potentially error/warn
-		env = DEV
+		panics.P("Unknown APP_ENV environment variable value [%s]", os.Getenv("APP_ENV"))
 	}
 	isInitialized = true
 }

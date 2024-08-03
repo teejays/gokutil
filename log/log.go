@@ -31,6 +31,10 @@ func Info(ctx context.Context, msg string, args ...any) {
 	logger.InfoContext(ctx, msg, args...)
 }
 
+func Warn(ctx context.Context, msg string, args ...interface{}) {
+	logger.WarnContext(ctx, msg, args...)
+}
+
 func Error(ctx context.Context, msg string, args ...interface{}) {
 	logger.ErrorContext(ctx, msg, args...)
 }
@@ -41,6 +45,10 @@ func DebugNoCtx(msg string, args ...interface{}) {
 
 func InfoNoCtx(msg string, args ...interface{}) {
 	Info(context.Background(), msg, args...)
+}
+
+func WarnNoCtx(msg string, args ...interface{}) {
+	Warn(context.Background(), msg, args...)
 }
 
 func ErrorNoCtx(msg string, args ...interface{}) {

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/teejays/gokutil/env"
 	"github.com/teejays/gokutil/panics"
 	"github.com/teejays/gokutil/scalars"
 )
@@ -21,17 +22,9 @@ const (
 	UserIDKey
 )
 
-type environment int
-
-const (
-	_ environment = iota
-	DEV
-	PROD
-)
-
 type UserIDType = scalars.ID
 type ContextValueType interface {
-	UserIDType | environment | string
+	UserIDType | env.Environment | string
 }
 
 func setValue[T ContextValueType](ctx context.Context, key ContextKey, val T) context.Context {
@@ -48,14 +41,14 @@ func getValue[T ContextValueType](ctx context.Context, key ContextKey) (T, error
 	return val, nil
 }
 
-func SetEnv(ctx context.Context, val environment) (context.Context, error) {
+func SetEnv(ctx context.Context, val env.Environment) (context.Context, error) {
 	return setValue(ctx, EnvironmentKey, val), nil
 }
 
-func GetEnv(ctx context.Context) environment {
-	val, err := getValue[environment](ctx, EnvironmentKey)
+func GetEnv(ctx context.Context) env.Environment {
+	val, err := getValue[env.Environment](ctx, EnvironmentKey)
 	if errors.Is(err, ErrValueNotSet) {
-		return DEV // Default to DEV
+		return env.DEV // Default to DEV
 	}
 	panics.IfError(err, "context.GetEnv()")
 	return val

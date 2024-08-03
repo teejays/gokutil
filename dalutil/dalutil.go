@@ -112,7 +112,7 @@ func BatchAddType[T types.BasicType, F types.Field](ctx context.Context, conn db
 	for i := range elems {
 		err := validate.Struct(elems[i])
 		if err != nil {
-			errs.AddNew("Validation failed for User (ID %s): %w", elems[i].GetID(), err)
+			errs.AddNew("Validation failed for item at position [%d], ID [%s]: %w", i+1, elems[i].GetID(), err)
 		}
 	}
 	if !errs.IsNil() {
