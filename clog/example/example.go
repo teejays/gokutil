@@ -3,8 +3,8 @@ package main
 import (
 	"fmt" // Required for Example 3
 
-	"github.com/teejays/clog"
-	"github.com/teejays/clog/decoration"
+	"github.com/teejays/gokutil/clog"
+	"github.com/teejays/gokutil/clog/decoration"
 )
 
 func main() {

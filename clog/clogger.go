@@ -6,7 +6,7 @@ import (
 	"log/syslog"
 	"strings"
 
-	"github.com/teejays/clog/decoration"
+	"github.com/teejays/gokutil/clog/decoration"
 )
 
 const DEFAULT_LOG_FACILITY = syslog.LOG_LOCAL1

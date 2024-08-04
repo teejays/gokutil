@@ -6,7 +6,7 @@ import (
 	"io"
 	"log/slog"
 
-	"github.com/teejays/clog/decoration"
+	"github.com/teejays/gokutil/clog/decoration"
 )
 
 var colorMap = map[slog.Level]decoration.Decoration{

@@ -4,7 +4,7 @@ import (
 	"log/slog"
 	"os"
 
-	"github.com/teejays/clog/sclog"
+	"github.com/teejays/gokutil/clog/sclog"
 )
 
 func main() {

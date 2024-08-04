@@ -18,7 +18,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/teejays/clog/decoration"
+	"github.com/teejays/gokutil/clog/decoration"
 )
 
 // LogLevel
