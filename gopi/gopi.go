@@ -10,6 +10,8 @@ import (
 	"github.com/teejays/gokutil/log"
 )
 
+var llog = log.GetLogger().WithHeading("gopi")
+
 // Route represents a standard route object
 type Route struct {
 	Method       string
@@ -45,7 +47,7 @@ func (s *Server) StartServer(ctx context.Context, addr string, port int) error {
 	http.Handle("/", s.rootHandler)
 
 	// Start the server
-	log.Info(ctx, "[Gopi] HTTP Server listening", "address", addr, "port", port)
+	llog.Info(ctx, "[HTTP server listening", "address", addr, "port", port)
 
 	err := http.ListenAndServe(fmt.Sprintf("%s:%d", addr, port), nil)
 	if err != nil {
@@ -108,7 +110,7 @@ func GetHandler(ctx context.Context, routes []Route, middlewares MiddlewareFuncs
 			r = a
 		}
 		// Register the route
-		log.Info(ctx, "[Gopi] Registering endpoint", "path", GetRoutePattern(route), "method", route.Method)
+		llog.Debug(ctx, "Registering endpoint", "method", route.Method, "path", GetRoutePattern(route))
 
 		if route.Method == "" {
 			return nil, fmt.Errorf("route [%s] has no http method", route.Path)
@@ -127,7 +129,7 @@ func GetHandler(ctx context.Context, routes []Route, middlewares MiddlewareFuncs
 		if err != nil {
 			return nil, err
 		}
-		log.Info(ctx, "[Gopi] Registered Endpoint", "method", route.Method, "path", fullPath)
+		llog.Debug(ctx, "Registered Endpoint", "method", route.Method, "path", fullPath)
 	}
 
 	// Set up pre handler middlewares
@@ -144,7 +146,7 @@ func GetHandler(ctx context.Context, routes []Route, middlewares MiddlewareFuncs
 func LoggerMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Log the request
-		log.DebugNoCtx("[Gopi] HTTP request received", "http_method", r.Method, "path", r.URL.Path)
+		llog.DebugWithoutCtx("HTTP request received", "method", r.Method, "path", r.URL.Path)
 		// Call the next handler
 		next.ServeHTTP(w, r)
 	})

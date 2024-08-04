@@ -3,7 +3,7 @@ package gopi
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"reflect"
 	"strconv"
@@ -26,7 +26,8 @@ func GetQueryParamInt(r *http.Request, name string, defaultVal int) (int, error)
 		return defaultVal, err
 	}
 	values, exist := r.Form[name]
-	log.DebugNoCtx("URL values", "param", name, "value", values)
+	log.DebugWithoutCtx("[GetQueryParamInt] URL values", "param", name, "value", values)
+
 	if !exist {
 		return defaultVal, nil
 	}
@@ -46,7 +47,7 @@ func GetMuxParamInt(r *http.Request, name string) (int64, error) {
 
 	var vars = mux.Vars(r)
 
-	log.DebugNoCtx("MUX vars", "value", vars)
+	log.DebugWithoutCtx("[GetMuxParamInt] MUX vars", "value", vars)
 	valStr := vars[name]
 	if strings.TrimSpace(valStr) == "" {
 		return -1, fmt.Errorf("could not find var %s in the route", name)
@@ -64,7 +65,7 @@ func GetMuxParamInt(r *http.Request, name string) (int64, error) {
 func GetMuxParamStr(r *http.Request, name string) (string, error) {
 
 	var vars = mux.Vars(r)
-	log.DebugNoCtx("MUX vars", "value", vars)
+	log.DebugWithoutCtx("[GetMuxParamStr] MUX vars", "value", vars)
 	valStr := vars[name]
 	if strings.TrimSpace(valStr) == "" {
 		return "", fmt.Errorf("var '%s' is not in the route", name)
@@ -95,7 +96,7 @@ func WriteResponse(w http.ResponseWriter, code int, v interface{}) {
 
 func writeResponse(w http.ResponseWriter, code int, v interface{}) {
 	w.WriteHeader(code)
-	log.DebugNoCtx("api: writeResponse", "kind", reflect.ValueOf(v).Kind(), "content", v)
+	log.DebugWithoutCtx("writing response", "kind", reflect.ValueOf(v).Kind(), "content", v)
 
 	if v == nil {
 		return
@@ -130,7 +131,7 @@ func writeError(w http.ResponseWriter, code int, err error) {
 		errMessage = ErrMessageGeneric
 	}
 
-	log.ErrorNoCtx("Writing error to http response", "error", err)
+	log.ErrorWithoutCtx("Writing error to http response", "error", err)
 
 	// If it a goku error?
 	if gErr, ok := errutil.AsGokuError(err); ok {
@@ -172,7 +173,7 @@ func writeError(w http.ResponseWriter, code int, err error) {
 // body into the variable v.
 func UnmarshalJSONFromRequest(r *http.Request, v interface{}) error {
 	// Read the HTTP request body
-	body, err := ioutil.ReadAll(r.Body)
+	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		// api.WriteError(w, http.StatusBadRequest, err, false, nil)
 		return err
@@ -184,12 +185,12 @@ func UnmarshalJSONFromRequest(r *http.Request, v interface{}) error {
 		return ErrEmptyBody
 	}
 
-	log.DebugNoCtx("api: Unmarshaling to JSON", "body", string(body))
+	log.DebugWithoutCtx("api: Unmarshaling to JSON", "body", string(body))
 
 	// Unmarshal JSON into Go type
 	err = json.Unmarshal(body, &v)
 	if err != nil {
-		log.ErrorNoCtx("api: Unmarshaling to JSON", "error", err)
+		log.ErrorWithoutCtx("api: Unmarshaling to JSON", "error", err)
 		return ErrInvalidJSON
 	}
 

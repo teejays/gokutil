@@ -10,7 +10,7 @@ import (
 
 	"github.com/doug-martin/goqu/v9"
 	_ "github.com/lib/pq"
-	"github.com/teejays/clog"
+	"github.com/teejays/gokutil/clog"
 	"github.com/teejays/gokutil/errutil"
 	"github.com/teejays/gokutil/log"
 	"github.com/teejays/gokutil/panics"

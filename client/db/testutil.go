@@ -5,7 +5,7 @@ import (
 	"errors"
 
 	_ "github.com/lib/pq"
-	"github.com/teejays/clog"
+	"github.com/teejays/gokutil/clog"
 )
 
 func GetTestDatabaseNameForService(serviceName string) string {

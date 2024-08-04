@@ -9,8 +9,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/teejays/clog"
+	"github.com/teejays/gokutil/log"
 )
+
+var llog = log.GetLogger().WithHeading("JWT")
 
 const gHeaderTyp = "JWT"
 const gHeaderAlg = "HS256"
@@ -62,12 +64,12 @@ func (bc *BaseClaim) GetBaseClaim() *BaseClaim {
 func (bc *BaseClaim) VerifyTimestamps() error {
 
 	// Make sure that the JWT token has not expired
-	clog.Debugf("JWT: token expiry: %v", bc.ExpireAt)
+	llog.DebugWithoutCtx("Verifying token timestamp", "expiry", bc.ExpireAt, "notBefore", bc.NotBefore, "issuedAt", bc.IssuedAt)
+
 	if bc.ExpireAt.Before(time.Now()) {
 		return fmt.Errorf("JWT has expired")
 	}
 
-	clog.Debugf("JWT: token valid not before: %v", bc.NotBefore)
 	if bc.NotBefore.After(time.Now()) {
 		return fmt.Errorf("JWT is not valid yet")
 	}
@@ -105,8 +107,7 @@ func (c *Client) CreateToken(claim Claim, lifespan time.Duration) (string, error
 	baseClaim.IssuedAt = now
 	baseClaim.NotBefore = now
 
-	clog.Debugf("JWT: Creating Token: Lifespan: %s", lifespan)
-	clog.Debugf("JWT: Creating Token: Expiry: %v", baseClaim.ExpireAt)
+	llog.DebugWithoutCtx("Creating token", "lifespan", lifespan, "expireAt", baseClaim.ExpireAt, "issuedAt", baseClaim.IssuedAt, "notBefore", baseClaim.NotBefore)
 
 	// Convert Header to JSON and then base64
 	headerJSON, err := json.Marshal(header)
@@ -115,10 +116,10 @@ func (c *Client) CreateToken(claim Claim, lifespan time.Duration) (string, error
 	}
 	// TODO: Encode directly to []byte and use those
 	headerB64 := base64.StdEncoding.EncodeToString(headerJSON)
-	clog.Debugf("JWT: Creating Token: Header: %+v", header)
+	llog.DebugWithoutCtx("Creating token", "header", header)
 
 	// Convert Payload to JSON and then base64
-	clog.Debugf("JWT: Creating Token: Claim: %+v", claim)
+	llog.DebugWithoutCtx("Creating token", "claim", claim)
 	claimJSON, err := json.Marshal(claim)
 	if err != nil {
 		return "", err

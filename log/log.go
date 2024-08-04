@@ -1,3 +1,5 @@
+// Package log provides a simple logging interface that can be used to log messages to the console.
+// It implements a singleton pattern.
 package log
 
 import (
@@ -7,56 +9,123 @@ import (
 
 	"github.com/teejays/gokutil/clog/sclog"
 	"github.com/teejays/gokutil/env"
+	"github.com/teejays/gokutil/panics"
 )
 
-var logger *slog.Logger = slog.Default()
+var defaultLogger LoggerI = nil
 
-func Init() {
+func init() {
 	switch env.GetEnv() {
 	/*
 		Can split the logging functionality based on env: env.PROD, env.STG, env.DEV
 	*/
 	case env.PROD:
-		logger = slog.New(slog.NewJSONHandler(os.Stderr, &slog.HandlerOptions{}))
+		defaultLogger = Logger{
+			sclogHandler: nil,
+			logger:       slog.New(slog.NewJSONHandler(os.Stderr, &slog.HandlerOptions{})),
+		}
 	default:
-		devHandler := sclog.NewHandler(sclog.NewHandlerRequest{
+		clogHandler := sclog.NewHandler(sclog.NewHandlerRequest{
 			Out:       os.Stderr,
 			Level:     slog.LevelDebug,
 			Color:     true,
 			Timestamp: true,
 		})
-		logger = slog.New(devHandler)
+		defaultLogger = Logger{
+			logger:       slog.New(clogHandler),
+			sclogHandler: &clogHandler,
+		}
 	}
 }
 
+type LoggerI interface {
+	Debug(ctx context.Context, msg string, args ...interface{})
+	Info(ctx context.Context, msg string, args ...interface{})
+	Warn(ctx context.Context, msg string, args ...interface{})
+	Error(ctx context.Context, msg string, args ...interface{})
+
+	DebugWithoutCtx(msg string, args ...interface{})
+	InfoWithoutCtx(msg string, args ...interface{})
+	WarnWithoutCtx(msg string, args ...interface{})
+	ErrorWithoutCtx(msg string, args ...interface{})
+
+	WithHeading(heading string) LoggerI
+}
+
+type Logger struct {
+	sclogHandler *sclog.Handler
+	logger       *slog.Logger
+}
+
+func (l Logger) Debug(ctx context.Context, msg string, args ...interface{}) {
+	l.logger.DebugContext(ctx, msg, args...)
+}
+func (l Logger) Info(ctx context.Context, msg string, args ...interface{}) {
+	l.logger.InfoContext(ctx, msg, args...)
+}
+func (l Logger) Warn(ctx context.Context, msg string, args ...interface{}) {
+	l.logger.WarnContext(ctx, msg, args...)
+}
+func (l Logger) Error(ctx context.Context, msg string, args ...interface{}) {
+	l.logger.ErrorContext(ctx, msg, args...)
+}
+func (l Logger) DebugWithoutCtx(msg string, args ...interface{}) {
+	l.logger.Debug(msg, args...)
+}
+func (l Logger) InfoWithoutCtx(msg string, args ...interface{}) {
+	l.logger.Info(msg, args...)
+}
+func (l Logger) WarnWithoutCtx(msg string, args ...interface{}) {
+	l.logger.Warn(msg, args...)
+}
+func (l Logger) ErrorWithoutCtx(msg string, args ...interface{}) {
+	l.logger.Error(msg, args...)
+}
+func (l Logger) WithHeading(heading string) LoggerI {
+	panics.IfNil(l.sclogHandler, "Cannot set heading on a logger that does not have a sclog handler")
+
+	handler := l.sclogHandler.WithHeading(heading)
+	return Logger{
+		sclogHandler: &handler,
+		logger:       slog.New(handler),
+	}
+}
+
+// Default Logger methods
+
+// GetLogger returns the logger instance
+func GetLogger() LoggerI {
+	return defaultLogger
+}
+
 func Debug(ctx context.Context, msg string, args ...interface{}) {
-	logger.DebugContext(ctx, msg, args...)
+	defaultLogger.Debug(ctx, msg, args...)
 }
 
 func Info(ctx context.Context, msg string, args ...any) {
-	logger.InfoContext(ctx, msg, args...)
+	defaultLogger.Info(ctx, msg, args...)
 }
 
 func Warn(ctx context.Context, msg string, args ...interface{}) {
-	logger.WarnContext(ctx, msg, args...)
+	defaultLogger.Warn(ctx, msg, args...)
 }
 
 func Error(ctx context.Context, msg string, args ...interface{}) {
-	logger.ErrorContext(ctx, msg, args...)
+	defaultLogger.Error(ctx, msg, args...)
 }
 
-func DebugNoCtx(msg string, args ...interface{}) {
-	Debug(context.Background(), msg, args...)
+func DebugWithoutCtx(msg string, args ...interface{}) {
+	defaultLogger.DebugWithoutCtx(msg, args...)
 }
 
-func InfoNoCtx(msg string, args ...interface{}) {
-	Info(context.Background(), msg, args...)
+func InfoWithoutCtx(msg string, args ...interface{}) {
+	defaultLogger.InfoWithoutCtx(msg, args...)
 }
 
-func WarnNoCtx(msg string, args ...interface{}) {
-	Warn(context.Background(), msg, args...)
+func WarnWithoutCtx(msg string, args ...interface{}) {
+	defaultLogger.WarnWithoutCtx(msg, args...)
 }
 
-func ErrorNoCtx(msg string, args ...interface{}) {
-	Error(context.Background(), msg, args...)
+func ErrorWithoutCtx(msg string, args ...interface{}) {
+	defaultLogger.ErrorWithoutCtx(msg, args...)
 }

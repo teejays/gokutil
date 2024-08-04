@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/teejays/clog"
+	"github.com/teejays/gokutil/log"
 
 	"github.com/teejays/gokutil/client/db"
 	"github.com/teejays/gokutil/errutil"
@@ -16,6 +16,8 @@ import (
 	"github.com/teejays/gokutil/types"
 	"github.com/teejays/gokutil/validate"
 )
+
+var llog = log.GetLogger().WithHeading("DALUtil")
 
 type EntityDALMetaBase[T types.BasicType, F types.Field] struct {
 	DbTableName      naam.Name
@@ -200,7 +202,7 @@ func ListTypeByIDs[T types.BasicType, F types.Field](ctx context.Context, conn d
 		elems = append(elems, elem)
 	}
 
-	clog.Debugf("Number of type %s rows fetched: %d\n%+v", meta.GetBasicTypeMetaBase().Name, len(elems), elems)
+	llog.Debug(ctx, "Sql rows fetched", "type", meta.GetBasicTypeMetaBase().Name, "count", len(elems), "data", elems)
 
 	// Unique Primary IDs of the fetched type
 	var ids []scalars.ID
@@ -288,7 +290,7 @@ func UpdateType[T types.BasicType, F types.Field](ctx context.Context, conn db.C
 		return resp, fmt.Errorf("no fields provided for update: nothing to update")
 	}
 
-	clog.Debugf("Updating %s Fields: %s", meta.GetBasicTypeMetaBase().Name.FormatGolangType(), allowedCols)
+	llog.Debug(ctx, "Updating fields", "type", meta.GetBasicTypeMetaBase().Name, "columns", allowedCols)
 
 	// Convert timestamps to UTC
 	elem = meta.ConvertTimestampColumnsToUTC(elem)

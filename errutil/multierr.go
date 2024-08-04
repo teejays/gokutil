@@ -3,7 +3,7 @@ package errutil
 import (
 	"fmt"
 
-	"github.com/teejays/clog"
+	"github.com/teejays/gokutil/clog"
 )
 
 type MultiErr struct {

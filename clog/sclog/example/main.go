@@ -17,6 +17,15 @@ func main() {
 	logger := slog.New(devHandler)
 
 	// Testing
+	logMessages(logger)
+
+	// With Headings
+	logger = slog.New(devHandler.WithHeading("Example Code"))
+	logMessages(logger)
+
+}
+
+func logMessages(logger *slog.Logger) {
 	type name struct {
 		first string
 		last  string
