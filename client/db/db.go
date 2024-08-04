@@ -54,6 +54,11 @@ func InitDatabase(ctx context.Context, o Options) error {
 		return err
 	}
 
+	err = db.Ping()
+	if err != nil {
+		return fmt.Errorf("DB connection ping failed: %w", err)
+	}
+
 	databases[o.Database] = db
 	return nil
 }
@@ -528,10 +533,6 @@ func InitAndTestConnectionForDb(ctx context.Context, dbName string) error {
 	})
 	if err != nil {
 		return fmt.Errorf("Initalizing database %w", err)
-	}
-	err = CheckConnection(dbName)
-	if err != nil {
-		return fmt.Errorf("Failed to verify connection to database: %w", err)
 	}
 
 	return nil
