@@ -5,6 +5,8 @@ import (
 	"log"
 	"log/syslog"
 	"strings"
+
+	"github.com/teejays/clog/decoration"
 )
 
 const DEFAULT_LOG_FACILITY = syslog.LOG_LOCAL1
@@ -13,19 +15,19 @@ var cloggers map[string]*Clogger = make(map[string]*Clogger)
 
 // default cloggers
 var defaultCloggers []*Clogger = []*Clogger{
-	NewClogger("Debug", LogLevelDebug, FG_GRAY_LIGHT),
-	NewClogger("Info", LogLevelInfo, FG_GREEN),
-	NewClogger("Notice", LogLevelNotice, FG_CYAN),
-	NewClogger("Warning", LogLevelWarning, FG_YELLOW),
-	NewClogger("Error", LogLevelError, FG_RED),
-	NewClogger("Crit", LogLevelCrit, FG_MAGENTA),
+	NewClogger("Debug", LogLevelDebug, decoration.FG_GRAY_LIGHT),
+	NewClogger("Info", LogLevelInfo, decoration.FG_GREEN),
+	NewClogger("Notice", LogLevelNotice, decoration.FG_CYAN),
+	NewClogger("Warning", LogLevelWarning, decoration.FG_YELLOW),
+	NewClogger("Error", LogLevelError, decoration.FG_RED),
+	NewClogger("Crit", LogLevelCrit, decoration.FG_MAGENTA),
 }
 
 // registerLogger adds a new Clogger to the cloggers map, which can then be fetched
 // by calling the GetCloggerByName method.
 func registerClogger(cl *Clogger) error {
 	if _, exists := cloggers[cl.Name]; exists {
-		return fmt.Errorf("%s: a logger with the name %s already exists", PACKAGE_NAME, cl.Name)
+		return fmt.Errorf("Clog: a logger with the name %s already exists", cl.Name)
 	}
 	cloggers[cl.Name] = cl
 	return nil
@@ -37,7 +39,7 @@ func GetCloggerByName(name string) *Clogger {
 	cl, exist := cloggers[name]
 	// panics if loggers[name] doesn't exist
 	if !exist {
-		log.Panicf("%s: no logger with name %s", PACKAGE_NAME, name)
+		log.Panicf("Clog: no logger with name %s", name)
 	}
 	return cl
 }
@@ -62,15 +64,15 @@ var LogLevelSysLogPriorityMap map[int]syslog.Priority = map[int]syslog.Priority{
 type Clogger struct {
 	Name string
 	syslog.Priority
-	Decorations []Decoration
+	Decorations []decoration.Decoration
 	*log.Logger
 	LogLevel int
 }
 
 // NewClogger creates a new Clogger object. It accepts the name of the new Clogger, priority level
-// in the form of syslog.Priority and one or more Decorations. It returns a pointer to a new Clogger
+// in the form of syslog.Priority and one or more decoration.Decorations. It returns a pointer to a new Clogger
 // object with those properties. It panics if it encounters an error.
-func NewClogger(name string, logLevel int, decorations ...Decoration) *Clogger {
+func NewClogger(name string, logLevel int, decorations ...decoration.Decoration) *Clogger {
 	clogger := new(Clogger)
 	clogger.Name = name
 	clogger.LogLevel = logLevel
@@ -84,7 +86,7 @@ func NewClogger(name string, logLevel int, decorations ...Decoration) *Clogger {
 	// https://en.wikipedia.org/wiki/Syslog
 	logger, err := syslog.NewLogger(clogger.Priority, 0)
 	if err != nil {
-		log.Printf("[%s] Clogger profile '%s' will not log to syslog as it failed to initialize syslog.Logger(): %v", PACKAGE_NAME, clogger.Name, err)
+		log.Printf("[Clog] Clogger profile '%s' will not log to syslog as it failed to initialize syslog.Logger(): %v", clogger.Name, err)
 	} else {
 		clogger.Logger = logger
 	}
@@ -98,13 +100,13 @@ func NewClogger(name string, logLevel int, decorations ...Decoration) *Clogger {
 
 // AddDecoration (deprecated) adds the decoration to the Clogger. It probably should not be used
 // hence it is being deprecated.
-func (l *Clogger) AddDecoration(d Decoration) {
+func (l *Clogger) AddDecoration(d decoration.Decoration) {
 	l.Decorations = append(l.Decorations, d)
 }
 
 // RemoveDecoration (deprecated) removes the decorations from the Clogger. It probably should not be used
 // hence it is being deprecated.
-func (l *Clogger) RemoveDecoration(d Decoration) {
+func (l *Clogger) RemoveDecoration(d decoration.Decoration) {
 	for i, _d := range l.Decorations {
 		if d == _d {
 			// delete the decoration from the list
@@ -152,7 +154,7 @@ func (l *Clogger) PrintfStdOut(formatString string, args ...interface{}) {
 // associated with the l Clogger.
 func (l *Clogger) PrintStdOut(msg string) {
 	if UseDecoration {
-		msg = decorate(msg, l.Decorations...)
+		msg = decoration.Decorate(msg, l.Decorations...)
 	}
 	if PrependTimestamp {
 		msg = prependTimestamp(msg)

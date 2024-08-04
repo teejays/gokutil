@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt" // Required for Example 3
+
 	"github.com/teejays/clog"
+	"github.com/teejays/clog/decoration"
 )
 
 func main() {
@@ -28,13 +30,13 @@ func main() {
 	clog.Critf("Crit: This is a %s statement.", "Crit")
 
 	// Example 2: Creating your own Clogger
-	myLogger := clog.NewClogger("myClogger", clog.LogLevelInfo, clog.BLINK, clog.FG_GREEN)
+	myLogger := clog.NewClogger("myClogger", clog.LogLevelInfo, decoration.BLINK, decoration.FG_GREEN)
 	myLogger.Print("myLogger: This is a myLogger statement")
 	myLogger.Printf("myLogger: This is a %s statement.", "myLogger")
 
 	// Example 3: clog.Print functions
-	clog.PrintWithDecorations("This is my own message!", clog.BLINK, clog.BG_YELLOW, clog.BRIGHT, clog.FG_BLUE)
-	clog.PrintWithDecorations(fmt.Sprintf("This is %s message!", "my own"), clog.BLINK, clog.BG_YELLOW, clog.BRIGHT, clog.FG_BLUE)
+	clog.PrintWithDecorations("This is my own message!", decoration.BLINK, decoration.BG_YELLOW, decoration.BRIGHT, decoration.FG_BLUE)
+	clog.PrintWithDecorations(fmt.Sprintf("This is %s message!", "my own"), decoration.BLINK, decoration.BG_YELLOW, decoration.BRIGHT, decoration.FG_BLUE)
 
 	// Example 4: Color functions
 	clog.Red("This is a red statement")

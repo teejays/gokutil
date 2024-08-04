@@ -1,4 +1,4 @@
-package clog
+package decoration
 
 import (
 	"fmt"
@@ -60,7 +60,16 @@ func NewDecoration(sgrCode string) Decoration {
 	// regex from: https://superuser.com/questions/380772/removing-ansi-color-codes-from-text-stream
 	reg := regexp.MustCompile(`^\x1b\[[0-9;]*[mG]$`)
 	if !reg.MatchString(sgrCode) {
-		panic(fmt.Sprintf("%s: invalid sgr code '%s' provided", PACKAGE_NAME, sgrCode))
+		panic(fmt.Sprintf("Clog.Decoration: invalid sgr code '%s' provided", sgrCode))
 	}
 	return Decoration(sgrCode)
+}
+
+// Decorate takes a message and a list of decorations, and returns the message with the decorations applied.
+func Decorate(msg string, Decorations ...Decoration) string {
+	var decorationsCode string
+	for _, d := range Decorations {
+		decorationsCode += string(d)
+	}
+	return fmt.Sprintf("%s%s%s", decorationsCode, msg, RESET)
 }

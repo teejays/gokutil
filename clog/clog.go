@@ -17,9 +17,9 @@ import (
 	"log"
 	"os"
 	"time"
-)
 
-const PACKAGE_NAME string = `Clog`
+	"github.com/teejays/clog/decoration"
+)
 
 // LogLevel
 const (
@@ -159,28 +159,28 @@ func Redf(msg string, args ...interface{}) {
 	Red(fmt.Sprintf(msg, args...))
 }
 func Red(msg string) {
-	PrintWithDecorations(msg, FG_RED)
+	PrintWithDecorations(msg, decoration.FG_RED)
 }
 
 func Greenf(msg string, args ...interface{}) {
 	Green(fmt.Sprintf(msg, args...))
 }
 func Green(msg string) {
-	PrintWithDecorations(msg, FG_GREEN)
+	PrintWithDecorations(msg, decoration.FG_GREEN)
 }
 
 func Yellowf(msg string, args ...interface{}) {
 	Yellow(fmt.Sprintf(msg, args...))
 }
 func Yellow(msg string) {
-	PrintWithDecorations(msg, FG_YELLOW)
+	PrintWithDecorations(msg, decoration.FG_YELLOW)
 }
 
 func Bluef(msg string, args ...interface{}) {
 	Blue(fmt.Sprintf(msg, args...))
 }
 func Blue(msg string) {
-	PrintWithDecorations(msg, FG_BLUE)
+	PrintWithDecorations(msg, decoration.FG_BLUE)
 }
 
 func Println(msg string) {
@@ -191,8 +191,8 @@ func Printf(msg string, args ...interface{}) {
 	fmt.Printf(msg, args...)
 }
 
-func PrintWithDecorations(msg string, decorations ...Decoration) {
-	msg = decorate(msg, decorations...)
+func PrintWithDecorations(msg string, decorations ...decoration.Decoration) {
+	msg = decoration.Decorate(msg, decorations...)
 	fmt.Println(msg)
 }
 
@@ -206,14 +206,6 @@ func Panicf(format string, v ...interface{}) {
 
 func prependTimestamp(msg string) string {
 	return fmt.Sprintf("%s %s", timestamp(), msg)
-}
-
-func decorate(msg string, Decorations ...Decoration) string {
-	var decorationsCode string
-	for _, d := range Decorations {
-		decorationsCode += string(d)
-	}
-	return fmt.Sprintf("%s%s%s", decorationsCode, msg, RESET)
 }
 
 func addBreak(msg string) string {

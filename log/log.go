@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"os"
 
+	"github.com/teejays/gokutil/clog/sclog"
 	"github.com/teejays/gokutil/env"
 )
 
@@ -18,8 +19,13 @@ func Init() {
 	case env.PROD:
 		logger = slog.New(slog.NewJSONHandler(os.Stderr, &slog.HandlerOptions{}))
 	default:
-		logger = slog.Default()
-		slog.SetLogLoggerLevel(slog.LevelDebug)
+		devHandler := sclog.NewHandler(sclog.NewHandlerRequest{
+			Out:       os.Stderr,
+			Level:     slog.LevelDebug,
+			Color:     true,
+			Timestamp: true,
+		})
+		logger = slog.New(devHandler)
 	}
 }
 
