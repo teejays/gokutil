@@ -1,6 +1,7 @@
 package types
 
 import (
+	"context"
 	"database/sql/driver"
 	"slices"
 	"time"
@@ -11,7 +12,7 @@ import (
 
 type BasicTypeMeta[T BasicType, F Field] interface {
 	GetBasicTypeMetaBase() BasicTypeMetaBase[T, F]
-	SetMetaFieldValues(T, time.Time) T
+	SetMetaFieldValues(context.Context, T, time.Time) T
 
 	ConvertTimestampColumnsToUTC(T) T
 	SetDefaultFieldValues(T) T

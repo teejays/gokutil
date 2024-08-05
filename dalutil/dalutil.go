@@ -96,7 +96,7 @@ func BatchAddType[T types.BasicType, F types.Field](ctx context.Context, conn db
 
 	// Set the Meta field values for each elem
 	for i := range elems {
-		elems[i] = meta.SetMetaFieldValues(elems[i], now)
+		elems[i] = meta.SetMetaFieldValues(ctx, elems[i], now)
 	}
 
 	// Convert all timestamps to UTC
