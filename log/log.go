@@ -7,9 +7,9 @@ import (
 	"log/slog"
 	"os"
 
-	"github.com/teejays/gokutil/clog/sclog"
 	"github.com/teejays/gokutil/env"
 	"github.com/teejays/gokutil/panics"
+	"github.com/teejays/gokutil/sclog"
 )
 
 var defaultLogger LoggerI = nil
