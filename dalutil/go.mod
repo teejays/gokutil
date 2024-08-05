@@ -1,6 +1,6 @@
 module github.com/teejays/gokutil/dalutil
 
-go 1.22.1
+go 1.22.5
 
 require (
 	github.com/teejays/gokutil/client/db v0.0.0-20240730042647-5936f7f638cb

@@ -1,6 +1,6 @@
 module github.com/teejays/gokutil/httputil
 
-go 1.22.1
+go 1.22.5
 
 require (
 	github.com/teejays/gokutil/log v0.0.0-20240805201441-7ba176910d62

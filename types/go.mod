@@ -1,10 +1,10 @@
 module github.com/teejays/gokutil/types
 
-go 1.22.1
+go 1.22.5
 
 require (
 	github.com/stretchr/testify v1.9.0
-	github.com/teejays/gokutil/naam v0.0.0-20240805201441-7ba176910d62
+	github.com/teejays/gokutil/naam v0.0.0-20240805214016-33a217111a57
 	github.com/teejays/gokutil/scalars v0.0.0-20240805212105-b649d72941b2
 )
 

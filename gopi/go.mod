@@ -1,6 +1,6 @@
 module github.com/teejays/gokutil/gopi
 
-go 1.22.1
+go 1.22.5
 
 require (
 	github.com/Rican7/conjson v0.1.0
