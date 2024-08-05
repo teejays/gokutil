@@ -49,6 +49,7 @@ type LoggerI interface {
 	WarnWithoutCtx(msg string, args ...interface{})
 	ErrorWithoutCtx(msg string, args ...interface{})
 
+	// GetWriter() io.Writer
 	WithHeading(heading string) LoggerI
 }
 

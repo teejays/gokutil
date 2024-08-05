@@ -24,10 +24,13 @@ const (
 
 type UserIDType = scalars.ID
 type ContextValueType interface {
-	UserIDType | env.Environment | string
+	UserIDType | env.Environment | string | int | bool
+}
+type ContextKeyType interface {
+	ContextKey | string
 }
 
-func setValue[T ContextValueType](ctx context.Context, key ContextKey, val T) context.Context {
+func setValue[K ContextKeyType, T ContextValueType](ctx context.Context, key K, val T) context.Context {
 	return context.WithValue(ctx, key, val)
 }
 
@@ -76,4 +79,25 @@ func SetJWTToken(ctx context.Context, token string) context.Context {
 
 func GetJWTToken(ctx context.Context) (string, error) {
 	return getValue[string](ctx, JWTTokenKey)
+}
+
+func SetValue[V any, K ContextKeyType](ctx context.Context, key K, val V) context.Context {
+	return context.WithValue(ctx, key, val)
+}
+
+func GetValue[V any, K ContextKeyType](ctx context.Context, key K) (V, error) {
+	var empty V
+
+	if ctx == nil {
+		return empty, ErrValueNotSet
+	}
+	valI := ctx.Value(key)
+	if valI == nil {
+		return empty, ErrValueNotSet
+	}
+	val, ok := valI.(V)
+	if !ok {
+		return empty, ErrUnexpectedValueType
+	}
+	return val, nil
 }
