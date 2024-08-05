@@ -18,8 +18,8 @@ github.com/graph-gophers/graphql-go v1.5.0 h1:fDqblo50TEpD0LY7RXk/LFVYEVqo3+tXMN
 github.com/graph-gophers/graphql-go v1.5.0/go.mod h1:YtmJZDLbF1YYNrlNAuiO5zAStUWc3XZT07iGsVqe1Os=
 github.com/huandu/go-assert v1.1.6 h1:oaAfYxq9KNDi9qswn/6aE0EydfxSa+tWZC1KabNitYs=
 github.com/huandu/go-assert v1.1.6/go.mod h1:JuIfbmYG9ykwvuxoJ3V8TB5QP+3+ajIA54Y44TmkMxs=
-github.com/huandu/go-sqlbuilder v1.28.0 h1:pd2EBXmSyuFRb2SGKy0wsBGGi6Z40xli6frqXQH/Uy8=
-github.com/huandu/go-sqlbuilder v1.28.0/go.mod h1:mS0GAtrtW+XL6nM2/gXHRJax2RwSW1TraavWDFAc1JA=
+github.com/huandu/go-sqlbuilder v1.28.1 h1:unk88CvOCvnUrOebhB0Q8KXtTkKENeYnT/L2prchnik=
+github.com/huandu/go-sqlbuilder v1.28.1/go.mod h1:mS0GAtrtW+XL6nM2/gXHRJax2RwSW1TraavWDFAc1JA=
 github.com/huandu/xstrings v1.4.0/go.mod h1:y5/lhBue+AyNmUVz9RLU9xbLR0o4KIIExikq4ovT0aE=
 github.com/huandu/xstrings v1.5.0 h1:2ag3IFq9ZDANvthTwTiqSSZLjDc+BedvHPAp5tJy2TI=
 github.com/huandu/xstrings v1.5.0/go.mod h1:y5/lhBue+AyNmUVz9RLU9xbLR0o4KIIExikq4ovT0aE=
@@ -35,8 +35,8 @@ github.com/stretchr/testify v1.3.0/go.mod h1:M5WIy9Dh21IEIfnGCwXGc5bZfKNJtfHm1UV
 github.com/stretchr/testify v1.7.0/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
 github.com/stretchr/testify v1.7.1 h1:5TQK59W5E3v0r2duFAb7P95B6hEeOyEnHRa8MjYSMTY=
 github.com/stretchr/testify v1.7.1/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
-github.com/teejays/gokutil/scalars v0.0.0-20240730042647-5936f7f638cb h1:Dr/MM0hqzi+EYWP/4xWspxJ8gjdQNINrlTd8JPoEp8Y=
-github.com/teejays/gokutil/scalars v0.0.0-20240730042647-5936f7f638cb/go.mod h1:2q1zoj4c8nV09b38pNiqPQaC0EIWaz/qaap4GHqS5BE=
+github.com/teejays/gokutil/scalars v0.0.0-20240805212105-b649d72941b2 h1:oKZ/sy67Ecd3HBL47LK8I+UgeQRZH1eLNk2hTh9HI8Y=
+github.com/teejays/gokutil/scalars v0.0.0-20240805212105-b649d72941b2/go.mod h1:2q1zoj4c8nV09b38pNiqPQaC0EIWaz/qaap4GHqS5BE=
 go.opentelemetry.io/otel v1.6.3/go.mod h1:7BgNga5fNlF/iZjG06hM3yofffp0ofKCDwSXx1GC4dI=
 go.opentelemetry.io/otel/trace v1.6.3/go.mod h1:GNJQusJlUgZl9/TQBPKU/Y/ty+0iVB5fjhKeJGZPGFs=
 golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2/go.mod h1:djNgcEr1/C05ACkg1iLfiJU5Ep61QUkGW8qpdssI0+w=

@@ -1,6 +1,8 @@
 github.com/joho/godotenv v1.5.1 h1:7eLL/+HRGLY0ldzfGMeQkb7vMd0as4CfYvUVzLqw0N0=
 github.com/joho/godotenv v1.5.1/go.mod h1:f4LDr5Voq0i2e/R5DDNOoa2zzDfwtkZa6DnEwAbqwq4=
-github.com/teejays/gokutil/log v0.0.0-20240801192633-7b1958693c9b h1:uTeIGQmbXoZkTBWcR67Y6mjDPT+6cFlWZM4vdLxWtVQ=
-github.com/teejays/gokutil/log v0.0.0-20240801192633-7b1958693c9b/go.mod h1:07909genuwVhp/qTXx+0ToKoKIFqQVtKkhOrJT1n6IY=
-github.com/teejays/gokutil/panics v0.0.0-20240801192633-7b1958693c9b h1:WHMARe93L9qB/Mwjs3PLHmuub7lfFW3w9UMnTmkPngY=
-github.com/teejays/gokutil/panics v0.0.0-20240801192633-7b1958693c9b/go.mod h1:fjJOwE3RWULsehGFVv9B9/jyc9e/qa5l4QpdWf2rlpE=
+github.com/teejays/gokutil/clog v0.0.0-20240804222343-f02386c3a6a3 h1:Y2ad+4565dlMH8KIh8zkbRKeFI2a2FitY/cd2xQYKI8=
+github.com/teejays/gokutil/clog v0.0.0-20240804222343-f02386c3a6a3/go.mod h1:btwNHLQw53faufeKPYvT4oj0ceKQkQ2pP43uiKT4exw=
+github.com/teejays/gokutil/log v0.0.0-20240805201441-7ba176910d62 h1:+CFT7WIhSNoWp9pAYqQuN8TydzUaj55gP7+BxCK2W4s=
+github.com/teejays/gokutil/log v0.0.0-20240805201441-7ba176910d62/go.mod h1:Qgjic4p63XHZ+4gPqwklBl0KC8FnG5o1YWrQQILEqSI=
+github.com/teejays/gokutil/panics v0.0.0-20240805212105-b649d72941b2 h1:4VWjzxxdZpKN6LXyWJUUDxLur+Q/DeSz4tfr5Ncgnrc=
+github.com/teejays/gokutil/panics v0.0.0-20240805212105-b649d72941b2/go.mod h1:fjJOwE3RWULsehGFVv9B9/jyc9e/qa5l4QpdWf2rlpE=
