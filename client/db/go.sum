@@ -31,8 +31,14 @@ github.com/stretchr/testify v1.7.1 h1:5TQK59W5E3v0r2duFAb7P95B6hEeOyEnHRa8MjYSMT
 github.com/stretchr/testify v1.7.1/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
 github.com/teejays/clog v0.0.0-20240330223723-2114569c05a4 h1:feBHL+8pD/J6MD5emp4iGTREITUXwQhOWiUq/8sHGx4=
 github.com/teejays/clog v0.0.0-20240330223723-2114569c05a4/go.mod h1:zZj4eob6D1DIUL6h+X+kRT6nbWM+Hiy1iupSz7Eu0HQ=
+github.com/teejays/gokutil/clog v0.0.0-20240805201441-7ba176910d62 h1:ri867dJgCcoBS61oaRjH3JYkO6ESTlhasHWiNMiCexI=
+github.com/teejays/gokutil/clog v0.0.0-20240805201441-7ba176910d62/go.mod h1:btwNHLQw53faufeKPYvT4oj0ceKQkQ2pP43uiKT4exw=
+github.com/teejays/gokutil/env v0.0.0-20240801191936-9caf6e23633a h1:yDNR1jnhXHIBN+j34HbfIEvgfQHqYTAfA5vCpm9y7jE=
+github.com/teejays/gokutil/env v0.0.0-20240801191936-9caf6e23633a/go.mod h1:lAxDiO8gMDGUlh6rSEUOPOt6Q2Y26EbmMpFsEO+2JWk=
 github.com/teejays/gokutil/errutil v0.0.0-20240730034000-a4d834987b3d h1:Tp/CSOoM/JfHiH6PDdNlzIkNUcR4Gkqi14ky+FupFKQ=
 github.com/teejays/gokutil/errutil v0.0.0-20240730034000-a4d834987b3d/go.mod h1:4Q26VPTr7gda0IFcHlXU17KkXaHY7FW4F0YQuFLYI+8=
+github.com/teejays/gokutil/log v0.0.0-20240805201441-7ba176910d62 h1:+CFT7WIhSNoWp9pAYqQuN8TydzUaj55gP7+BxCK2W4s=
+github.com/teejays/gokutil/log v0.0.0-20240805201441-7ba176910d62/go.mod h1:Qgjic4p63XHZ+4gPqwklBl0KC8FnG5o1YWrQQILEqSI=
 github.com/teejays/gokutil/panics v0.0.0-20240730034000-a4d834987b3d h1:zBHaLb6HvWs2WrS0MS0PgeWQdTQWmQP61ORcfQCwaj0=
 github.com/teejays/gokutil/panics v0.0.0-20240730034000-a4d834987b3d/go.mod h1:fjJOwE3RWULsehGFVv9B9/jyc9e/qa5l4QpdWf2rlpE=
 github.com/teejays/gokutil/scalars v0.0.0-20240730034000-a4d834987b3d h1:/XPtk1fwq/AfTKRqECRHuzi2Gh5RErwgh4lE9OVPNOk=

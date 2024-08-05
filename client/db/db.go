@@ -10,7 +10,6 @@ import (
 
 	"github.com/doug-martin/goqu/v9"
 	_ "github.com/lib/pq"
-	"github.com/teejays/gokutil/clog"
 	"github.com/teejays/gokutil/errutil"
 	"github.com/teejays/gokutil/log"
 	"github.com/teejays/gokutil/panics"
@@ -39,7 +38,7 @@ func InitDatabase(ctx context.Context, o Options) error {
 		return err
 	}
 
-	clog.Debugf("Initializing SQL Connection: %s", connStr)
+	log.Info(ctx, "Initializing SQL connection", "connectionString", connStr)
 
 	if databases == nil {
 		databases = make(map[string]*sql.DB)
@@ -140,12 +139,12 @@ func (c *Connection) Begin(ctx context.Context) error {
 
 	// If  there is already a transaction, don't do anything
 	if c.IsInTransaction(ctx) {
-		clog.Warnf("Attempting to begin a nested SQL transaction")
+		log.Warn(ctx, "Attempting to begin a nested SQL transaction")
 		return nil
 	}
 
 	// Otherwise start a transaction
-	clog.Infof("Begin a transaction")
+	log.Info(ctx, "Begin transaction")
 	txn, err := c.DB.BeginTx(ctx, &sql.TxOptions{})
 	if err != nil {
 		return err
@@ -171,10 +170,10 @@ func (c *Connection) Commit(ctx context.Context) error {
 
 	// If we have another deeper transaction left, don't do anything. Only commit on final commit.
 	if c.NumTxs > 0 {
-		clog.Warnf("Attempting to commit a nested SQL transaction")
+		log.Warn(ctx, "Attempting to commit a nested SQL transaction")
 		return nil
 	}
-	clog.Infof("Commiting a transaction")
+	log.Info(ctx, "Commiting transaction")
 	err := c.Tx.Commit()
 	if err != nil {
 		return err
@@ -197,9 +196,9 @@ func (c *Connection) Rollback(ctx context.Context) error {
 
 	// We cannot rollback nested transactions, so can lets rollback everything
 	if c.NumTxs > 1 {
-		clog.Warnf("Attempting to rollback a nested SQL transaction")
+		log.Warn(ctx, "Attempting to rollback a nested SQL transaction")
 	}
-	clog.Infof("Rollback the transaction")
+	log.Info(ctx, "Rollback transaction")
 	c.NumTxs = 0
 
 	err := c.Tx.Rollback()
@@ -229,7 +228,7 @@ func (c Connection) GetSQLConnection() SQLConnection {
 // ExecuteQuery executes an insert or update query, returning the number of rows affected.
 func (c Connection) ExecuteQuery(ctx context.Context, query string, args ...interface{}) (int64, error) {
 
-	clog.Debugf("Executing Query: \n"+query, args...)
+	log.Debug(ctx, "Executing SQL query", "query", query, "args", args)
 
 	// Execute the Query
 	conn := c.GetSQLConnection()
@@ -248,7 +247,7 @@ func (c Connection) ExecuteQuery(ctx context.Context, query string, args ...inte
 		return -1, fmt.Errorf("executed query returned %d rows affected", rowsAffected)
 	}
 
-	clog.Debugf("Query successfully executed: %d rows affected ", rowsAffected)
+	log.Debug(ctx, "Query successfully executed", "rowsAffected", rowsAffected)
 
 	return rowsAffected, nil
 }
@@ -256,8 +255,7 @@ func (c Connection) ExecuteQuery(ctx context.Context, query string, args ...inte
 // QueryRows executes a query that returns rows e.g. Select Query
 func (c Connection) QueryRows(ctx context.Context, query string, args ...interface{}) (*sql.Rows, error) {
 
-	clog.Debug("Fetching Query:\n" + query)
-	clog.Debugf("Fetching Query Args:\n %+v", args)
+	log.Debug(ctx, "SQL Query for fetch", "query", query, "args", args)
 
 	// Get the connection that we'll use to execute the query. This `conn` can be a direct DB connection or a transaction
 	conn := c.GetSQLConnection()
@@ -267,7 +265,7 @@ func (c Connection) QueryRows(ctx context.Context, query string, args ...interfa
 		return nil, err
 	}
 
-	clog.Debugf("Query successfully run!")
+	log.Debug(ctx, "Query ran successfully.")
 
 	return rows, nil
 }
@@ -279,7 +277,7 @@ type InsertBuilderRequest struct {
 }
 
 func (c Connection) ConstructInsertQuery(ctx context.Context, req InsertBuilderRequest) (string, []interface{}, error) {
-	clog.Debugf("Constructing Insert Query:\n%s", PrettyPrint(req))
+	log.Debug(ctx, "Constructing query for insert", "request", PrettyPrint(req))
 
 	// Validate
 	if len(req.ColumnNames) < 1 {
@@ -332,7 +330,7 @@ type UpdateBuilderRequest struct {
 // ConstructSelectQuery creates a string SQL query with args
 func (c Connection) ConstructUpdateQuery(ctx context.Context, req UpdateBuilderRequest) (string, []interface{}, error) {
 
-	clog.Debugf("Constructing Update Query:\n%s", PrettyPrint(req))
+	log.Debug(ctx, "Constructing query for update", "request", PrettyPrint(req))
 
 	// Validate
 	if len(req.Columns) < 1 {
@@ -421,12 +419,6 @@ type UniqueIDsQueryBuilderParams struct {
 }
 
 // Insert Helpers
-
-// Scanner is an interface used to represent sql.Row and sql.Rows, which have the ability to call the Scan function.
-// It helps us DRY code when scanning row/rows into vars.
-// type Scanner interface {
-// 	Scan(...interface{}) error
-// }
 
 func UUIDsToInterfaces(ids []scalars.ID) []interface{} {
 	var r []interface{}
@@ -522,7 +514,7 @@ func InitAndTestConnectionForDb(ctx context.Context, dbName string) error {
 			return fmt.Errorf("Env variable [DATABASE_PORT] value [%s] is not a number: %w", portStr, err)
 		}
 	}
-	clog.Warnf("Initializing database connection to database %s", dbName)
+	log.Warn(ctx, "Initializing database connection", "database", dbName)
 	err = InitDatabase(ctx, Options{
 		Host:     os.Getenv("DATABASE_HOST"),
 		Port:     port,

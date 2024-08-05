@@ -5,7 +5,7 @@ import (
 	"errors"
 
 	_ "github.com/lib/pq"
-	"github.com/teejays/gokutil/clog"
+	"github.com/teejays/gokutil/log"
 )
 
 func GetTestDatabaseNameForService(serviceName string) string {
@@ -23,7 +23,7 @@ func NewMockConnection(ctx context.Context, serviceName string) (Connection, err
 		SSLMode:  "disable",
 	})
 	if err != nil && !errors.Is(err, ErrDatabaseAlreadyInitialized) {
-		clog.Warnf("Database %s already initialized", dbName)
+		log.Warn(ctx, "Database connection already initialized", "database", dbName)
 		return conn, err
 	}
 

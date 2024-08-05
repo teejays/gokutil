@@ -2,8 +2,6 @@ package errutil
 
 import (
 	"fmt"
-
-	"github.com/teejays/gokutil/clog"
 )
 
 type MultiErr struct {
@@ -45,10 +43,9 @@ func (e MultiErr) ErrorIndent(ind int) string {
 		for j := 0; j < ind; j++ {
 			space += "\t"
 		}
-		// clog.Debugf("Type of Error: %v", reflect.TypeOf(err))
+
 		errMessage := ""
 		if inErr, ok := err.(MultiErr); ok {
-			clog.Debugf("Err is MultiErr")
 			errMessage = inErr.ErrorIndent(ind + 1)
 		} else {
 			errMessage = err.Error()
