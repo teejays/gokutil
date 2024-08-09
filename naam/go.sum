@@ -6,8 +6,8 @@ github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZb
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/stretchr/testify v1.9.0 h1:HtqpIVDClZ4nwg75+f6Lvsy/wHu+3BoSGCbBAcpTsTg=
 github.com/stretchr/testify v1.9.0/go.mod h1:r2ic/lqez/lEtzL7wO/rwa5dbSLXVDPFyf8C91i36aY=
-github.com/teejays/gokutil/panics v0.0.0-20240807004339-2e36dbb93e96 h1:sGnAxwvW8+1UuHmRWgTOrva3f7gFJSYhf8BtvvmroAQ=
-github.com/teejays/gokutil/panics v0.0.0-20240807004339-2e36dbb93e96/go.mod h1:ozbKMbDGOPikGWQ5byY801Jv2s1P1gaNxAdtJIQQGRo=
+github.com/teejays/gokutil/panics v0.0.0-20240809214320-31c9daaaa6fe h1:8cGLeYIHxV+xiOV+c2LGgOybflsQCCeTKEOzVSusLt0=
+github.com/teejays/gokutil/panics v0.0.0-20240809214320-31c9daaaa6fe/go.mod h1:ozbKMbDGOPikGWQ5byY801Jv2s1P1gaNxAdtJIQQGRo=
 github.com/teejays/gokutil/strcase v0.0.0-20240807004339-2e36dbb93e96 h1:EYw/0Oq8mMpPDHDHssu/NI2E2RE5zYoS3kvBpvRhRP4=
 github.com/teejays/gokutil/strcase v0.0.0-20240807004339-2e36dbb93e96/go.mod h1:KhYJD8IeGtvdN0iBNrJVxT2RlXBxt3k1gEKvOoMjDFE=
 golang.org/x/text v0.17.0 h1:XtiM5bkSOt+ewxlOE/aE/AKEHibwj/6gvWMl9Rsh0Qc=

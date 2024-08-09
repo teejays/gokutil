@@ -3,13 +3,13 @@ module github.com/teejays/gokutil/dalutil
 go 1.22.5
 
 require (
-	github.com/teejays/gokutil/client/db v0.0.0-20240807004339-2e36dbb93e96
-	github.com/teejays/gokutil/errutil v0.0.0-20240807004339-2e36dbb93e96
-	github.com/teejays/gokutil/log v0.0.0-20240807004339-2e36dbb93e96
-	github.com/teejays/gokutil/naam v0.0.0-20240807004339-2e36dbb93e96
-	github.com/teejays/gokutil/panics v0.0.0-20240807004339-2e36dbb93e96
-	github.com/teejays/gokutil/scalars v0.0.0-20240807004339-2e36dbb93e96
-	github.com/teejays/gokutil/types v0.0.0-20240807004339-2e36dbb93e96
+	github.com/teejays/gokutil/client/db v0.0.0-20240809214320-31c9daaaa6fe
+	github.com/teejays/gokutil/errutil v0.0.0-20240809214320-31c9daaaa6fe
+	github.com/teejays/gokutil/log v0.0.0-20240809214320-31c9daaaa6fe
+	github.com/teejays/gokutil/naam v0.0.0-20240809214320-31c9daaaa6fe
+	github.com/teejays/gokutil/panics v0.0.0-20240809214320-31c9daaaa6fe
+	github.com/teejays/gokutil/scalars v0.0.0-20240809214320-31c9daaaa6fe
+	github.com/teejays/gokutil/types v0.0.0-20240809214320-31c9daaaa6fe
 	github.com/teejays/gokutil/validate v0.0.0-20240807004339-2e36dbb93e96
 )
 
@@ -26,8 +26,8 @@ require (
 	github.com/lib/pq v1.10.9 // indirect
 	github.com/stretchr/objx v0.5.2 // indirect
 	github.com/teejays/gokutil/clog v0.0.0-20240807004339-2e36dbb93e96 // indirect
-	github.com/teejays/gokutil/ctxutil v0.0.0-20240807004339-2e36dbb93e96 // indirect
-	github.com/teejays/gokutil/env v0.0.0-20240807004339-2e36dbb93e96 // indirect
+	github.com/teejays/gokutil/ctxutil v0.0.0-20240809214320-31c9daaaa6fe // indirect
+	github.com/teejays/gokutil/env v0.0.0-20240809214320-31c9daaaa6fe // indirect
 	github.com/teejays/gokutil/sclog v0.0.0-20240807004339-2e36dbb93e96 // indirect
 	github.com/teejays/gokutil/strcase v0.0.0-20240807004339-2e36dbb93e96 // indirect
 	golang.org/x/crypto v0.26.0 // indirect

@@ -6,8 +6,8 @@ require (
 	github.com/stretchr/testify v1.9.0
 	github.com/teejays/gokutil/client/db v0.0.0-20240807004339-2e36dbb93e96
 	github.com/teejays/gokutil/dalutil v0.0.0-20240807004339-2e36dbb93e96
-	github.com/teejays/gokutil/naam v0.0.0-20240807004339-2e36dbb93e96
-	github.com/teejays/gokutil/scalars v0.0.0-20240807004339-2e36dbb93e96
+	github.com/teejays/gokutil/naam v0.0.0-20240809214320-31c9daaaa6fe
+	github.com/teejays/gokutil/scalars v0.0.0-20240809214320-31c9daaaa6fe
 )
 
 require (
@@ -28,7 +28,7 @@ require (
 	github.com/teejays/gokutil/env v0.0.0-20240805234313-b8685f35edeb // indirect
 	github.com/teejays/gokutil/errutil v0.0.0-20240805234313-b8685f35edeb // indirect
 	github.com/teejays/gokutil/log v0.0.0-20240805234313-b8685f35edeb // indirect
-	github.com/teejays/gokutil/panics v0.0.0-20240807004339-2e36dbb93e96 // indirect
+	github.com/teejays/gokutil/panics v0.0.0-20240809214320-31c9daaaa6fe // indirect
 	github.com/teejays/gokutil/sclog v0.0.0-20240805234313-b8685f35edeb // indirect
 	github.com/teejays/gokutil/strcase v0.0.0-20240807004339-2e36dbb93e96 // indirect
 	github.com/teejays/gokutil/validate v0.0.0-20240805234313-b8685f35edeb // indirect
