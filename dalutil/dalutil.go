@@ -19,11 +19,13 @@ import (
 
 var llog = log.GetLogger().WithHeading("DALUtil")
 
+// EntityDALMeta is the interface that provides the basic methods that a DAL Meta for an entity to implement.
 type EntityDALMetaBase[T types.BasicType, F types.Field] struct {
 	DbTableName      naam.Name
 	BasicTypeDALMeta BasicTypeDALMeta[T, F]
 }
 
+// BasicTypeDALMeta is the interface that provides the basic methods that a DAL Meta for a type to implement.
 type BasicTypeDALMeta[T types.BasicType, F types.Field] interface {
 	types.BasicTypeMeta[T, F]
 
@@ -44,6 +46,7 @@ type BasicTypeDALMeta[T types.BasicType, F types.Field] interface {
 	UpdateSubTableFields(context.Context, db.Connection, UpdateTypeRequest[T, F], []F, T) (T, error) // TODO
 }
 
+// BasicTypeDALMetaBase is an implementation of above interface, that can be inherited by DAL Metas for types.
 type BasicTypeDALMetaBase[T types.BasicType, F types.Field] struct {
 	DatabaseColumnFields          []F // fields that are direct SQL Columns
 	DatabaseSubTableFields        []F
@@ -59,12 +62,20 @@ func (m BasicTypeDALMetaBase[T, F]) GetDatabaseColumns() []string {
 	return FieldsToStrings(m.DatabaseColumnFields)
 }
 
-func FieldsToStrings[T types.Field](fields []T) []string {
-	var colNames []string
-	for _, f := range fields {
-		colNames = append(colNames, f.Name().FormatSQL())
-	}
-	return colNames
+type GetEntityRequest[T types.BasicType] struct {
+	GetTypeRequest[T]
+}
+
+type GetTypeRequest[T types.BasicType] struct {
+	ID scalars.ID
+}
+
+type ListEntityRequest[T types.BasicType] struct {
+	ListTypeRequest[T]
+}
+
+type ListEntityResponse[T types.BasicType] struct {
+	ListTypeRequest[T]
 }
 
 type ListTypeRequest[T types.FilterType] struct {
@@ -77,6 +88,25 @@ type ListTypeResponse[T types.BasicType] struct {
 	// MAYBE TODO: PageInfo interface{}
 }
 
+// Todo: Make QueryByText part of the List methods, by including a Query field in the filters
+type QueryByTextEntityRequest[T types.BasicType] struct {
+	QueryByTextTypeRequest[T]
+}
+
+type QueryByTextTypeRequest[T types.BasicType] struct {
+	QueryText string `json:"query_text"`
+}
+
+type UpdateEntityRequest[T types.BasicType, F types.Field] struct {
+	Object        T
+	Fields        []F
+	ExcludeFields []F
+}
+
+type UpdateEntityResponse[T types.BasicType] struct {
+	Object T
+}
+
 type UpdateTypeRequest[T types.BasicType, F types.Field] struct {
 	TableName     string
 	Object        T
@@ -86,6 +116,14 @@ type UpdateTypeRequest[T types.BasicType, F types.Field] struct {
 
 type UpdateTypeResponse[T types.BasicType] struct {
 	Object T
+}
+
+func FieldsToStrings[T types.Field](fields []T) []string {
+	var colNames []string
+	for _, f := range fields {
+		colNames = append(colNames, f.Name().FormatSQL())
+	}
+	return colNames
 }
 
 func BatchAddType[T types.BasicType, F types.Field](ctx context.Context, conn db.Connection, params db.InsertTypeParams, meta BasicTypeDALMeta[T, F], elems ...T) ([]T, error) {

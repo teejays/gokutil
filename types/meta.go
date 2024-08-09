@@ -29,6 +29,12 @@ type BasicType interface {
 	SetUpdatedAt(scalars.Time)
 }
 
+type EntityType interface {
+	GetID() scalars.ID
+	GetUpdatedAt() scalars.Time
+	SetUpdatedAt(scalars.Time)
+}
+
 type FilterType interface{}
 
 type EntityMetaBase[T BasicType, F Field] struct {
