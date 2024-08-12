@@ -1,6 +1,8 @@
 package httputil
 
 import (
+	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -45,4 +47,40 @@ func UnmarshalJSONFromRequest(r *http.Request, v interface{}) error {
 	}
 
 	return nil
+}
+
+func MakeRequest[ReqT any, RespT any](ctx context.Context, c http.Client, method string, req ReqT) (RespT, error) {
+
+	var resp RespT
+
+	// Create the request
+	reqBody := new(bytes.Buffer)
+	err := json.NewEncoder(reqBody).Encode(req)
+	if err != nil {
+		return resp, fmt.Errorf("Converting request to JSON: %w", err)
+	}
+
+	httpReq, err := http.NewRequestWithContext(ctx, http.MethodGet, "user/user", reqBody)
+	if err != nil {
+		return resp, fmt.Errorf("Creating HTTP request: %w", err)
+	}
+
+	// Send the request
+	httpResp, err := c.Do(httpReq)
+	if err != nil {
+		return resp, fmt.Errorf("Sending HTTP request: %w", err)
+	}
+	defer httpResp.Body.Close()
+
+	// Parse the response
+	respBody, err := io.ReadAll(httpResp.Body)
+	if err != nil {
+		return resp, fmt.Errorf("Reading HTTP response: %w", err)
+	}
+	err = json.Unmarshal(respBody, &resp)
+	if err != nil {
+		return resp, fmt.Errorf("Parsing HTTP response: %w", err)
+	}
+
+	return resp, nil
 }

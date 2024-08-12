@@ -339,6 +339,13 @@ func (s Name) FormatGolangType() string {
 	return strcase.ToSnakedCamel(s.words)
 }
 
+// FormatGolangTypeUnexported
+func (s Name) FormatGolangTypeUnexported() string {
+	ret := strcase.ToSnakedCamel(s.words)
+	// Lowercase the first letter
+	return strings.ToLower(ret[:1]) + ret[1:]
+}
+
 // FormatGolangFieldName prints a string representation of Name `s` which can be used an exported Field name in Golang.
 func (s Name) FormatGolangFieldName() string {
 	return strcase.ToSplitCamel(s.words, ".")

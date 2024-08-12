@@ -62,6 +62,18 @@ func (m BasicTypeDALMetaBase[T, F]) GetDatabaseColumns() []string {
 	return FieldsToStrings(m.DatabaseColumnFields)
 }
 
+// type AddEntityRequest[T types.BasicType] struct {
+// 	Entity T
+// }
+
+// type AddTypeRequest[T types.BasicType] struct {
+// 	Object T
+// }
+
+// type AddTypeResponse[T types.BasicType] struct {
+// 	Object T
+// }
+
 type GetEntityRequest[T types.BasicType] struct {
 	GetTypeRequest[T]
 }
@@ -70,12 +82,13 @@ type GetTypeRequest[T types.BasicType] struct {
 	ID scalars.ID
 }
 
-type ListEntityRequest[T types.BasicType] struct {
-	ListTypeRequest[T]
+type ListEntityRequest[T types.FilterType] struct {
+	Filter T
 }
 
 type ListEntityResponse[T types.BasicType] struct {
-	ListTypeRequest[T]
+	Items []T
+	Count int
 }
 
 type ListTypeRequest[T types.FilterType] struct {
