@@ -4,7 +4,7 @@ go 1.22.5
 
 require (
 	github.com/stretchr/testify v1.9.0
-	github.com/teejays/gokutil/log v0.0.0-20240809214320-31c9daaaa6fe
+	github.com/teejays/gokutil/log v0.0.0-20240812200034-27c1110c8a4f
 )
 
 require (
@@ -12,11 +12,11 @@ require (
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/graph-gophers/graphql-go v1.5.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	github.com/teejays/gokutil/clog v0.0.0-20240807004339-2e36dbb93e96 // indirect
-	github.com/teejays/gokutil/ctxutil v0.0.0-20240809214320-31c9daaaa6fe // indirect
-	github.com/teejays/gokutil/env v0.0.0-20240809214320-31c9daaaa6fe // indirect
-	github.com/teejays/gokutil/panics v0.0.0-20240809214320-31c9daaaa6fe // indirect
-	github.com/teejays/gokutil/scalars v0.0.0-20240809214320-31c9daaaa6fe // indirect
-	github.com/teejays/gokutil/sclog v0.0.0-20240807004339-2e36dbb93e96 // indirect
+	github.com/teejays/gokutil/clog v0.0.0-20240812200034-27c1110c8a4f // indirect
+	github.com/teejays/gokutil/ctxutil v0.0.0-20240812200034-27c1110c8a4f // indirect
+	github.com/teejays/gokutil/env v0.0.0-20240812200034-27c1110c8a4f // indirect
+	github.com/teejays/gokutil/panics v0.0.0-20240812200034-27c1110c8a4f // indirect
+	github.com/teejays/gokutil/scalars v0.0.0-20240812200034-27c1110c8a4f // indirect
+	github.com/teejays/gokutil/sclog v0.0.0-20240812200034-27c1110c8a4f // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
