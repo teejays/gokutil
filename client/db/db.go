@@ -33,9 +33,19 @@ type Options struct {
 }
 
 func InitDatabase(ctx context.Context, o Options) error {
+	db, err := GetDB(ctx, o)
+	if err != nil {
+		return fmt.Errorf("failed to initialize database: %w", err)
+	}
+
+	databases[o.Database] = db
+	return nil
+}
+
+func GetDB(ctx context.Context, o Options) (*sql.DB, error) {
 	connStr, err := getConnectionString(o)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	log.Info(ctx, "Initializing SQL connection", "connectionString", connStr)
@@ -45,21 +55,20 @@ func InitDatabase(ctx context.Context, o Options) error {
 	}
 
 	if databases[o.Database] != nil {
-		return fmt.Errorf("database '%s': %w", o.Database, ErrDatabaseAlreadyInitialized)
+		return nil, fmt.Errorf("database '%s': %w", o.Database, ErrDatabaseAlreadyInitialized)
 	}
 
 	db, err := sql.Open(SQL_DIALECT, connStr)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	err = db.Ping()
 	if err != nil {
-		return fmt.Errorf("DB connection ping failed: %w", err)
+		return nil, fmt.Errorf("DB connection ping failed: %w", err)
 	}
 
-	databases[o.Database] = db
-	return nil
+	return db, nil
 }
 
 func getConnectionString(o Options) (string, error) {
