@@ -5,7 +5,7 @@ go 1.22.5
 require (
 	github.com/doug-martin/goqu/v9 v9.19.0
 	github.com/huandu/go-sqlbuilder v1.28.1
-	github.com/teejays/gokutil/scalars v0.0.0-20240812233319-22200974f4ba
+	github.com/teejays/gokutil/scalars v0.0.0-20240814060546-d1e09702c69f
 )
 
 require (
