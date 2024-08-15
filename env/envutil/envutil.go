@@ -2,11 +2,14 @@ package envutil
 
 import (
 	"context"
+	"os"
 	"path/filepath"
+	"strconv"
 
 	"github.com/joho/godotenv"
 	"github.com/teejays/gokutil/env"
 	"github.com/teejays/gokutil/log"
+	"github.com/teejays/gokutil/panics"
 )
 
 func LoadEnvFiles(ctx context.Context, wd string) error {
@@ -35,4 +38,26 @@ func LoadEnvFiles(ctx context.Context, wd string) error {
 	}
 
 	return nil
+}
+
+func GetEnvVarStr(key string) string {
+	val := os.Getenv(key)
+	return val
+}
+
+// GetEnvVarInt returns 0 if the variable is not set
+func GetEnvVarInt(key string) int {
+	val := os.Getenv(key)
+	if val == "" {
+		return 0
+	}
+	valInt, err := strconv.Atoi(val)
+	panics.IfError(err, "Expected env variable [%s] to be a number", key)
+	return valInt
+}
+
+func MustGetEnvVarStr(key string) string {
+	val := os.Getenv(key)
+	panics.If(val == "", "Env var not found [%s]", key)
+	return val
 }

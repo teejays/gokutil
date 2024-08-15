@@ -2,11 +2,15 @@ package panics
 
 import (
 	"fmt"
+	"log"
 	"reflect"
 )
 
 func P(msg string, args ...interface{}) {
-	panic(fmt.Sprintf(msg, args...))
+	s := fmt.Sprintf(msg, args...)
+
+	log.Print("Panic: " + s)
+	panic(s)
 }
 
 func If(b bool, msg string, args ...interface{}) {

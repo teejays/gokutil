@@ -42,13 +42,36 @@ func InitDatabase(ctx context.Context, o Options) error {
 	return nil
 }
 
+func GetConnection(ctx context.Context, o Options) (Connection, error) {
+	// If an existing connection is already present, return it
+	conn, ok := databases[o.Database]
+	if ok {
+		return Connection{
+			DbName: o.Database,
+			DB:     conn,
+		}, nil
+	}
+
+	// Otherwise initialize a new connection (and save it)
+	db, err := GetDB(ctx, o)
+	if err != nil {
+		return Connection{}, fmt.Errorf("failed to initialize database: %w", err)
+	}
+
+	databases[o.Database] = db
+	return Connection{
+		DbName: o.Database,
+		DB:     db,
+	}, nil
+}
+
 func GetDB(ctx context.Context, o Options) (*sql.DB, error) {
 	connStr, err := getConnectionString(o)
 	if err != nil {
 		return nil, err
 	}
 
-	log.Info(ctx, "Initializing SQL connection", "connectionString", connStr)
+	log.Debug(ctx, "Initializing SQL connection", "connectionString", connStr)
 
 	if databases == nil {
 		databases = make(map[string]*sql.DB)
@@ -72,6 +95,21 @@ func GetDB(ctx context.Context, o Options) (*sql.DB, error) {
 }
 
 func getConnectionString(o Options) (string, error) {
+	if o.Database == "" {
+		log.DebugWithoutCtx("GetConnectionString: Database name not provided. Defaulting to 'postgres'")
+		o.Database = "postgres"
+	}
+	if o.Host == "" {
+		return "", fmt.Errorf("GetConnectionString: Host is not provider or is invalid")
+	}
+	if o.Port < 1 {
+		return "", fmt.Errorf("GetConnectionString: Port is not provider or is invalid")
+	}
+	if o.SSLMode == "" {
+		log.DebugWithoutCtx("GetConnectionString: SSLMode not provided. Defaulting to 'disable'")
+		o.SSLMode = "disable"
+	}
+
 	str := fmt.Sprintf("host=%s port=%d dbname=%s user=%s sslmode=%s timezone=%s",
 		o.Host, o.Port, o.Database, o.User, o.SSLMode, "UTC")
 	if o.Password != "" {
@@ -523,7 +561,7 @@ func InitAndTestConnectionForDb(ctx context.Context, dbName string) error {
 			return fmt.Errorf("Env variable [DATABASE_PORT] value [%s] is not a number: %w", portStr, err)
 		}
 	}
-	log.Warn(ctx, "Initializing database connection", "database", dbName)
+	log.Debug(ctx, "Initializing database connection", "database", dbName)
 	err = InitDatabase(ctx, Options{
 		Host:     os.Getenv("DATABASE_HOST"),
 		Port:     port,
