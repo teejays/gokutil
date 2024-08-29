@@ -37,13 +37,13 @@ func UnmarshalJSONFromRequest(r *http.Request, v interface{}) error {
 	// Unmarshal JSON into Go type
 	err = json.Unmarshal(body, &v)
 	if err != nil {
-		llog.Error(r.Context(), "Couldn't unmarshaling JSON", "error", err)
+		llog.Error(r.Context(), "Couldn't unmarshal JSON", "error", err)
 		return ErrInvalidJSON
 	}
 
 	err = validate.Struct(v)
 	if err != nil {
-		return err
+		return fmt.Errorf("Validation error: %w", err)
 	}
 
 	return nil

@@ -69,6 +69,25 @@ func (id ID) MarshalJSON() ([]byte, error) {
 	return strconv.AppendQuote(nil, id.String()), nil
 }
 
+// UnmarshalJSON makes ID compatible with the json.Unmarshaler interface.
+func (id *ID) UnmarshalJSON(data []byte) error {
+	s, err := strconv.Unquote(string(data))
+	if err != nil {
+		return err
+	}
+	if s == "" {
+		// id is nil
+		return nil
+	}
+
+	uid, err := ParseID(s)
+	if err != nil {
+		return err
+	}
+	*id = uid
+	return nil
+}
+
 type Time struct {
 	graphql.Time
 }

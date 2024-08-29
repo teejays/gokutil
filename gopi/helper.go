@@ -227,8 +227,7 @@ func GetGenericGetHandler[ReqT, RespT any](fn func(context.Context, ReqT) (RespT
 		// Get the req data from URL
 		reqParam, ok := r.URL.Query()["req"]
 		if !ok || len(reqParam) < 1 {
-			WriteError(w, http.StatusBadRequest, fmt.Errorf("URL param 'req' is required"))
-			return
+			log.Warn(ctx, "An expected URL param is missing", "param", "req")
 		}
 		if len(reqParam) > 1 {
 			WriteError(w, http.StatusBadRequest, fmt.Errorf("multiple URL params with name 'req' found"))
@@ -236,10 +235,12 @@ func GetGenericGetHandler[ReqT, RespT any](fn func(context.Context, ReqT) (RespT
 		}
 
 		var req ReqT
-		err := json.Unmarshal([]byte(reqParam[0]), &req)
-		if err != nil {
-			WriteError(w, http.StatusBadRequest, err)
-			return
+		if len(reqParam) == 1 {
+			err := json.Unmarshal([]byte(reqParam[0]), &req)
+			if err != nil {
+				WriteError(w, http.StatusBadRequest, err)
+				return
+			}
 		}
 
 		// Call the method

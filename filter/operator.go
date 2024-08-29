@@ -163,7 +163,7 @@ func (t OperatorInfo) GetSqlFormatString() string {
 // }
 
 var store = map[Operator]OperatorInfo{
-	EQUAL: OperatorInfo{
+	EQUAL: {
 		Name:    "EQUAL",
 		Sign:    "==",
 		SqlSign: "=",
@@ -175,7 +175,7 @@ var store = map[Operator]OperatorInfo{
 			return sb.Where(goqu.C(col).Eq(values[0]))
 		},
 	},
-	NOT_EQUAL: OperatorInfo{
+	NOT_EQUAL: {
 		Name: "NOT_EQUAL",
 		Sign: "!=",
 		InjectSqlBuilderWhereCond_Huandu: func(sb *sqlbuilder.SelectBuilder, col string, values ...interface{}) error {
@@ -186,7 +186,7 @@ var store = map[Operator]OperatorInfo{
 			return sb.Where(goqu.C(col).Neq(values[0]))
 		},
 	},
-	IN: OperatorInfo{
+	IN: {
 		Name:    "IN",
 		SqlSign: "IN",
 		InjectSqlBuilderWhereCond_Huandu: func(sb *sqlbuilder.SelectBuilder, col string, values ...interface{}) error {
@@ -197,7 +197,7 @@ var store = map[Operator]OperatorInfo{
 			return sb.Where(goqu.C(col).In(values))
 		},
 	},
-	GREATER_THAN: OperatorInfo{
+	GREATER_THAN: {
 		Name: "GREATER_THAN",
 		Sign: ">",
 		InjectSqlBuilderWhereCond_Huandu: func(sb *sqlbuilder.SelectBuilder, col string, values ...interface{}) error {
@@ -208,7 +208,7 @@ var store = map[Operator]OperatorInfo{
 			return sb.Where(goqu.C(col).Gt(values[0]))
 		},
 	},
-	GREATER_THAN_EQUAL: OperatorInfo{
+	GREATER_THAN_EQUAL: {
 		Name: "GREATER_THAN_EQUAL",
 		Sign: ">=",
 		InjectSqlBuilderWhereCond_Huandu: func(sb *sqlbuilder.SelectBuilder, col string, values ...interface{}) error {
@@ -219,7 +219,7 @@ var store = map[Operator]OperatorInfo{
 			return sb.Where(goqu.C(col).Gte(values[0]))
 		},
 	},
-	LESS_THAN: OperatorInfo{
+	LESS_THAN: {
 		Name: "LESS_THAN",
 		Sign: "<",
 		InjectSqlBuilderWhereCond_Huandu: func(sb *sqlbuilder.SelectBuilder, col string, values ...interface{}) error {
@@ -230,7 +230,7 @@ var store = map[Operator]OperatorInfo{
 			return sb.Where(goqu.C(col).Lt(values[0]))
 		},
 	},
-	LESS_THAN_EQUAL: OperatorInfo{
+	LESS_THAN_EQUAL: {
 		Name: "LESS_THAN_EQUAL",
 		Sign: "<=",
 		InjectSqlBuilderWhereCond_Huandu: func(sb *sqlbuilder.SelectBuilder, col string, values ...interface{}) error {
@@ -241,7 +241,7 @@ var store = map[Operator]OperatorInfo{
 			return sb.Where(goqu.C(col).Lte(values[0]))
 		},
 	},
-	LIKE: OperatorInfo{
+	LIKE: {
 		Name:    "LIKE",
 		Sign:    "",
 		SqlSign: "LIKE",
@@ -253,7 +253,7 @@ var store = map[Operator]OperatorInfo{
 			return sb.Where(goqu.C(col).Like(fmt.Sprintf("%%%s%%", values[0]))) // `%%` results in `%`
 		},
 	},
-	ILIKE: OperatorInfo{
+	ILIKE: {
 		Name:    "ILIKE",
 		Sign:    "",
 		SqlSign: "ILIKE",
@@ -265,7 +265,7 @@ var store = map[Operator]OperatorInfo{
 			return sb.Where(goqu.C(col).ILike(fmt.Sprintf("%%%s%%", values[0]))) // `%%` results in `%`
 		},
 	},
-	NOT_LIKE: OperatorInfo{
+	NOT_LIKE: {
 		Name:                "NOT_LIKE",
 		SqlSign:             "NOT LIKE",
 		AllowMultipleValues: true,
@@ -277,7 +277,7 @@ var store = map[Operator]OperatorInfo{
 			return sb.Where(goqu.C(col).NotLike(values[0]))
 		},
 	},
-	IS_NULL: OperatorInfo{
+	IS_NULL: {
 		Name:     "IS_NULL",
 		Sign:     "!=",
 		SqlSign:  "IS NULL",
@@ -290,7 +290,7 @@ var store = map[Operator]OperatorInfo{
 			return sb.Where(goqu.C(col).IsNull())
 		},
 	},
-	IS_NOT_NULL: OperatorInfo{
+	IS_NOT_NULL: {
 		Name:     "IS_NOT_NULL",
 		Sign:     "",
 		SqlSign:  "IS NOT NULL",
