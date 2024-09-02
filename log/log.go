@@ -43,13 +43,14 @@ type LoggerI interface {
 	Info(ctx context.Context, msg string, args ...interface{})
 	Warn(ctx context.Context, msg string, args ...interface{})
 	Error(ctx context.Context, msg string, args ...interface{})
+	None(ctx context.Context, msg string, args ...interface{})
 
 	DebugWithoutCtx(msg string, args ...interface{})
 	InfoWithoutCtx(msg string, args ...interface{})
 	WarnWithoutCtx(msg string, args ...interface{})
 	ErrorWithoutCtx(msg string, args ...interface{})
+	NoneWithoutCtx(msg string, args ...interface{})
 
-	// GetWriter() io.Writer
 	WithHeading(heading string) LoggerI
 }
 
@@ -70,6 +71,8 @@ func (l Logger) Warn(ctx context.Context, msg string, args ...interface{}) {
 func (l Logger) Error(ctx context.Context, msg string, args ...interface{}) {
 	l.logger.ErrorContext(ctx, msg, args...)
 }
+func (l Logger) None(ctx context.Context, msg string, args ...interface{}) {}
+
 func (l Logger) DebugWithoutCtx(msg string, args ...interface{}) {
 	l.logger.Debug(msg, args...)
 }
@@ -82,6 +85,8 @@ func (l Logger) WarnWithoutCtx(msg string, args ...interface{}) {
 func (l Logger) ErrorWithoutCtx(msg string, args ...interface{}) {
 	l.logger.Error(msg, args...)
 }
+func (l Logger) NoneWithoutCtx(msg string, args ...interface{}) {}
+
 func (l Logger) WithHeading(heading string) LoggerI {
 	panics.IfNil(l.sclogHandler, "Cannot set heading on a logger that does not have a sclog handler")
 
@@ -111,6 +116,10 @@ func Warn(ctx context.Context, msg string, args ...interface{}) {
 	defaultLogger.Warn(ctx, msg, args...)
 }
 
+func None(ctx context.Context, msg string, args ...interface{}) {
+	defaultLogger.None(ctx, msg, args...)
+}
+
 func Error(ctx context.Context, msg string, args ...interface{}) {
 	defaultLogger.Error(ctx, msg, args...)
 }
@@ -129,4 +138,8 @@ func WarnWithoutCtx(msg string, args ...interface{}) {
 
 func ErrorWithoutCtx(msg string, args ...interface{}) {
 	defaultLogger.ErrorWithoutCtx(msg, args...)
+}
+
+func NoneWithoutCtx(msg string, args ...interface{}) {
+	defaultLogger.NoneWithoutCtx(msg, args...)
 }

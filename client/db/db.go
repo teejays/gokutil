@@ -5,8 +5,6 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"os"
-	"strconv"
 
 	"github.com/doug-martin/goqu/v9"
 	_ "github.com/lib/pq"
@@ -23,10 +21,20 @@ var databases map[string]*sql.DB
 
 var ErrDatabaseAlreadyInitialized = fmt.Errorf("Database connection is already initialized")
 
-type Options struct {
+// ServiceInitConnectionRequest are the options required to initialize a connection for a service.
+// The database name is not required since it's the same as the service name. This is used for
+// the generated service code to initialize the database connection for a service.
+type ServiceInitConnectionRequest struct {
 	Host     string
 	Port     int
+	User     string
+	Password string
+}
+
+type Options struct {
 	Database string
+	Host     string
+	Port     int
 	User     string
 	Password string
 	SSLMode  string
@@ -537,42 +545,41 @@ func PrettyPrint(i interface{}) string {
 	return string(s)
 }
 
-// InitAndTestConnectionForDb initializes connections for the given database
-func InitAndTestConnectionForDb(ctx context.Context, dbName string) error {
-	// TEST
-	var err error
+// // InitAndTestConnectionForDb initializes connections for the given database
+// func InitAndTestConnectionForDb(ctx context.Context, dbName string) error {
+// 	var err error
 
-	// Ensure neccessary ENV variables are set
-	if os.Getenv("DATABASE_HOST") == "" {
-		return fmt.Errorf("ENV variable DATABASE_HOST not set")
-	}
-	if os.Getenv("POSTGRES_USERNAME") == "" {
-		return fmt.Errorf("ENV variable POSTGRES_USERNAME not set")
-	}
-	if os.Getenv("POSTGRES_PASSWORD") == "" {
-		log.Warn(ctx, "Initializing Database Connection: ENV variable POSTGRES_PASSWORD not set")
-	}
+// 	// Ensure neccessary ENV variables are set
+// 	if os.Getenv("DATABASE_HOST") == "" {
+// 		return fmt.Errorf("ENV variable DATABASE_HOST not set")
+// 	}
+// 	if os.Getenv("POSTGRES_USERNAME") == "" {
+// 		return fmt.Errorf("ENV variable POSTGRES_USERNAME not set")
+// 	}
+// 	if os.Getenv("POSTGRES_PASSWORD") == "" {
+// 		log.Warn(ctx, "Initializing Database Connection: ENV variable POSTGRES_PASSWORD not set")
+// 	}
 
-	portStr := os.Getenv("DATABASE_PORT")
-	port := DEFAULT_POSTGRES_PORT
-	if portStr != "" {
-		port, err = strconv.Atoi(portStr)
-		if err != nil {
-			return fmt.Errorf("Env variable [DATABASE_PORT] value [%s] is not a number: %w", portStr, err)
-		}
-	}
-	log.Debug(ctx, "Initializing database connection", "database", dbName)
-	err = InitDatabase(ctx, Options{
-		Host:     os.Getenv("DATABASE_HOST"),
-		Port:     port,
-		Database: dbName,
-		User:     os.Getenv("POSTGRES_USERNAME"),
-		Password: os.Getenv("POSTGRES_PASSWORD"),
-		SSLMode:  "disable",
-	})
-	if err != nil {
-		return fmt.Errorf("Initalizing database %w", err)
-	}
+// 	port := DEFAULT_POSTGRES_PORT
+// 	portStr := os.Getenv("DATABASE_PORT")
+// 	if portStr != "" {
+// 		port, err = strconv.Atoi(portStr)
+// 		if err != nil {
+// 			return fmt.Errorf("Env variable [DATABASE_PORT] value [%s] is not a number: %w", portStr, err)
+// 		}
+// 	}
+// 	log.Debug(ctx, "Initializing database connection", "database", dbName)
+// 	err = InitDatabase(ctx, Options{
+// 		Host:     os.Getenv("DATABASE_HOST"),
+// 		Port:     port,
+// 		Database: dbName,
+// 		User:     os.Getenv("POSTGRES_USERNAME"),
+// 		Password: os.Getenv("POSTGRES_PASSWORD"),
+// 		SSLMode:  "disable",
+// 	})
+// 	if err != nil {
+// 		return fmt.Errorf("Initalizing database %w", err)
+// 	}
 
-	return nil
-}
+// 	return nil
+// }
