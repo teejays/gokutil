@@ -283,6 +283,12 @@ func (s Name) ToCompact() string {
 	return strings.ToLower(strcase.ToCamel(s.words))
 }
 
+// ToCompactUpper returns an unrecoverable string representation of the name: 'purchase_id' => 'PURCHASEID'
+func (s Name) ToCompactUpper() string {
+	panics.If(s.IsEmpty(), "naam.Name.ToCompact() called on empty Name")
+	return strings.ToUpper(strcase.ToCamel(s.words))
+}
+
 // Formatting Functions: These functions print Name into a string type that is suitable to the subjective environment.
 
 // FormatSQL prints a general string representation of Name `s`, which may be appropriate for SQL environment.

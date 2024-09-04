@@ -47,3 +47,7 @@ func GetEnv() Environment {
 	}
 	return env
 }
+
+func IsDev() bool {
+	return GetEnv() == DEV
+}
