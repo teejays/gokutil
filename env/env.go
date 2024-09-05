@@ -2,19 +2,22 @@ package env
 
 import (
 	"os"
+	"strings"
 
 	"github.com/teejays/gokutil/panics"
 )
 
-type Environment ENV
+type Environment string
 
-type ENV string
+func (e Environment) String() string {
+	return string(e)
+}
 
 const (
-	DEV  = "development"
-	TEST = "testing" // For running tests
-	STG  = "staging"
-	PROD = "production"
+	DEV  Environment = "dev"
+	TEST Environment = "test" // For running tests
+	STG  Environment = "stage"
+	PROD Environment = "prod"
 )
 
 var (
@@ -23,14 +26,14 @@ var (
 )
 
 func Init() {
-	switch os.Getenv("APP_ENV") {
-	case "production":
+	switch strings.ToLower(os.Getenv("APP_ENV")) {
+	case "production", "prod", "prd":
 		env = PROD
-	case "staging":
+	case "staging", "stage", "stg":
 		env = STG
-	case "development":
+	case "development", "dev":
 		env = DEV
-	case "testing":
+	case "testing", "test":
 		env = TEST
 	case "":
 		env = DEV
