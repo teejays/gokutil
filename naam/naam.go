@@ -144,6 +144,11 @@ func (s Name) AppendName(a Name) Name {
 	return Join("", s, a)
 }
 
+// AppendNameNamespaced appends a name but with a namespace separator, so the the final results is `s__a`.
+func (s Name) AppendNameNamespaced(a Name) Name {
+	return Join("_", s, a)
+}
+
 // Prepend is a Name manipulator function. It prepends a string to the Name.
 func (s Name) Prepend(a string) Name {
 	s.words = a + "_" + s.words
@@ -153,6 +158,11 @@ func (s Name) Prepend(a string) Name {
 // PrependName is a wrapper around Join. It joins the Name `a` at the start of Name `s`.
 func (s Name) PrependName(a Name) Name {
 	return Join("", a, s)
+}
+
+// PrependNameNamespaced appends a name but with a namespace separator, so the the final results is `a__s`.
+func (s Name) PrependNameNamespaced(a Name) Name {
+	return Join("_", a, s)
 }
 
 // AppendID is a helper function that adds `_id` to the Name.

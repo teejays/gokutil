@@ -2,7 +2,6 @@ package filter
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/doug-martin/goqu/v9"
 	"github.com/teejays/gokutil/scalars"
@@ -68,81 +67,67 @@ func InjectConditionIntoSqlBuilder(f Condition, sb *goqu.SelectDataset, col stri
 }
 
 // Primitive Conditions
-
-type StringCondition struct {
+type GenericCondition[T comparable] struct {
 	Op     Operator
-	Values []string
+	Values []T
 }
+
+func NewGenericCondition[T comparable](op Operator, values ...T) *GenericCondition[T] {
+	return &GenericCondition[T]{Op: op, Values: values}
+}
+
+func (f GenericCondition[T]) GetOperator() Operator      { return f.Op }
+func (f GenericCondition[T]) Len() int                   { return len(f.Values) }
+func (f GenericCondition[T]) GetValue(i int) interface{} { return f.Values[i] }
+
+type StringCondition = GenericCondition[string]
 
 func NewStringCondition(op Operator, values ...string) *StringCondition {
-	return &StringCondition{Op: op, Values: values}
+	return NewGenericCondition(op, values...)
 }
 
-func (f StringCondition) GetOperator() Operator      { return f.Op }
-func (f StringCondition) Len() int                   { return len(f.Values) }
-func (f StringCondition) GetValue(i int) interface{} { return f.Values[i] }
+type NumberCondition = GenericCondition[int]
 
-type IntCondition struct {
-	Op     Operator
-	Values []int
+func NewNumberCondition(op Operator, values ...int) *NumberCondition {
+	return NewGenericCondition(op, values...)
 }
 
-func NewIntCondition(op Operator, values ...int) *IntCondition {
-	return &IntCondition{Op: op, Values: values}
-}
-
-func (f IntCondition) GetOperator() Operator      { return f.Op }
-func (f IntCondition) Len() int                   { return len(f.Values) }
-func (f IntCondition) GetValue(i int) interface{} { return f.Values[i] }
-
-type FloatCondition struct {
-	Op     Operator
-	Values []float64
-}
+type FloatCondition = GenericCondition[float64]
 
 func NewFloatCondition(op Operator, values ...float64) *FloatCondition {
-	return &FloatCondition{Op: op, Values: values}
+	return NewGenericCondition(op, values...)
 }
 
-func (f FloatCondition) GetOperator() Operator      { return f.Op }
-func (f FloatCondition) Len() int                   { return len(f.Values) }
-func (f FloatCondition) GetValue(i int) interface{} { return f.Values[i] }
-
-type BoolCondition struct {
-	Op     Operator
-	Values []bool
-}
+type BoolCondition = GenericCondition[bool]
 
 func NewBoolCondition(op Operator, values ...bool) *BoolCondition {
-	return &BoolCondition{Op: op, Values: values}
+	return NewGenericCondition(op, values...)
 }
 
-func (f BoolCondition) GetOperator() Operator      { return f.Op }
-func (f BoolCondition) Len() int                   { return len(f.Values) }
-func (f BoolCondition) GetValue(i int) interface{} { return f.Values[i] }
+type IDCondition = GenericCondition[scalars.ID]
 
-type UUIDCondition struct {
-	Op     Operator
-	Values []scalars.ID
+func NewIDCondition(op Operator, values ...scalars.ID) *IDCondition {
+	return NewGenericCondition(op, values...)
 }
 
-func NewUUIDCondition(op Operator, values ...scalars.ID) *UUIDCondition {
-	return &UUIDCondition{Op: op, Values: values}
+type TimeCondition = GenericCondition[scalars.Time]
+
+func NewTimestampCondition(op Operator, values ...scalars.Time) *TimeCondition {
+	return NewGenericCondition(op, values...)
 }
 
-func (f UUIDCondition) GetOperator() Operator      { return f.Op }
-func (f UUIDCondition) Len() int                   { return len(f.Values) }
-func (f UUIDCondition) GetValue(i int) interface{} { return f.Values[i] }
+type DateCondition = GenericCondition[scalars.Date]
 
-type TimestampCondition struct {
-	Op     Operator
-	Values []time.Time
+func NewDateCondition(op Operator, values ...scalars.Date) *DateCondition {
+	return NewGenericCondition(op, values...)
 }
 
-func NewTimestampCondition(op Operator, values ...time.Time) *TimestampCondition {
-	return &TimestampCondition{Op: op, Values: values}
+type EmailCondition = GenericCondition[scalars.Email]
+
+func NewEmailCondition(op Operator, values ...scalars.Email) *EmailCondition {
+	return NewGenericCondition(op, values...)
 }
 
-func (f TimestampCondition) GetOperator() Operator      { return f.Op }
-func (f TimestampCondition) Len() int                   { return len(f.Values) }
-func (f TimestampCondition) GetValue(i int) interface{} { return f.Values[i] }
+func SecretCondition(op Operator, values ...string) *StringCondition {
+	return NewStringCondition(op, values...)
+}
