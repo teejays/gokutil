@@ -161,3 +161,31 @@ func TestUnmarshalJSON(t *testing.T) {
 		})
 	}
 }
+
+func TestHasSuffixString(t *testing.T) {
+	tests := []struct {
+		name   string
+		n      Name
+		suffix string
+		want   bool
+	}{
+		{
+			name:   "1",
+			n:      New("user_id"),
+			suffix: "id",
+			want:   true,
+		},
+		{
+			name:   "2",
+			n:      New("user_id"),
+			suffix: "ID",
+			want:   true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := tt.n.HasSuffixString(tt.suffix)
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}

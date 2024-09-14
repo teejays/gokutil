@@ -231,6 +231,7 @@ func (s Name) EqualString(str string) bool {
 
 // HasSuffixString checks is the Name `s` has a suffix string equivalent to `str`.
 func (s Name) HasSuffixString(str string) bool {
+	str = strings.ToLower(str)
 	if len(s.words) < len(str) {
 		return false
 	}
