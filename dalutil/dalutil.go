@@ -19,56 +19,71 @@ import (
 
 var llog = log.GetLogger().WithHeading("DALUtil")
 
-// EntityDALMeta is the interface that provides the basic methods that a DAL Meta for an entity to implement.
-type EntityDALMetaBase[T types.BasicType, F types.Field] struct {
-	DbTableName      naam.Name
-	BasicTypeDALMeta BasicTypeDALMeta[T, F]
+type IEntityDALMeta[T types.EntityType, F types.Field] interface {
+	types.IEntityMeta[T, F]
+	GetDbTableName() naam.Name
+	GetTypeDALMeta() ITypeDALMeta[T, F]
 }
 
-// BasicTypeDALMeta is the interface that provides the basic methods that a DAL Meta for a type to implement.
-type BasicTypeDALMeta[T types.BasicType, F types.Field] interface {
-	types.BasicTypeMeta[T, F]
+// EntityDALMeta is holds knowledge for DAL Meta for an entity.
+type EntityCommonDALMeta[T types.BasicType, F types.Field] struct {
+	DbTableName naam.Name
+	TypeDALMeta ITypeDALMeta[T, F]
+}
 
-	GetDALMetaBase() BasicTypeDALMetaBase[T, F]
+func (m EntityCommonDALMeta[T, F]) GetDbTableName() naam.Name {
+	return m.DbTableName
+}
 
+func (m EntityCommonDALMeta[T, F]) GetTypeDALMeta() ITypeDALMeta[T, F] {
+	return m.TypeDALMeta
+}
+
+// ITypeDALMeta is the interface that provides the basic methods that a DAL Meta for a type to implement.
+type ITypeDALMeta[T types.BasicType, F types.Field] interface {
+	types.ITypeMeta[T, F]
 	GetDatabaseColumns() []string
-
 	// Add
 	GetDirectDBValues(T) []interface{} // Returns all the values that need to be added to DB
 	AddSubTableFieldsToDB(context.Context, db.Connection, db.InsertTypeParams, T) (T, error)
-
 	// ListType
 	ScanDBNextRow(*sql.Rows) (T, error)
 	FetchSubTableFields(context.Context, db.Connection, db.ListTypeByIDsParams, []T) ([]T, error)
-
 	// Update Type
 	GetChangedFieldsAndValues(old, new T, allowedFields []F) ([]F, []interface{})
 	UpdateSubTableFields(context.Context, db.Connection, UpdateTypeRequest[T, F], []F, T) (T, error) // TODO
+
+	GetCommonDALMeta() TypeCommonDALMeta[T, F]
 }
 
-// BasicTypeDALMetaBase is an implementation of above interface, that can be inherited by DAL Metas for types.
-type BasicTypeDALMetaBase[T types.BasicType, F types.Field] struct {
+// TypeCommonDALMeta
+type TypeCommonDALMeta[T types.BasicType, F types.Field] struct {
 	DatabaseColumnFields          []F // fields that are direct SQL Columns
 	DatabaseSubTableFields        []F
 	DatabaseColumnTimestampFields []F // fields that are direct DB columns, not repeated, and timestamps
-
-	MutableOnlyByDALFields []F
-	NonMutableFields       []F // Fields that can never be updated one object has been created
-
-	UpdatedAtField F
+	SetInternallyByDALFields      []F
+	ImmutableFields               []F // Fields that can never be updated one object has been created
+	UpdatedAtField                F
 }
 
-func (m BasicTypeDALMetaBase[T, F]) GetDatabaseColumns() []string {
+//	func NewBasicTypeDALMetaBase[T types.BasicType, F types.Field]() ITypeDALMeta[T, F] {
+//		return &TypeCommonDALMeta[T, F]{}
+//	}
+func (m TypeCommonDALMeta[T, F]) GetDatabaseColumns() []string {
 	return FieldsToStrings(m.DatabaseColumnFields)
 }
 
-// type AddEntityRequest[T types.BasicType] struct {
-// 	Entity T
-// }
+type EntityAddRequest[T any] struct {
+	Object T
+}
 
-// type AddTypeRequest[T types.BasicType] struct {
-// 	Object T
-// }
+type EntityBatchAddRequest[T any] struct {
+	Objects []T
+}
+
+type TypeBatchAddRequest[T any] struct {
+	Objects []T
+}
 
 // type AddTypeResponse[T types.BasicType] struct {
 // 	Object T
@@ -139,7 +154,7 @@ func FieldsToStrings[T types.Field](fields []T) []string {
 	return colNames
 }
 
-func BatchAddType[T types.BasicType, F types.Field](ctx context.Context, conn db.Connection, params db.InsertTypeParams, meta BasicTypeDALMeta[T, F], elems ...T) ([]T, error) {
+func BatchAddType[T types.BasicType, F types.Field](ctx context.Context, conn db.Connection, params db.InsertTypeParams, meta ITypeDALMeta[T, F], elems ...T) ([]T, error) {
 
 	now := time.Now()
 
@@ -165,7 +180,7 @@ func BatchAddType[T types.BasicType, F types.Field](ctx context.Context, conn db
 	for i := range elems {
 		err := validate.Struct(elems[i])
 		if err != nil {
-			errs.AddNew("Validation failed for item at position [%d], ID [%s]: %w", i+1, elems[i].GetID(), err)
+			errs.AddNew("Validation failed for item at position [%d]: %w", i+1, err)
 		}
 	}
 	if !errs.IsNil() {
@@ -217,7 +232,7 @@ func BatchAddType[T types.BasicType, F types.Field](ctx context.Context, conn db
 }
 
 // ListTypeByIDs fetches a list of type T based on the IDs provided.
-func ListTypeByIDs[T types.BasicType, F types.Field](ctx context.Context, conn db.Connection, params db.ListTypeByIDsParams, meta BasicTypeDALMeta[T, F]) (ListTypeResponse[T], error) {
+func ListTypeByIDs[T types.BasicType, F types.Field](ctx context.Context, conn db.Connection, params db.ListTypeByIDsParams, meta ITypeDALMeta[T, F]) (ListTypeResponse[T], error) {
 	var resp ListTypeResponse[T]
 
 	// If no ID's provided, can't fetch nothing
@@ -227,7 +242,7 @@ func ListTypeByIDs[T types.BasicType, F types.Field](ctx context.Context, conn d
 
 	subReq := db.SelectByIDBuilderRequest{
 		TableName: params.TableName,
-		Columns:   meta.GetDALMetaBase().GetDatabaseColumns(),
+		Columns:   meta.GetDatabaseColumns(),
 		IDColumn:  params.IDColumn,
 		IDs:       params.IDs,
 	}
@@ -253,7 +268,7 @@ func ListTypeByIDs[T types.BasicType, F types.Field](ctx context.Context, conn d
 		elems = append(elems, elem)
 	}
 
-	llog.Debug(ctx, "Sql rows fetched", "type", meta.GetBasicTypeMetaBase().Name, "count", len(elems), "data", elems)
+	llog.Debug(ctx, "Sql rows fetched", "type", meta.GetCommonMeta().Name, "count", len(elems), "data", elems)
 
 	// Unique Primary IDs of the fetched type
 	var ids []scalars.ID
@@ -272,7 +287,7 @@ func ListTypeByIDs[T types.BasicType, F types.Field](ctx context.Context, conn d
 	return resp, nil
 }
 
-func UpdateType[T types.BasicType, F types.Field](ctx context.Context, conn db.Connection, req UpdateTypeRequest[T, F], meta BasicTypeDALMeta[T, F]) (UpdateTypeResponse[T], error) {
+func UpdateType[T types.BasicType, F types.Field](ctx context.Context, conn db.Connection, req UpdateTypeRequest[T, F], meta ITypeDALMeta[T, F]) (UpdateTypeResponse[T], error) {
 	var resp UpdateTypeResponse[T]
 	now := scalars.NewTime(time.Now().UTC())
 
@@ -305,13 +320,13 @@ func UpdateType[T types.BasicType, F types.Field](ctx context.Context, conn db.C
 	existingElem := existingElemsResp.Items[0]
 
 	// (Included) Fields (provided by the caller) should not include any field updatable only by DAL
-	for _, f := range meta.GetDALMetaBase().MutableOnlyByDALFields {
+	for _, f := range meta.GetCommonDALMeta().SetInternallyByDALFields {
 		if types.IsFieldInFields(f, fields) {
 			errs.AddNew("Mutations on field '%s' are allowed only in DAL", f)
 		}
 	}
 	// (Included) Fields (provided by the caller) should not include any non-mutable
-	for _, f := range meta.GetDALMetaBase().NonMutableFields {
+	for _, f := range meta.GetCommonDALMeta().ImmutableFields {
 		if types.IsFieldInFields(f, fields) {
 			errs.AddNew("Mutations on field '%s' are not allowed", f)
 		}
@@ -321,27 +336,27 @@ func UpdateType[T types.BasicType, F types.Field](ctx context.Context, conn db.C
 	}
 
 	// Now that we have verified that caller provided fields are okay, we can add stuff to them to make them more useful
-	// - Add NonMutable fields to ExcludeFields list
-	for _, f := range meta.GetDALMetaBase().NonMutableFields {
+	// - Add IsImmutable fields to ExcludeFields list
+	for _, f := range meta.GetCommonDALMeta().ImmutableFields {
 		if !types.IsFieldInFields(f, excludeFields) {
 			excludeFields = append(excludeFields, f)
 		}
 	}
 	// - Add DALOnlyMutable fields to ExcludeFields list
-	for _, f := range meta.GetDALMetaBase().MutableOnlyByDALFields {
+	for _, f := range meta.GetCommonDALMeta().SetInternallyByDALFields {
 		if !types.IsFieldInFields(f, excludeFields) {
 			excludeFields = append(excludeFields, f)
 		}
 	}
 
 	// Get Updatable Columns (taking field mask into account)
-	var cols = meta.GetDALMetaBase().DatabaseColumnFields
+	var cols = meta.GetCommonDALMeta().DatabaseColumnFields
 	allowedCols := types.PruneFields(cols, fields, excludeFields)
 	if len(cols) < 1 {
 		return resp, fmt.Errorf("no fields provided for update: nothing to update")
 	}
 
-	llog.Debug(ctx, "Updating fields", "type", meta.GetBasicTypeMetaBase().Name, "columns", allowedCols)
+	llog.Debug(ctx, "Updating fields", "type", meta.GetCommonMeta().Name, "columns", allowedCols)
 
 	// Convert timestamps to UTC
 	elem = meta.ConvertTimestampColumnsToUTC(elem)
@@ -358,7 +373,7 @@ func UpdateType[T types.BasicType, F types.Field](ctx context.Context, conn db.C
 	elem.SetUpdatedAt(now)
 
 	// Add UpdatedAt fields to update columns
-	colsWithValueChange = append(colsWithValueChange, meta.GetDALMetaBase().UpdatedAtField)
+	colsWithValueChange = append(colsWithValueChange, meta.GetCommonDALMeta().UpdatedAtField)
 	vals = append(vals, elem.GetUpdatedAt())
 
 	// Get Query

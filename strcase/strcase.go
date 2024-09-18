@@ -10,14 +10,15 @@ import (
 )
 
 var acronyms = []string{
-	"HTTP",
-	"UUID",
 	"API",
 	"DAL",
-	"JWT",
-	"USA",
+	"HTTP",
 	"ID",
+	"JWT",
 	"UI",
+	"URL",
+	"USA",
+	"UUID",
 }
 
 var acronymsLookup map[string]bool

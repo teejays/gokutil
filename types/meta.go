@@ -10,39 +10,117 @@ import (
 	"github.com/teejays/gokutil/scalars"
 )
 
-type BasicTypeMeta[T BasicType, F Field] interface {
-	GetBasicTypeMetaBase() BasicTypeMetaBase[T, F]
+/* * * * * *
+ * With MetaFields
+ * * * * * */
+
+type IWithMetaFields interface {
+	GetID() scalars.ID
+	GetUpdatedAt() scalars.Timestamp
+	SetUpdatedAt(scalars.Timestamp)
+	SetDeletedAt(scalars.Timestamp)
+}
+
+type WithMetaFields struct {
+	ID        scalars.ID
+	CreatedAt scalars.Timestamp
+	UpdatedAt scalars.Timestamp
+	DeletedAt *scalars.Timestamp
+}
+
+func (t WithMetaFields) GetID() scalars.ID {
+	return t.ID
+}
+
+func (t WithMetaFields) GetCreatedAt() scalars.Timestamp {
+	return t.CreatedAt
+}
+
+func (t WithMetaFields) GetUpdatedAt() scalars.Timestamp {
+	return t.UpdatedAt
+}
+
+func (t *WithMetaFields) SetUpdatedAt(v scalars.Timestamp) {
+	t.UpdatedAt = v
+}
+
+func (t *WithMetaFields) SetDeletedAt(v scalars.Timestamp) {
+	t.DeletedAt = &v
+}
+
+// type TypeWithMetaFields[T any] struct {
+// 	WithMetaFields
+// }
+
+/* * * * * *
+ * Type Meta
+ * * * * * */
+
+type ITypeMeta[T BasicType, F Field] interface {
+	GetCommonMeta() TypeCommonMeta[T, F]
 	SetMetaFieldValues(context.Context, T, time.Time) T
 
 	ConvertTimestampColumnsToUTC(T) T
 	SetDefaultFieldValues(T) T
 }
 
-type BasicTypeMetaBase[T BasicType, F Field] struct {
+type TypeCommonMeta[T BasicType, F Field] struct {
 	Name   naam.Name
 	Fields []F
 }
 
+/* * * * * *
+ * Basic Type
+ * * * * * */
+
 type BasicType interface {
 	GetID() scalars.ID
-	GetUpdatedAt() scalars.Time
-	SetUpdatedAt(scalars.Time)
+	GetUpdatedAt() scalars.Timestamp
+	SetUpdatedAt(scalars.Timestamp)
 }
+
+/* * * * * *
+ * Entity Type
+ * * * * * */
 
 type EntityType interface {
 	GetID() scalars.ID
-	GetUpdatedAt() scalars.Time
-	SetUpdatedAt(scalars.Time)
+	GetUpdatedAt() scalars.Timestamp
+	SetUpdatedAt(scalars.Timestamp)
 }
+
+/* * * * * *
+ * Filter Type
+ * * * * * */
 
 type FilterType interface{}
 
-type EntityMetaBase[T BasicType, F Field] struct {
-	DbTableName   naam.Name
-	BasicTypeMeta BasicTypeMeta[T, F]
+/* * * * * *
+ * Entity Meta
+ * * * * * */
+
+type IEntityMeta[T BasicType, F Field] interface {
+	GetTypeMeta() ITypeMeta[T, F]
 }
 
-type EntityMeta[T BasicType, F Field] interface{}
+type EntityMeta[T BasicType, F Field] struct {
+	TypeMeta ITypeMeta[T, F]
+}
+
+// NewEntityMeta exists to ensure that EntityMeta implements IEntityMeta
+func NewEntityMeta[T BasicType, F Field](dbTableName naam.Name, typeMeta ITypeMeta[T, F]) IEntityMeta[T, F] {
+	return EntityMeta[T, F]{
+		TypeMeta: typeMeta,
+	}
+}
+
+func (em EntityMeta[T, F]) GetTypeMeta() ITypeMeta[T, F] {
+	return em.TypeMeta
+}
+
+/* * * * * *
+ * Enum
+ * * * * * */
 
 type Enum interface {
 	String() string
@@ -57,6 +135,10 @@ type Enum interface {
 	ImplementsGraphQLType(name string) bool
 	UnmarshalGraphQL(input interface{}) error
 }
+
+/* * * * * *
+ * Field
+ * * * * * */
 
 // Field is a generic constraint
 // Can also consider Field interface and FieldConstraint separately if needed.

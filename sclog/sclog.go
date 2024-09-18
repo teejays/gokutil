@@ -100,7 +100,7 @@ func (l Handler) Handle(ctx context.Context, rec slog.Record) error {
 		spliter := "\n"
 		attrMsg := ""
 		rec.Attrs(func(a slog.Attr) bool {
-			attrMsg += fmt.Sprintf("  - %s: %v%s", a.Key, a.Value, spliter)
+			attrMsg += fmt.Sprintf("  - %s: %+v%s", a.Key, a.Value, spliter)
 			return true
 		})
 		attrMsg = strings.TrimSuffix(attrMsg, spliter)

@@ -181,10 +181,52 @@ func TestHasSuffixString(t *testing.T) {
 			suffix: "ID",
 			want:   true,
 		},
+		{
+			name:   "3",
+			n:      New("update_request"),
+			suffix: "update_request",
+			want:   true,
+		},
+		{
+			name:   "3",
+			n:      New("update_request"),
+			suffix: "UpdateRequest",
+			want:   true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := tt.n.HasSuffixString(tt.suffix)
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}
+
+func TestToURL(t *testing.T) {
+	tests := []struct {
+		name string
+		n    Name
+		want string
+	}{
+		{
+			name: "1",
+			n:    New("user"),
+			want: "user",
+		},
+		{
+			name: "2",
+			n:    New("file_upload"),
+			want: "file_upload",
+		},
+		{
+			name: "3",
+			n:    New("file_upload").PrependNameNamespaced(New("core")),
+			want: "core/file_upload",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := tt.n.ToURL()
 			assert.Equal(t, tt.want, got)
 		})
 	}

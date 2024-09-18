@@ -110,7 +110,7 @@ func GetHandler(ctx context.Context, routes []Route, middlewares MiddlewareFuncs
 			r = a
 		}
 		// Register the route
-		llog.Debug(ctx, "Registering endpoint", "method", route.Method, "path", GetRoutePattern(route))
+		llog.None(ctx, "Registering endpoint", "method", route.Method, "path", GetRoutePattern(route))
 
 		if route.Method == "" {
 			return nil, fmt.Errorf("route [%s] has no http method", route.Path)

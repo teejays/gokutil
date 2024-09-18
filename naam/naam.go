@@ -11,13 +11,15 @@ import (
 	"github.com/teejays/gokutil/strcase"
 )
 
+const _sep = "_"
+
+var Empty = Name{words: ""}
+var ID = Name{words: "id"}
+
 // Named is any object/struct that has a name
 type Named interface {
 	GetName() Name
 }
-
-var Empty = Name{words: ""}
-var ID = Name{words: "id"}
 
 // Name is the ry struct that stores our name.
 type Name struct {
@@ -43,9 +45,9 @@ func Join(sep string, names ...Name) Name {
 		strs = append(strs, n.words)
 	}
 	if sep != "" {
-		sep = "_" + sep + "_"
+		sep = _sep + sep + _sep
 	} else {
-		sep = "_"
+		sep = _sep
 	}
 	n := Name{
 		words: strings.Join(strs, sep),
@@ -71,9 +73,9 @@ func cleanWords(words string) string {
 	// Trim edge spaces
 	words = strings.TrimSpace(words)
 	// Trim edge underscores
-	words = strings.Trim(words, "_")
-	// Allow spaces, convert them to "_"
-	words = strings.ReplaceAll(words, " ", "_")
+	words = strings.Trim(words, _sep)
+	// Allow spaces, convert them to _sep
+	words = strings.ReplaceAll(words, " ", _sep)
 	parts := strings.Split(words, strcase.PartsSep)
 	// Need to protect triple `_` seperators
 	for i := range parts {
@@ -135,7 +137,7 @@ func (s Name) ContainsString(sub string) bool {
 
 // Append is a Name manipulator function. It appends a string to the end of the Name
 func (s Name) Append(a string) Name {
-	s.words = s.words + "_" + a
+	s.words = s.words + _sep + a
 	return s.clean()
 }
 
@@ -146,12 +148,12 @@ func (s Name) AppendName(a Name) Name {
 
 // AppendNameNamespaced appends a name but with a namespace separator, so the the final results is `s__a`.
 func (s Name) AppendNameNamespaced(a Name) Name {
-	return Join("_", s, a)
+	return Join(_sep, s, a)
 }
 
 // Prepend is a Name manipulator function. It prepends a string to the Name.
 func (s Name) Prepend(a string) Name {
-	s.words = a + "_" + s.words
+	s.words = a + _sep + s.words
 	return s.clean()
 }
 
@@ -162,7 +164,7 @@ func (s Name) PrependName(a Name) Name {
 
 // PrependNameNamespaced appends a name but with a namespace separator, so the the final results is `a__s`.
 func (s Name) PrependNameNamespaced(a Name) Name {
-	return Join("_", a, s)
+	return Join(_sep, a, s)
 }
 
 // AppendID is a helper function that adds `_id` to the Name.
@@ -178,7 +180,7 @@ func (n Name) TrimSuffixString(s string) Name {
 
 // TrimSuffixID undoes `AppendID`, as it removes any trailing `id` in the Name.
 func (n Name) TrimSuffixID() Name {
-	n.words = strings.TrimSuffix(n.words, "_id")
+	n.words = strings.TrimSuffix(n.words, _sep+"id")
 	return n.clean()
 }
 
@@ -210,7 +212,7 @@ func (s Name) Singularize() Name {
 // wordParts returns the individual words in the Name `s`.
 // TODO: Handle major parts that are separated by `PartsSeperator`.
 func (s Name) wordParts() []string {
-	return strings.Split(s.words, "_")
+	return strings.Split(s.words, _sep)
 }
 
 // IsEmpty checks if the Name is empty. This is sometimes interchangeably used with `s == name.Nil()`
@@ -231,7 +233,8 @@ func (s Name) EqualString(str string) bool {
 
 // HasSuffixString checks is the Name `s` has a suffix string equivalent to `str`.
 func (s Name) HasSuffixString(str string) bool {
-	str = strings.ToLower(str)
+	// Convert the string to name and then use it's words
+	str = New(str).words
 	if len(s.words) < len(str) {
 		return false
 	}
@@ -286,6 +289,16 @@ func (s Name) ToSnakeUpper() string {
 func (s Name) ToKebab() string {
 	panics.If(s.IsEmpty(), "naam.Name.ToKebab() called on empty Name")
 	return strcase.ToKebab(s.words)
+}
+
+// ToURL prints a url friendly representation of the name.
+// e.g. `snake_case` = snake_case
+// `core___snake_case` = core/snake_case
+func (s Name) ToURL() string {
+	// convert the name to snake_case, and then replace the parts seperator with a `/`
+	w := s.ToSnake()
+	w = strings.ReplaceAll(w, "__", "/") // namespaced parts are separated by two "_" in snake case version
+	return w
 }
 
 // ToCompact returns an unrecoverable string representation of the name: 'purchase_id' => 'purchaseid'

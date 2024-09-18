@@ -110,9 +110,9 @@ func NewIDCondition(op Operator, values ...scalars.ID) *IDCondition {
 	return NewGenericCondition(op, values...)
 }
 
-type TimeCondition = GenericCondition[scalars.Time]
+type TimestampCondition = GenericCondition[scalars.Timestamp]
 
-func NewTimestampCondition(op Operator, values ...scalars.Time) *TimeCondition {
+func NewTimestampCondition(op Operator, values ...scalars.Timestamp) *TimestampCondition {
 	return NewGenericCondition(op, values...)
 }
 

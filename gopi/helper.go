@@ -281,3 +281,23 @@ func GetGenericPostPutPatchHandler[ReqT, RespT any](fn func(context.Context, Req
 
 	}
 }
+
+// GetDirectRequestHandler returns a handler which simply forwards the HTTP request to the given method
+func GetDirectRequestHandler[RespT any](fn func(context.Context, *http.Request) (RespT, error)) http.HandlerFunc {
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		ctx := r.Context()
+
+		log.Debug(ctx, "[HTTP Handler] Starting...")
+
+		// Call the method
+		resp, err := fn(r.Context(), r)
+		if err != nil {
+			WriteError(w, 0, err)
+			return
+		}
+
+		WriteStandardResponse(w, resp)
+
+	}
+}

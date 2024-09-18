@@ -32,7 +32,7 @@ type IScalar interface {
 // _ is a list of all the scalars. This is used to ensure that the listed scalars have all IScalar methods implemented.
 var _ = []IScalar{
 	&ID{},
-	&Time{},
+	&Timestamp{},
 	&Date{},
 	&Email{},
 	&Secret{},
@@ -148,29 +148,29 @@ func NewIDFromString(str string) (ID, error) {
 }
 
 /* * * * * * *
- * Time
+ * Timestamp
 * * * * * * */
 
-type Time struct {
+type Timestamp struct {
 	graphql.Time
 }
 
-func NewTime(t time.Time) Time {
-	return Time{Time: graphql.Time{Time: t}}
+func NewTime(t time.Time) Timestamp {
+	return Timestamp{Time: graphql.Time{Time: t}}
 }
 
-func (t Time) IsEmpty() bool {
+func (t Timestamp) IsEmpty() bool {
 	return t.Time.IsZero()
 }
 
-func (t Time) Validate() error {
+func (t Timestamp) Validate() error {
 	if t.IsEmpty() {
 		return fmt.Errorf("Time is empty")
 	}
 	return nil
 }
 
-func (t *Time) ParseString(str string) error {
+func (t *Timestamp) ParseString(str string) error {
 	_t, err := NewFromString(str)
 	if err != nil {
 		return err
@@ -179,7 +179,7 @@ func (t *Time) ParseString(str string) error {
 	return nil
 }
 
-func (t *Time) Scan(value interface{}) error {
+func (t *Timestamp) Scan(value interface{}) error {
 	if value == nil {
 		return nil
 	}
@@ -194,21 +194,25 @@ func (t *Time) Scan(value interface{}) error {
 	}
 }
 
-func (t Time) Value() (driver.Value, error) {
+func (t Timestamp) Value() (driver.Value, error) {
 	return t.ToGolangTime(), nil
+}
+
+func (d Timestamp) ImplementsGraphQLType(name string) bool {
+	return name == "Timestamp"
 }
 
 // Custom Methods
 
-func NewFromString(str string) (Time, error) {
+func NewFromString(str string) (Timestamp, error) {
 	t, err := time.Parse(time.RFC3339, str)
 	if err != nil {
-		return Time{}, err
+		return Timestamp{}, err
 	}
 	return NewTime(t), nil
 }
 
-func (t Time) ToGolangTime() time.Time {
+func (t Timestamp) ToGolangTime() time.Time {
 	return t.Time.Time
 }
 
