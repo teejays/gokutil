@@ -12,6 +12,7 @@ import (
 	"github.com/teejays/gokutil/panics"
 )
 
+// LoadEnvFiles loads the env files into the environment as env vars
 func LoadEnvFiles(ctx context.Context, wd string) error {
 	// Load the env file
 	_env := env.GetEnv()

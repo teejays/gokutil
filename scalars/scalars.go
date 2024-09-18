@@ -89,6 +89,10 @@ func (id *ID) UnmarshalJSON(data []byte) error {
 	if err != nil {
 		return err
 	}
+	if s == "" {
+		// ID is nil
+		return nil
+	}
 	err = id.ParseString(s)
 	if err != nil {
 		return err

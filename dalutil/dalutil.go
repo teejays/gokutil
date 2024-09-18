@@ -42,6 +42,8 @@ func (m EntityCommonDALMeta[T, F]) GetTypeDALMeta() ITypeDALMeta[T, F] {
 // ITypeDALMeta is the interface that provides the basic methods that a DAL Meta for a type to implement.
 type ITypeDALMeta[T types.BasicType, F types.Field] interface {
 	types.ITypeMeta[T, F]
+	GetCommonDALMeta() *TypeCommonDALMeta[T, F]
+
 	GetDatabaseColumns() []string
 	// Add
 	GetDirectDBValues(T) []interface{} // Returns all the values that need to be added to DB
@@ -53,7 +55,6 @@ type ITypeDALMeta[T types.BasicType, F types.Field] interface {
 	GetChangedFieldsAndValues(old, new T, allowedFields []F) ([]F, []interface{})
 	UpdateSubTableFields(context.Context, db.Connection, UpdateTypeRequest[T, F], []F, T) (T, error) // TODO
 
-	GetCommonDALMeta() TypeCommonDALMeta[T, F]
 }
 
 // TypeCommonDALMeta
@@ -175,6 +176,20 @@ func BatchAddType[T types.BasicType, F types.Field](ctx context.Context, conn db
 		elems[i] = meta.SetDefaultFieldValues(elems[i])
 	}
 
+	// Run any before create hooks
+	if fn := meta.GetHookAddBefore(); fn != nil {
+		log.Warn(ctx, "Running BeforeCreateHook", "type", meta.GetTypeCommonMeta().Name)
+		for i := range elems {
+			var err error
+			elems[i], err = fn(ctx, elems[i])
+			if err != nil {
+				return nil, fmt.Errorf("BeforeCreateHook failed for item index [%d]: %w", i, err)
+			}
+		}
+	} else {
+		log.Warn(ctx, "No BeforeCreateHook found", "type", meta.GetTypeCommonMeta().Name, "meta", meta)
+	}
+
 	// Validate the types before they are added
 	errs := errutil.NewMultiErr()
 	for i := range elems {
@@ -268,7 +283,7 @@ func ListTypeByIDs[T types.BasicType, F types.Field](ctx context.Context, conn d
 		elems = append(elems, elem)
 	}
 
-	llog.Debug(ctx, "Sql rows fetched", "type", meta.GetCommonMeta().Name, "count", len(elems), "data", elems)
+	llog.Debug(ctx, "Sql rows fetched", "type", meta.GetTypeCommonMeta().Name, "count", len(elems), "data", elems)
 
 	// Unique Primary IDs of the fetched type
 	var ids []scalars.ID
@@ -356,7 +371,7 @@ func UpdateType[T types.BasicType, F types.Field](ctx context.Context, conn db.C
 		return resp, fmt.Errorf("no fields provided for update: nothing to update")
 	}
 
-	llog.Debug(ctx, "Updating fields", "type", meta.GetCommonMeta().Name, "columns", allowedCols)
+	llog.Debug(ctx, "Updating fields", "type", meta.GetTypeCommonMeta().Name, "columns", allowedCols)
 
 	// Convert timestamps to UTC
 	elem = meta.ConvertTimestampColumnsToUTC(elem)
