@@ -75,9 +75,9 @@ func GetMuxParamStr(r *http.Request, name string) (string, error) {
 }
 
 type StandardResponse struct {
-	StatusCode int
-	Data       interface{}
-	Error      interface{}
+	StatusCode int         `json:"statusCode"`
+	Data       interface{} `json:"data"`
+	Error      interface{} `json:"error"`
 }
 
 func WriteStandardResponse(w http.ResponseWriter, v interface{}) {

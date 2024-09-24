@@ -231,3 +231,33 @@ func TestToURL(t *testing.T) {
 		})
 	}
 }
+
+func TestToCamel(t *testing.T) {
+	tests := []struct {
+		name string
+		n    Name
+		want string
+	}{
+		{
+			name: "1",
+			n:    New("user foo"),
+			want: "userFoo",
+		},
+		{
+			name: "2",
+			n:    New("file_upload"),
+			want: "fileUpload",
+		},
+		{
+			name: "3",
+			n:    New("file_upload").PrependNameNamespaced(New("core")),
+			want: "coreFileUpload",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := tt.n.ToLowerCamel()
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}

@@ -10,7 +10,7 @@ import (
 // Marshal encodes the struct into JSON
 func Marshal(v interface{}) ([]byte, error) {
 
-	marshaler := conjson.NewMarshaler(v, transform.ConventionalKeys())
+	marshaler := conjson.NewMarshaler(v, transform.CamelCaseKeys(false))
 	encoded, err := json.Marshal(marshaler)
 	if err != nil {
 		return nil, err

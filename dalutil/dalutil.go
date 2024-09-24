@@ -75,15 +75,15 @@ func (m TypeCommonDALMeta[T, F]) GetDatabaseColumns() []string {
 }
 
 type EntityAddRequest[T any] struct {
-	Object T
+	Object T `json:"object"`
 }
 
 type EntityBatchAddRequest[T any] struct {
-	Objects []T
+	Objects []T `json:"objects"`
 }
 
 type TypeBatchAddRequest[T any] struct {
-	Objects []T
+	Objects []T `json:"objects"`
 }
 
 // type AddTypeResponse[T types.BasicType] struct {
@@ -99,21 +99,21 @@ type GetTypeRequest[T types.BasicType] struct {
 }
 
 type ListEntityRequest[T types.FilterType] struct {
-	Filter T
+	Filter T `json:"filter"`
 }
 
 type ListEntityResponse[T types.BasicType] struct {
-	Items []T
-	Count int
+	Items []T `json:"items"`
+	Count int `json:"count"`
 }
 
 type ListTypeRequest[T types.FilterType] struct {
-	Filter T
+	Filter T `json:"filter"`
 }
 
 type ListTypeResponse[T types.BasicType] struct {
-	Items []T
-	Count int
+	Items []T `json:"items"`
+	Count int `json:"count"`
 	// MAYBE TODO: PageInfo interface{}
 }
 
@@ -127,9 +127,9 @@ type QueryByTextTypeRequest[T types.BasicType] struct {
 }
 
 type UpdateEntityRequest[T types.BasicType, F types.Field] struct {
-	Object        T
-	Fields        []F
-	ExcludeFields []F
+	Object        T   `json:"object"`
+	Fields        []F `json:"fields"`
+	ExcludeFields []F `json:"excludeFields"`
 }
 
 type UpdateEntityResponse[T types.BasicType] struct {

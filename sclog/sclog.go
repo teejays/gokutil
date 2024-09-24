@@ -2,6 +2,7 @@ package sclog
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"log/slog"
@@ -185,4 +186,12 @@ func copy(l Handler) Handler {
 		commonAttrs:    l.commonAttrs,
 		prefixHeadings: l.prefixHeadings,
 	}
+}
+
+func MustJsonMarshalPretty(v interface{}) string {
+	b, err := json.MarshalIndent(v, "", "  ")
+	if err != nil {
+		return fmt.Sprintf("Error marshalling json: %v", err)
+	}
+	return string(b)
 }

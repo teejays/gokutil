@@ -386,22 +386,26 @@ func (s Name) FormatFileName() string {
 	return strcase.ToSnake(s.words)
 }
 
-func (s Name) FormatTypescript() string {
-	return strcase.ToSnake(s.words)
-}
+// func (s Name) FormatTypescript() string {
+// 	return strcase.ToSnake(s.words)
+// }
 
 func (s Name) FormatTypescriptType() string {
-	return strcase.ToCamel(s.words)
+	return s.ToPascal()
 }
 
 func (s Name) FormatTypescriptField() string {
-	return strcase.ToSnake(s.words)
+	return s.ToLowerCamel()
 }
 
 func (s Name) FormatTypescriptVar() string {
-	return strcase.ToLowerCamel(s.words)
+	return s.ToLowerCamel()
 }
 
 func (s Name) FormatGraphql() string {
-	return strcase.ToSnake(s.words)
+	return s.ToSnake()
+}
+
+func (s Name) FormatJSONField() string {
+	return s.ToLowerCamel()
 }
