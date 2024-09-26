@@ -3,14 +3,14 @@ module github.com/teejays/gokutil/dalutil
 go 1.22.5
 
 require (
-	github.com/teejays/gokutil/client/db v0.0.0-20240918174225-86d5c46a7fa5
-	github.com/teejays/gokutil/errutil v0.0.0-20240918174225-86d5c46a7fa5
-	github.com/teejays/gokutil/log v0.0.0-20240918174225-86d5c46a7fa5
-	github.com/teejays/gokutil/naam v0.0.0-20240918174225-86d5c46a7fa5
-	github.com/teejays/gokutil/panics v0.0.0-20240918174225-86d5c46a7fa5
-	github.com/teejays/gokutil/scalars v0.0.0-20240918174225-86d5c46a7fa5
-	github.com/teejays/gokutil/types v0.0.0-20240918174225-86d5c46a7fa5
-	github.com/teejays/gokutil/validate v0.0.0-20240918174225-86d5c46a7fa5
+	github.com/teejays/gokutil/client/db v0.0.0-20240924175405-eddc126c032f
+	github.com/teejays/gokutil/errutil v0.0.0-20240924175405-eddc126c032f
+	github.com/teejays/gokutil/log v0.0.0-20240924175405-eddc126c032f
+	github.com/teejays/gokutil/naam v0.0.0-20240924175405-eddc126c032f
+	github.com/teejays/gokutil/panics v0.0.0-20240924175405-eddc126c032f
+	github.com/teejays/gokutil/scalars v0.0.0-20240924175405-eddc126c032f
+	github.com/teejays/gokutil/types v0.0.0-20240924175405-eddc126c032f
+	github.com/teejays/gokutil/validate v0.0.0-20240924175405-eddc126c032f
 )
 
 require (
@@ -25,11 +25,11 @@ require (
 	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/lib/pq v1.10.9 // indirect
 	github.com/stretchr/objx v0.5.2 // indirect
-	github.com/teejays/gokutil/clog v0.0.0-20240918174225-86d5c46a7fa5 // indirect
-	github.com/teejays/gokutil/ctxutil v0.0.0-20240918174225-86d5c46a7fa5 // indirect
-	github.com/teejays/gokutil/env v0.0.0-20240918174225-86d5c46a7fa5 // indirect
-	github.com/teejays/gokutil/sclog v0.0.0-20240918174225-86d5c46a7fa5 // indirect
-	github.com/teejays/gokutil/strcase v0.0.0-20240918174225-86d5c46a7fa5 // indirect
+	github.com/teejays/gokutil/clog v0.0.0-20240924175405-eddc126c032f // indirect
+	github.com/teejays/gokutil/ctxutil v0.0.0-20240924175405-eddc126c032f // indirect
+	github.com/teejays/gokutil/env v0.0.0-20240924175405-eddc126c032f // indirect
+	github.com/teejays/gokutil/sclog v0.0.0-20240924175405-eddc126c032f // indirect
+	github.com/teejays/gokutil/strcase v0.0.0-20240924175405-eddc126c032f // indirect
 	golang.org/x/crypto v0.27.0 // indirect
 	golang.org/x/net v0.29.0 // indirect
 	golang.org/x/sys v0.25.0 // indirect

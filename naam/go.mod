@@ -4,8 +4,8 @@ go 1.22.5
 
 require (
 	github.com/stretchr/testify v1.9.0
-	github.com/teejays/gokutil/panics v0.0.0-20240918174225-86d5c46a7fa5
-	github.com/teejays/gokutil/strcase v0.0.0-20240918174225-86d5c46a7fa5
+	github.com/teejays/gokutil/panics v0.0.0-20240924175405-eddc126c032f
+	github.com/teejays/gokutil/strcase v0.0.0-20240924175405-eddc126c032f
 )
 
 require (
