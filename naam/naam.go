@@ -13,6 +13,9 @@ import (
 
 const _sep = "_"
 
+// PartsSeperator is the string used to separated two major parts within the name.
+const PartsSeperator = strcase.PartsSep
+
 var Empty = Name{words: ""}
 var ID = Name{words: "id"}
 
@@ -243,25 +246,29 @@ func (s Name) HasSuffixString(str string) bool {
 
 // String makes Name a Stringer, so Names are printed in a slightly nicer manner in print/log statements.
 func (s Name) String() string {
-	return strcase.ToSnakedCamel(s.words)
+	return strcase.ToPascal(s.words)
 }
 
-// ToCamel converts the Name `s` into a CamelCase version, however it doesn't respect the parts.
-func (s Name) ToCamel() string {
-	panics.If(s.IsEmpty(), "naam.Name.ToCamel() called on empty Name")
-	return strcase.ToCamel(s.String())
-}
+// // ToPascal converts the Name `s` into a CamelCase version, however it doesn't respect the parts.
+// func (s Name) ToPascal() string {
+// 	panics.If(s.IsEmpty(), "naam.Name.ToPascal() called on empty Name")
+// 	return strcase.ToPascal(s.String())
+// }
 
-// ToPascal is an alias for ToCamel
+/* * * * * * * *
+ * Formatters (Main)
+ * * * * * * * */
+
+// ToPascal is an alias for ToPascal
 func (s Name) ToPascal() string {
 	panics.If(s.IsEmpty(), "naam.Name.ToPascal() called on empty Name")
-	return s.ToSnakedCamel()
+	return strcase.ToPascal(s.words)
 }
 
-// ToLowerCamel converts the Name into a lowerCamelCase version, however it doesn't respect the parts.
-func (s Name) ToLowerCamel() string {
-	panics.If(s.IsEmpty(), "naam.Name.ToLowerCamel() called on empty Name")
-	return strcase.ToLowerCamel(s.String())
+// ToCamel converts the Name into a lowerCamelCase version, however it doesn't respect the parts.
+func (s Name) ToCamel() string {
+	panics.If(s.IsEmpty(), "naam.Name.ToCamel() called on empty Name")
+	return strcase.ToCamel(s.words)
 }
 
 // ToSnake prints a `snake_case` version of the Name. It should take into account any Name parts, so it could end up
@@ -271,25 +278,28 @@ func (s Name) ToSnake() string {
 	return strcase.ToSnake(s.words)
 }
 
-// PartsSeperator is the string used to separated two major parts within the name.
-const PartsSeperator = strcase.PartsSep
-
-// ToSnakedCamel converts the Name into a CamelCase, but it respects any major parts of the name (separated by three `_`) and
-// keeps them seperated by a single `_`. E.g. `hello___best_bay` -> `Hello_BestBay`
-func (s Name) ToSnakedCamel() string {
-	return strcase.ToSnakedCamel(s.words)
-}
-
-// ToSnakeUpper converts HELLO_DAISY
-func (s Name) ToSnakeUpper() string {
-	return strings.ToUpper(s.ToSnake())
-}
-
 // ToKebab prints a `snake_case` version of the Name. It, yet, does not take into account any Name parts.
 func (s Name) ToKebab() string {
 	panics.If(s.IsEmpty(), "naam.Name.ToKebab() called on empty Name")
 	return strcase.ToKebab(s.words)
 }
+
+// // ToSnakedCamel converts the Name into a CamelCase, but it respects any major parts of the name (separated by three `_`) and
+// // keeps them seperated by a single `_`. E.g. `hello___best_bay` -> `Hello_BestBay`
+// func (s Name) ToSnakedCamel() string {
+// 	return strcase.ToSnakedCamel(s.words)
+// }
+
+// ToSnakeUpper converts HELLO_DAISY
+func (s Name) ToSnakeUpper() string {
+	panics.If(s.IsEmpty(), "naam.Name.ToSnakeUpper() called on empty Name")
+	str := s.ToSnake()
+	return strings.ToUpper(str)
+}
+
+/* * * * * * * *
+ * Formatters (Others)
+ * * * * * * * */
 
 // ToURL prints a url friendly representation of the name.
 // e.g. `snake_case` = snake_case
@@ -304,15 +314,18 @@ func (s Name) ToURL() string {
 // ToCompact returns an unrecoverable string representation of the name: 'purchase_id' => 'purchaseid'
 func (s Name) ToCompact() string {
 	panics.If(s.IsEmpty(), "naam.Name.ToCompact() called on empty Name")
-	return strings.ToLower(strcase.ToCamel(s.words))
+	return strings.ToLower(strcase.ToPascal(s.words))
 }
 
 // ToCompactUpper returns an unrecoverable string representation of the name: 'purchase_id' => 'PURCHASEID'
 func (s Name) ToCompactUpper() string {
 	panics.If(s.IsEmpty(), "naam.Name.ToCompact() called on empty Name")
-	return strings.ToUpper(strcase.ToCamel(s.words))
+	return strings.ToUpper(s.ToCompact())
 }
 
+/* * * * * * * *
+ * Formatters (Language Specific)
+ * * * * * * * */
 // Formatting Functions: These functions print Name into a string type that is suitable to the subjective environment.
 
 // FormatSQL prints a general string representation of Name `s`, which may be appropriate for SQL environment.
@@ -357,49 +370,36 @@ func (s Name) FormatSQLTable() string {
 	return strcase.ToSnake(s.Truncate(63).words)
 }
 
-// FormatGolang prints a general string representation of Name `s`, which may be appropriate for Golang codebase.
-func (s Name) FormatGolang() string {
-	// TODO: Use ToSnakedCamel
-	return strcase.ToSnakedCamel(s.words)
-}
-
 // FormatGolangType prints a string representation of Name `s` which can be used an exported Type name in Golang.
 func (s Name) FormatGolangType() string {
-	// TODO: Use ToSnakedCamel instead, since it's a type name which cannot have `.`.
-	return strcase.ToSnakedCamel(s.words)
+	return s.ToPascal()
 }
 
 // FormatGolangTypeUnexported
 func (s Name) FormatGolangTypeUnexported() string {
-	ret := strcase.ToSnakedCamel(s.words)
-	// Lowercase the first letter
-	return strings.ToLower(ret[:1]) + ret[1:]
+	return s.ToCamel()
 }
 
 // FormatGolangFieldName prints a string representation of Name `s` which can be used an exported Field name in Golang.
 func (s Name) FormatGolangFieldName() string {
-	return strcase.ToSplitCamel(s.words, ".")
+	return s.ToPascal()
 }
 
 // FormatFileName prints a strings representation of Name `s` that can used as part of a Unix file or directory name.
 func (s Name) FormatFileName() string {
-	return strcase.ToSnake(s.words)
+	return s.ToSnake()
 }
-
-// func (s Name) FormatTypescript() string {
-// 	return strcase.ToSnake(s.words)
-// }
 
 func (s Name) FormatTypescriptType() string {
 	return s.ToPascal()
 }
 
 func (s Name) FormatTypescriptField() string {
-	return s.ToLowerCamel()
+	return s.ToCamel()
 }
 
 func (s Name) FormatTypescriptVar() string {
-	return s.ToLowerCamel()
+	return s.ToCamel()
 }
 
 func (s Name) FormatGraphql() string {
@@ -407,5 +407,5 @@ func (s Name) FormatGraphql() string {
 }
 
 func (s Name) FormatJSONField() string {
-	return s.ToLowerCamel()
+	return s.ToCamel()
 }

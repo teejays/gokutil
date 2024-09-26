@@ -4,117 +4,94 @@ import (
 	"strings"
 
 	"github.com/iancoleman/strcase"
+	"github.com/teejays/gokutil/log"
 	"github.com/teejays/gokutil/panics"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 )
 
+// PartsSep seprates major parts in the string vs. a single `_` which separates words. It is three underscores.
+const PartsSep = "___"
+
 var acronyms = []string{
 	"API",
 	"DAL",
 	"HTTP",
+	"HTTPS",
 	"ID",
 	"JWT",
+	"SHA",
 	"UI",
 	"URL",
 	"USA",
 	"UUID",
+	"URI",
+	"XML",
+	"YAML",
+	"YML",
+	"JSON",
+	"HTML",
+	"CSS",
+	"JS",
+	"TS",
+	"SQL",
+	"DB",
 }
 
 var acronymsLookup map[string]bool
 
 func init() {
 	// Note: Not sure if this even works. Our own Acronyms work better
-	for _, v := range acronyms {
-		strcase.ConfigureAcronym(v, strings.ToLower(v))
-	}
+	// for _, v := range acronyms {
+	// 	strcase.ConfigureAcronym(v, strings.ToLower(v))
+	// }
 	acronymsLookup = map[string]bool{}
 	for _, v := range acronyms {
 		acronymsLookup[v] = true
 	}
 }
 
-func IsEqual(a, b string) bool {
-	return strings.EqualFold(a, b)
-}
-func IsAcronym(s string) bool {
-	return acronymsLookup[strings.ToUpper(s)]
-}
-
-func HasAcronym(s string) bool {
-	for _, acr := range acronyms {
-		if strings.Contains(s, acr) {
-			return true
+func ToPascal(s string) string {
+	// strcase.ToCamel is actually PascalCase and ToLowerCamel is camelCase
+	// Conver to snake case so we can distinguish between words
+	s = strcase.ToSnake(s)
+	fams := strings.Split(s, PartsSep)
+	for i := range fams {
+		words := strings.Split(fams[i], "_")
+		for i := range words {
+			words[i] = ToPascalWord(words[i])
 		}
+		fams[i] = strings.Join(words, "")
 	}
-	return false
-}
-
-// UpperizeAcronym - only upperize if the prefix or suffix is an Acronym
-func UpperizeAcronym(s string) string {
-	for _, acr := range acronyms {
-		// Can't match if string is smaller than the acronym
-		if len(s) < len(acr) {
-			continue
-		}
-		// First n characters
-		if strings.EqualFold(s[:len(acr)], acr) {
-			s = strings.ToUpper(s[:len(acr)]) + s[len(acr):]
-		}
-		// Last n characters
-		if strings.EqualFold(s[len(s)-len(acr):], acr) {
-			s = s[:len(s)-len(acr)] + strings.ToUpper(s[len(s)-len(acr):])
-		}
-		// Last n+1 characters == plural acronym (i.e. xyzs / XYZs)
-		if len(s) >= len(acr)+1 &&
-			strings.EqualFold(s[len(s)-len(acr)-1:], acr+"s") {
-			s = s[:len(s)-len(acr)-1] + strings.ToUpper(s[len(s)-len(acr)-1:len(s)-1]) + "s"
-		}
-	}
-	return s
+	return strings.Join(fams, "_")
 }
 
 func ToCamel(s string) string {
-	if IsAcronym(s) {
-		return strings.ToUpper(s)
+	s = strcase.ToSnake(s)
+	// fams are the namespaces
+	fams := strings.Split(s, PartsSep)
+	for i := range fams {
+		words := strings.Split(fams[i], "_")
+		for j := range words {
+			word := words[j]
+			// first word is always lower case
+			// rest of the words are pascal case (uppercase if they are acronyms)
+			if j == 0 {
+				word = strcase.ToLowerCamel(word)
+			} else {
+				word = ToPascalWord(word)
+				word = UpperizeAcronymWord(word)
+			}
+			words[j] = word
+		}
+		fams[i] = strings.Join(words, "")
 	}
-	s = strcase.ToCamel(s)
-	s = UpperizeAcronym(s)
-	return s
+
+	// Join the namespaces with a single `_`
+	return strings.Join(fams, "_")
 }
 
-// PartsSep seprates major parts in the string vs. a single `_` which separates words. It is three underscores.
-const PartsSep = "___"
-
-// to___split_camel -> To<sep>SplitCamel eg. To.SplitCamel
-func ToSplitCamel(s string, sep string) string {
-	if IsAcronym(s) {
-		return strings.ToUpper(s)
-	}
-	// split by key
-	parts := strings.Split(s, PartsSep)
-	for i := range parts {
-		parts[i] = strcase.ToCamel(parts[i])
-	}
-	r := strings.Join(parts, sep)
-	return UpperizeAcronym(r)
-}
-
-// to___snaked_camel -> To_SnakedCamel
-func ToSnakedCamel(s string) string {
-	return ToSplitCamel(s, "_")
-}
-
-func ToLowerCamel(s string) string {
-	if IsAcronym(s) {
-		return strings.ToLower(s)
-	}
-	s = strcase.ToLowerCamel(s)
-	s = UpperizeAcronym(s)
-	return s
-}
-
-// ToSnake - converts a string to snake_case
+// ToSnake expects a single word and  - converts a string to snake_case
 func ToSnake(s string) string {
 	for _, acr := range acronyms {
 		// If there is an uppercase acronym XYZ in here, make it title case since strcase thinks x, y, and z in XYX are seperate words
@@ -133,7 +110,54 @@ func ToSnake(s string) string {
 }
 
 func ToKebab(s string) string {
-	return strcase.ToKebab(s)
+	// simply convert to snake case and then replace `_` with `-`
+	s = ToSnake(s)
+	s = strings.ReplaceAll(s, "_", "-")
+	return s
+}
+
+/* * * * * * *
+* Helper Functions
+* * * * * * */
+
+func IsAcronym(s string) bool {
+	return acronymsLookup[strings.ToUpper(s)]
+}
+
+// UpperizeAcronyms - upperize all acronyms in the string. It assumes that the words are split by the separator
+func UpperizeAcronyms(s string, sep string) string {
+	parts := strings.Split(s, sep)
+	for i := range parts {
+		parts[i] = UpperizeAcronymWord(parts[i])
+	}
+	return strings.Join(parts, sep)
+}
+
+// UpperizeAcronymWord makes the word uppercase if the word is an acronym.
+// It handles the case where the word is a plural of an acronym.
+func UpperizeAcronymWord(word string) string {
+
+	// Check if the entire word is an acronym
+	// e.g. ID, API, HTTP, HTTPS, etc.
+	if IsAcronym(word) {
+		return strings.ToUpper(word)
+	}
+	// Check if the word is a plural of an acronym
+	// e.g. ids, apis, https, etc.
+	if len(word) > 1 && word[len(word)-1] == 's' && IsAcronym(word[:len(word)-1]) {
+		// Upperize all the characters except the last one
+		return strings.ToUpper(word[:len(word)-1]) + "s"
+	}
+
+	return word
+
+}
+
+func ToPascalWord(w string) string {
+	// do no
+	w = strcase.ToCamel(w)
+	w = UpperizeAcronymWord(w)
+	return w
 }
 
 var pluralOverrides = map[string]string{
@@ -143,16 +167,26 @@ var pluralOverrides = map[string]string{
 	"process": "processes",
 }
 
+// Pluralize should only be called on a snake cased string
 func Pluralize(s string) string {
 	if s == "" {
 		return s
 	}
-	if ans, exists := pluralOverrides[strings.ToLower(s)]; exists {
-		return ans
+	snakeS := ToSnake(s)
+	if snakeS != s {
+		log.WarnWithoutCtx("library strcase: Pluralize should only be called on a snake cased string. Got [%s]", s)
 	}
+	// We only need to pluralize the last word
+	words := strings.Split(s, "_")
+	lastWord := words[len(words)-1]
+	if ans, exists := pluralOverrides[lastWord]; exists {
+		words[len(words)-1] = ans
+		return strings.Join(words, "_")
+	}
+
 	// If ends with `s`, don't know what to do
 	if s[len(s)-1] == 's' {
-		panics.P("library strcase: couldn't determine plural form of '%s'", s)
+		log.WarnWithoutCtx("library strcase: couldn't determine plural form of [%s]", s)
 	}
 	// If ends with `y`, change `y` to `ies` e.g. company -> companies
 	if s[len(s)-1] == 'y' {

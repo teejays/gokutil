@@ -64,25 +64,6 @@ func TestNewName(t *testing.T) {
 	}
 }
 
-func TestCamel(t *testing.T) {
-	tests := []struct {
-		name string
-		in   Name
-		want Name
-	}{
-		{
-			name: "1",
-			in:   New("person_name"),
-			want: New("person_names"),
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got := tt.in.Pluralize()
-			assert.Equal(t, tt.want, got)
-		})
-	}
-}
 func TestPluralize(t *testing.T) {
 	tests := []struct {
 		name string
@@ -202,6 +183,36 @@ func TestHasSuffixString(t *testing.T) {
 	}
 }
 
+func TestToCamel(t *testing.T) {
+	tests := []struct {
+		name string
+		n    Name
+		want string
+	}{
+		{
+			name: "1",
+			n:    New("user foo"),
+			want: "userFoo",
+		},
+		{
+			name: "2",
+			n:    New("file_upload"),
+			want: "fileUpload",
+		},
+		{
+			name: "3",
+			n:    New("file_upload").PrependNameNamespaced(New("core")),
+			want: "core_fileUpload",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := tt.n.ToCamel()
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}
+
 func TestToURL(t *testing.T) {
 	tests := []struct {
 		name string
@@ -227,36 +238,6 @@ func TestToURL(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := tt.n.ToURL()
-			assert.Equal(t, tt.want, got)
-		})
-	}
-}
-
-func TestToCamel(t *testing.T) {
-	tests := []struct {
-		name string
-		n    Name
-		want string
-	}{
-		{
-			name: "1",
-			n:    New("user foo"),
-			want: "userFoo",
-		},
-		{
-			name: "2",
-			n:    New("file_upload"),
-			want: "fileUpload",
-		},
-		{
-			name: "3",
-			n:    New("file_upload").PrependNameNamespaced(New("core")),
-			want: "coreFileUpload",
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got := tt.n.ToLowerCamel()
 			assert.Equal(t, tt.want, got)
 		})
 	}
