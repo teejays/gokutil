@@ -78,6 +78,14 @@ func WrapGerror(err error, code int, externalMsg string) error {
 	}
 }
 
+func WrapBadRequest(err error, externalMsg string) error {
+	return WrapGerror(err, http.StatusBadRequest, externalMsg)
+}
+
+func WrapInteralError(err error) error {
+	return WrapGerror(err, http.StatusBadRequest, "We're sorry but something went wrong in our system. We're looking into it.")
+}
+
 func (err GokuError) Error() string {
 	if err.internalError != nil {
 		return err.internalError.Error()
