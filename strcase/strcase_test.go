@@ -13,6 +13,7 @@ type TestCase struct {
 	CamelCase  string
 	SnakeCase  string
 	KebabCase  string
+	TitleCase  string
 }
 
 var testCases = []TestCase{
@@ -22,6 +23,7 @@ var testCases = []TestCase{
 		CamelCase:  "id",
 		SnakeCase:  "id",
 		KebabCase:  "id",
+		TitleCase:  "ID",
 	},
 	{
 		Input:      "ids",
@@ -29,6 +31,7 @@ var testCases = []TestCase{
 		CamelCase:  "ids",
 		SnakeCase:  "ids",
 		KebabCase:  "ids",
+		TitleCase:  "IDs",
 	},
 	{
 		Input:      "first_id",
@@ -36,6 +39,7 @@ var testCases = []TestCase{
 		CamelCase:  "firstID",
 		SnakeCase:  "first_id",
 		KebabCase:  "first-id",
+		TitleCase:  "First ID",
 	},
 	{
 		Input:      "first_ids",
@@ -43,6 +47,7 @@ var testCases = []TestCase{
 		CamelCase:  "firstIDs",
 		SnakeCase:  "first_ids",
 		KebabCase:  "first-ids",
+		TitleCase:  "First IDs",
 	},
 	{
 		Input:      "first_id_last",
@@ -50,6 +55,7 @@ var testCases = []TestCase{
 		CamelCase:  "firstIDLast",
 		SnakeCase:  "first_id_last",
 		KebabCase:  "first-id-last",
+		TitleCase:  "First ID Last",
 	},
 	{
 		Input:      "first_ids_last",
@@ -57,6 +63,7 @@ var testCases = []TestCase{
 		CamelCase:  "firstIDsLast",
 		SnakeCase:  "first_ids_last",
 		KebabCase:  "first-ids-last",
+		TitleCase:  "First IDs Last",
 	},
 	{
 		Input:      "parent___first_ids_last",
@@ -64,6 +71,7 @@ var testCases = []TestCase{
 		CamelCase:  "parent_firstIDsLast",
 		SnakeCase:  "parent__first_ids_last",
 		KebabCase:  "parent--first-ids-last",
+		TitleCase:  "Parent - First IDs Last",
 	},
 }
 
@@ -80,6 +88,9 @@ func TestMain(t *testing.T) {
 		})
 		t.Run("KebabCase: "+tc.Input, func(t *testing.T) {
 			assert.Equalf(t, tc.KebabCase, ToKebab(tc.Input), "Input: %s", tc.Input)
+		})
+		t.Run("TitleCase: "+tc.Input, func(t *testing.T) {
+			assert.Equalf(t, tc.TitleCase, ToTitle(tc.Input), "Input: %s", tc.Input)
 		})
 	}
 }

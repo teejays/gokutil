@@ -284,6 +284,13 @@ func (s Name) ToKebab() string {
 	return strcase.ToKebab(s.words)
 }
 
+// ToTitle converts the Name into a TitleCase, but it respects any major parts of the name (separated by three `_`) and
+// keeps them seperated by a single `-`. E.g. `hello___best_bay` -> `Hello - Best Bay`
+func (s Name) ToTitle() string {
+	panics.If(s.IsEmpty(), "naam.Name.ToTitle() called on empty Name")
+	return strcase.ToTitle(s.words)
+}
+
 // // ToSnakedCamel converts the Name into a CamelCase, but it respects any major parts of the name (separated by three `_`) and
 // // keeps them seperated by a single `_`. E.g. `hello___best_bay` -> `Hello_BestBay`
 // func (s Name) ToSnakedCamel() string {
@@ -323,6 +330,36 @@ func (s Name) ToCompactUpper() string {
 	return strings.ToUpper(s.ToCompact())
 }
 
+// ToCompressedName returns an unrecoverable string representation of the name: 'purchase_id' => 'prchsid'
+func (s Name) ToCompressedName() Name {
+	panics.If(s.IsEmpty(), "naam.Name.ToCompressed() called on empty Name")
+	// Remove all the vowels (unless they are the first letter of the word)
+	words := s.wordParts()
+
+	newWords := ""
+
+	for _, word := range words {
+		for j, letter := range word {
+			// If it's the first letter of the word, or it's an underscore, keep it
+			if j == 0 || letter == '_' {
+				newWords += string(letter)
+				continue
+			}
+			// If it's a consonant, keep it
+			// If it's a vowel, skip it
+			if !strings.Contains("aeiou", string(letter)) {
+				newWords += string(letter)
+				continue
+			}
+
+			continue
+		}
+		// at the end of the word, add an underscore
+		newWords += "_"
+	}
+	return New(newWords)
+}
+
 /* * * * * * * *
  * Formatters (Language Specific)
  * * * * * * * */
@@ -337,9 +374,12 @@ func (s Name) FormatSQL() string {
 	// trying to add the same fkey/object again.
 	// TODO: Instead of just truncating, maybe take a hash and append in the name so we can have unique names
 	if len(s.words) > 63 {
-		panic(fmt.Sprintf("naam.FormatSQL(): name '%s' is longer than 63 characters (which is the SQL limit): ", s.words))
+		s = s.ToCompressedName()
 	}
-	return strcase.ToSnake(s.Truncate(63).words)
+	if len(s.words) > 63 {
+		panic(fmt.Sprintf("naam.FormatSQL(): name '%s' is longer than 63 characters (despite compression): ", s.words))
+	}
+	return s.ToSnake()
 }
 
 // FormatSQLColumn prints a string representation of Name `s`, which may be appropriate for a SQL column name.

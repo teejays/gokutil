@@ -57,42 +57,62 @@ func (t *WithMetaFields) SetDeletedAt(v scalars.Timestamp) {
  * Hooks
  * * * * * */
 
+type HookType string
+
+func (h HookType) Name() naam.Name { return naam.New(string(h)) }
+
+const (
+	HookPoint_CreatePre  HookType = "create_pre"
+	HookPoint_CreatePost HookType = "create_post"
+	HookPoint_UpdatePre  HookType = "update_pre"
+	HookPoint_UpdatePost HookType = "update_post"
+	HookPoint_SavePre    HookType = "save_pre"
+	HookPoint_SavePost   HookType = "save_post"
+	HookPoint_DeletePre  HookType = "delete_pre"
+	HookPoint_DeletePost HookType = "delete_post"
+	HookPoint_ReadPre    HookType = "read_pre"
+	HookPoint_ReadPost   HookType = "read_post"
+)
+
 type TypeHookFunc[T BasicType] func(context.Context, T) (T, error)
 
 type IWithHooks[T BasicType] interface {
 	// Setters
-	SetHookAddBefore(TypeHookFunc[T]) error
-	SetHookAddAfter(TypeHookFunc[T]) error
-	SetHookUpdateBefore(TypeHookFunc[T]) error
-	SetHookUpdateAfter(TypeHookFunc[T]) error
-	SetHookSaveBefore(TypeHookFunc[T]) error
-	SetHookSaveAfter(TypeHookFunc[T]) error
-	SetHookDeleteBefore(TypeHookFunc[T]) error
-	SetHookDeleteAfter(TypeHookFunc[T]) error
-	SetHookFetchAfter(TypeHookFunc[T]) error
+	SetHookCreatePre(TypeHookFunc[T]) error
+	SetHookCreatePost(TypeHookFunc[T]) error
+	SetHookUpdatePre(TypeHookFunc[T]) error
+	SetHookUpdatePost(TypeHookFunc[T]) error
+	SetHookSavePre(TypeHookFunc[T]) error
+	SetHookSavePost(TypeHookFunc[T]) error
+	SetHookDeletePre(TypeHookFunc[T]) error
+	SetHookDeletePost(TypeHookFunc[T]) error
+	SetHookReadPre(TypeHookFunc[T]) error
+	SetHookReadPost(TypeHookFunc[T]) error
 
 	// Getters
-	GetHookAddBefore() TypeHookFunc[T]
-	GetHookAddAfter() TypeHookFunc[T]
-	GetHookUpdateBefore() TypeHookFunc[T]
-	GetHookUpdateAfter() TypeHookFunc[T]
-	GetHookSaveBefore() TypeHookFunc[T]
-	GetHookSaveAfter() TypeHookFunc[T]
-	GetHookDeleteBefore() TypeHookFunc[T]
-	GetHookDeleteAfter() TypeHookFunc[T]
-	GetHookFetchAfter() TypeHookFunc[T]
+	GetHookCreatePre() TypeHookFunc[T]
+	GetHookCreatePost() TypeHookFunc[T]
+	GetHookUpdatePre() TypeHookFunc[T]
+	GetHookUpdatePost() TypeHookFunc[T]
+	GetHookSavePre() TypeHookFunc[T]
+	GetHookSavePost() TypeHookFunc[T]
+	GetHookDeletePre() TypeHookFunc[T]
+	GetHookDeletePost() TypeHookFunc[T]
+	GetHookReadPre() TypeHookFunc[T]
+	GetHookReadPost() TypeHookFunc[T]
 }
 
 type WithHooks[T BasicType] struct {
-	AddBefore    TypeHookFunc[T]
-	AddAfter     TypeHookFunc[T]
-	UpdateBefore TypeHookFunc[T]
-	UpdateAfter  TypeHookFunc[T]
-	SaveBefore   TypeHookFunc[T]
-	SaveAfter    TypeHookFunc[T]
-	DeleteBefore TypeHookFunc[T]
-	DeleteAfter  TypeHookFunc[T]
-	FetchAfter   TypeHookFunc[T]
+	CreatePre  TypeHookFunc[T]
+	CreatePost TypeHookFunc[T]
+	UpdatePre  TypeHookFunc[T]
+	UpdatePost TypeHookFunc[T]
+	SavePre    TypeHookFunc[T]
+	SavePost   TypeHookFunc[T]
+	DeletePre  TypeHookFunc[T]
+	DeletePost TypeHookFunc[T]
+	ReadPre    TypeHookFunc[T]
+	ReadPost   TypeHookFunc[T]
 }
 
 func setHookHelper[T BasicType](fn TypeHookFunc[T], dst *TypeHookFunc[T]) error {
@@ -111,112 +131,124 @@ func NewWithHooks[T BasicType]() IWithHooks[T] {
 	return &WithHooks[T]{}
 }
 
-func (t *WithHooks[T]) SetHookAddBefore(fn TypeHookFunc[T]) error {
-	err := setHookHelper(fn, &t.AddBefore)
+func (t *WithHooks[T]) SetHookCreatePre(fn TypeHookFunc[T]) error {
+	err := setHookHelper(fn, &t.CreatePre)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (t *WithHooks[T]) SetHookAddAfter(fn TypeHookFunc[T]) error {
-	err := setHookHelper(fn, &t.AddAfter)
+func (t *WithHooks[T]) SetHookCreatePost(fn TypeHookFunc[T]) error {
+	err := setHookHelper(fn, &t.CreatePost)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (t *WithHooks[T]) SetHookUpdateBefore(fn TypeHookFunc[T]) error {
-	err := setHookHelper(fn, &t.UpdateBefore)
+func (t *WithHooks[T]) SetHookUpdatePre(fn TypeHookFunc[T]) error {
+	err := setHookHelper(fn, &t.UpdatePre)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (t *WithHooks[T]) SetHookUpdateAfter(fn TypeHookFunc[T]) error {
-	err := setHookHelper(fn, &t.UpdateAfter)
+func (t *WithHooks[T]) SetHookUpdatePost(fn TypeHookFunc[T]) error {
+	err := setHookHelper(fn, &t.UpdatePost)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (t *WithHooks[T]) SetHookSaveBefore(fn TypeHookFunc[T]) error {
-	err := setHookHelper(fn, &t.SaveBefore)
+func (t *WithHooks[T]) SetHookSavePre(fn TypeHookFunc[T]) error {
+	err := setHookHelper(fn, &t.SavePre)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (t *WithHooks[T]) SetHookSaveAfter(fn TypeHookFunc[T]) error {
-	err := setHookHelper(fn, &t.SaveAfter)
+func (t *WithHooks[T]) SetHookSavePost(fn TypeHookFunc[T]) error {
+	err := setHookHelper(fn, &t.SavePost)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (t *WithHooks[T]) SetHookDeleteBefore(fn TypeHookFunc[T]) error {
-	err := setHookHelper(fn, &t.DeleteBefore)
+func (t *WithHooks[T]) SetHookDeletePre(fn TypeHookFunc[T]) error {
+	err := setHookHelper(fn, &t.DeletePre)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (t *WithHooks[T]) SetHookDeleteAfter(fn TypeHookFunc[T]) error {
-	err := setHookHelper(fn, &t.DeleteAfter)
+func (t *WithHooks[T]) SetHookDeletePost(fn TypeHookFunc[T]) error {
+	err := setHookHelper(fn, &t.DeletePost)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (t *WithHooks[T]) SetHookFetchAfter(fn TypeHookFunc[T]) error {
-	err := setHookHelper(fn, &t.FetchAfter)
+func (t *WithHooks[T]) SetHookReadPre(fn TypeHookFunc[T]) error {
+	err := setHookHelper(fn, &t.ReadPre)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (t WithHooks[T]) GetHookAddBefore() TypeHookFunc[T] {
-	return t.AddBefore
+func (t *WithHooks[T]) SetHookReadPost(fn TypeHookFunc[T]) error {
+	err := setHookHelper(fn, &t.ReadPost)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
-func (t WithHooks[T]) GetHookAddAfter() TypeHookFunc[T] {
-	return t.AddAfter
+func (t WithHooks[T]) GetHookCreatePre() TypeHookFunc[T] {
+	return t.CreatePre
 }
 
-func (t WithHooks[T]) GetHookUpdateBefore() TypeHookFunc[T] {
-	return t.UpdateBefore
+func (t WithHooks[T]) GetHookCreatePost() TypeHookFunc[T] {
+	return t.CreatePost
 }
 
-func (t WithHooks[T]) GetHookUpdateAfter() TypeHookFunc[T] {
-	return t.UpdateAfter
+func (t WithHooks[T]) GetHookUpdatePre() TypeHookFunc[T] {
+	return t.UpdatePre
 }
 
-func (t WithHooks[T]) GetHookSaveBefore() TypeHookFunc[T] {
-	return t.SaveBefore
+func (t WithHooks[T]) GetHookUpdatePost() TypeHookFunc[T] {
+	return t.UpdatePost
 }
 
-func (t WithHooks[T]) GetHookSaveAfter() TypeHookFunc[T] {
-	return t.SaveAfter
+func (t WithHooks[T]) GetHookSavePre() TypeHookFunc[T] {
+	return t.SavePre
 }
 
-func (t WithHooks[T]) GetHookDeleteBefore() TypeHookFunc[T] {
-	return t.DeleteBefore
+func (t WithHooks[T]) GetHookSavePost() TypeHookFunc[T] {
+	return t.SavePost
 }
 
-func (t WithHooks[T]) GetHookDeleteAfter() TypeHookFunc[T] {
-	return t.DeleteAfter
+func (t WithHooks[T]) GetHookDeletePre() TypeHookFunc[T] {
+	return t.DeletePre
 }
 
-func (t WithHooks[T]) GetHookFetchAfter() TypeHookFunc[T] {
-	return t.FetchAfter
+func (t WithHooks[T]) GetHookDeletePost() TypeHookFunc[T] {
+	return t.DeletePost
+}
+
+func (t WithHooks[T]) GetHookReadPre() TypeHookFunc[T] {
+	return t.ReadPost
+}
+
+func (t WithHooks[T]) GetHookReadPost() TypeHookFunc[T] {
+	return t.ReadPost
 }
 
 /* * * * * *

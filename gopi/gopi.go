@@ -146,7 +146,7 @@ func GetHandler(ctx context.Context, routes []Route, middlewares MiddlewareFuncs
 func LoggerMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Log the request
-		llog.DebugWithoutCtx("HTTP request received", "method", r.Method, "path", r.URL.Path)
+		llog.DebugWithoutCtx("HTTP request received", "method", r.Method, "path", r.URL.Path, "query", r.URL.String())
 		// Call the next handler
 		next.ServeHTTP(w, r)
 	})

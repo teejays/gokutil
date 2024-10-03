@@ -222,7 +222,7 @@ func GetGenericGetHandler[ReqT, RespT any](fn func(context.Context, ReqT) (RespT
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 
-		log.Debug(ctx, "[HTTP Handler] Starting...")
+		log.Debug(ctx, "[HTTP Handler] Handling GET request...")
 
 		// Get the req data from URL
 		reqParam, ok := r.URL.Query()["req"]
@@ -241,6 +241,7 @@ func GetGenericGetHandler[ReqT, RespT any](fn func(context.Context, ReqT) (RespT
 				WriteError(w, http.StatusBadRequest, err)
 				return
 			}
+			log.Debug(ctx, "[HTTP Handler] Request unmarshaled from URL", "req", req)
 		}
 
 		// Call the method

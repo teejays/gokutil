@@ -6,6 +6,7 @@ import (
 
 	"github.com/doug-martin/goqu/v9"
 	"github.com/huandu/go-sqlbuilder"
+	"github.com/teejays/gokutil/panics"
 )
 
 type Operator int8
@@ -45,6 +46,8 @@ func (o Operator) String() string {
 		return "EQUAL"
 	case NOT_EQUAL:
 		return "NOT_EQUAL"
+	case IN:
+		return "IN"
 	case GREATER_THAN:
 		return "GREATER_THAN"
 	case GREATER_THAN_EQUAL:
@@ -64,8 +67,10 @@ func (o Operator) String() string {
 	case IS_NOT_NULL:
 		return "IS_NOT_NULL"
 	default:
-		return "INVALID_OPERATOR"
+		panics.P("Unrecognized Filter Operator [%d]", o)
 	}
+
+	return ""
 }
 
 func (o *Operator) FromString(str string) error {
@@ -74,6 +79,8 @@ func (o *Operator) FromString(str string) error {
 		*o = EQUAL
 	case "NOT_EQUAL":
 		*o = NOT_EQUAL
+	case "IN":
+		*o = IN
 	case "GREATER_THAN":
 		*o = GREATER_THAN
 	case "GREATER_THAN_EQUAL":
@@ -93,7 +100,7 @@ func (o *Operator) FromString(str string) error {
 	case "IS_NOT_NULL":
 		*o = IS_NOT_NULL
 	default:
-		return fmt.Errorf("Unrecognized Operator '%s'", str)
+		return fmt.Errorf("Unrecognized Filter Operator [%s]", str)
 	}
 	return nil
 }

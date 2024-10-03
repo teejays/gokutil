@@ -242,3 +242,33 @@ func TestToURL(t *testing.T) {
 		})
 	}
 }
+
+func TestToCompressedName(t *testing.T) {
+	tests := []struct {
+		name string
+		n    Name
+		want Name
+	}{
+		{
+			name: "1",
+			n:    New("user"),
+			want: New("usr"),
+		},
+		{
+			name: "2",
+			n:    New("file_upload"),
+			want: New("fl_upld"),
+		},
+		{
+			name: "3",
+			n:    New("purchase_id"),
+			want: New("prchs_id"),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := tt.n.ToCompressedName()
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}

@@ -81,6 +81,9 @@ func (id *ID) ParseString(str string) error {
 // JSON
 
 func (id ID) MarshalJSON() ([]byte, error) {
+	if id.IsEmpty() {
+		return []byte("null"), nil
+	}
 	return strconv.AppendQuote(nil, id.String()), nil
 }
 

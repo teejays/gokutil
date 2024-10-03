@@ -117,6 +117,19 @@ func ToKebab(s string) string {
 	return s
 }
 
+func ToTitle(s string) string {
+	parts := strings.Split(s, PartsSep)
+	for i := range parts {
+		words := strings.Split(parts[i], "_")
+		for j := range words {
+			words[j] = UpperizeAcronymWord(words[j])
+			words[j] = capitalizeFirstLetterInWord(words[j])
+		}
+		parts[i] = strings.Join(words, " ")
+	}
+	return strings.Join(parts, " - ")
+}
+
 /* * * * * * *
 * Helper Functions
 * * * * * * */
@@ -159,6 +172,13 @@ func ToPascalWord(w string) string {
 	w = strcase.ToCamel(w)
 	w = UpperizeAcronymWord(w)
 	return w
+}
+
+func capitalizeFirstLetterInWord(word string) string {
+	if word == "" {
+		return word
+	}
+	return strings.ToUpper(word[:1]) + word[1:]
 }
 
 var pluralOverrides = map[string]string{

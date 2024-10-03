@@ -177,7 +177,7 @@ func BatchAddType[T types.BasicType, F types.Field](ctx context.Context, conn db
 	}
 
 	// Run any before create hooks
-	if fn := meta.GetHookAddBefore(); fn != nil {
+	if fn := meta.GetHookCreatePre(); fn != nil {
 		log.Warn(ctx, "Running BeforeCreateHook", "type", meta.GetTypeCommonMeta().Name)
 		for i := range elems {
 			var err error

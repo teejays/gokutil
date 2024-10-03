@@ -24,10 +24,13 @@ func Unmarshal(src []byte, v interface{}) error {
 
 	unmarshaler := conjson.NewUnmarshaler(v, transform.ConventionalKeys())
 
+	// JSON unmarshal strict mode, so any unknown fields will cause an error
+
 	err := json.Unmarshal(src, unmarshaler)
 	if err != nil {
 		return err
 	}
+
 	return nil
 
 }
