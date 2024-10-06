@@ -5,6 +5,7 @@ import (
 	"database/sql/driver"
 	"fmt"
 	"net/mail"
+	"os"
 	"strconv"
 	"time"
 
@@ -178,7 +179,7 @@ func (t Timestamp) Validate() error {
 }
 
 func (t *Timestamp) ParseString(str string) error {
-	_t, err := NewFromString(str)
+	_t, err := NewTimestampFromString(str)
 	if err != nil {
 		return err
 	}
@@ -211,7 +212,20 @@ func (d Timestamp) ImplementsGraphQLType(name string) bool {
 
 // Custom Methods
 
-func NewFromString(str string) (Timestamp, error) {
+// NewTimestampNow creates a new Timestamp with the current time. If the environment variable GOKUTIL_TIMESTAMP_NOW is set, it will use that value instead.
+// This is useful for testing when you want to have a consistent time.
+func NewTimestampNow() Timestamp {
+	now := time.Now()
+	overrideNowStr := os.Getenv("GOKUTIL_TIMESTAMP_NOW")
+	if overrideNowStr != "" {
+		var err error
+		now, err = time.Parse(time.RFC3339, overrideNowStr)
+		panics.IfError(err, "Parsing GOKUTIL_TIMESTAMP_NOW [%s]: %s. Make sure the value is RFC3339", overrideNowStr, err)
+	}
+	return NewTime(now)
+}
+
+func NewTimestampFromString(str string) (Timestamp, error) {
 	t, err := time.Parse(time.RFC3339, str)
 	if err != nil {
 		return Timestamp{}, err
@@ -441,6 +455,42 @@ func NewSecret(value string) Secret {
 
 func (s Secret) ImplementsGraphQLType(name string) bool {
 	return name == "Secret"
+}
+
+/* * * * * * *
+ * JSON
+* * * * * * */
+
+type JSON struct {
+	GenericStringScalar
+}
+
+func NewJSON(value string) JSON {
+	return JSON{GenericStringScalar: NewGenericStringScalar(value)}
+}
+
+func (g *JSON) Scan(value interface{}) error {
+	if value == nil {
+		return nil
+	}
+	// Stored in SQL as type jsonb
+	switch v := value.(type) {
+	case []byte:
+		str := string(v)
+		g.value = str
+		return nil
+	default:
+		return fmt.Errorf("could not scan SQL db value into scalar.JSON field: %v", v)
+	}
+
+}
+
+func (s JSON) ImplementsGraphQLType(name string) bool {
+	return name == "JSON"
+}
+
+func NewJSONFromBytes(b []byte) JSON {
+	return NewJSON(string(b))
 }
 
 /* * * * * * *

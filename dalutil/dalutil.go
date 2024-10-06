@@ -53,7 +53,7 @@ type ITypeDALMeta[T types.BasicType, F types.Field] interface {
 	FetchSubTableFields(context.Context, db.Connection, db.ListTypeByIDsParams, []T) ([]T, error)
 	// Update Type
 	GetChangedFieldsAndValues(old, new T, allowedFields []F) ([]F, []interface{})
-	UpdateSubTableFields(context.Context, db.Connection, UpdateTypeRequest[T, F], []F, T) (T, error) // TODO
+	UpdateSubTableFields(context.Context, db.Connection, UpdateTypeRequest[T, F], []F, T, T) (T, error) // TODO
 
 }
 
@@ -155,8 +155,20 @@ func FieldsToStrings[T types.Field](fields []T) []string {
 	return colNames
 }
 
-func BatchAddType[T types.BasicType, F types.Field](ctx context.Context, conn db.Connection, params db.InsertTypeParams, meta ITypeDALMeta[T, F], elems ...T) ([]T, error) {
+func AddType[T types.BasicType, F types.Field](ctx context.Context, conn db.Connection, params db.InsertTypeParams, meta ITypeDALMeta[T, F], elem T) (T, error) {
+	log.Info(ctx, "Adding type", "type", meta.GetTypeCommonMeta().Name, "data", elem)
+	var emptyT T
+	items, err := BatchAddType(ctx, conn, params, meta, elem)
+	if err != nil {
+		return emptyT, err
+	}
+	if len(items) != 1 {
+		return emptyT, fmt.Errorf("expected 1 item to be added but got %d items", len(items))
+	}
+	return items[0], nil
+}
 
+func BatchAddType[T types.BasicType, F types.Field](ctx context.Context, conn db.Connection, params db.InsertTypeParams, meta ITypeDALMeta[T, F], elems ...T) ([]T, error) {
 	now := time.Now()
 
 	// Meta info
@@ -178,16 +190,20 @@ func BatchAddType[T types.BasicType, F types.Field](ctx context.Context, conn db
 
 	// Run any before create hooks
 	if fn := meta.GetHookCreatePre(); fn != nil {
-		log.Warn(ctx, "Running BeforeCreateHook", "type", meta.GetTypeCommonMeta().Name)
+		log.Info(ctx, "Running BeforeCreateHook", "type", meta.GetTypeCommonMeta().Name)
 		for i := range elems {
 			var err error
 			elems[i], err = fn(ctx, elems[i])
 			if err != nil {
-				return nil, fmt.Errorf("BeforeCreateHook failed for item index [%d]: %w", i, err)
+				if len(elems) == 1 {
+					return nil, fmt.Errorf("BeforeCreateHook failed: %w", err)
+				} else {
+					return nil, fmt.Errorf("BeforeCreateHook failed for item index [%d]: %w", i, err)
+				}
 			}
 		}
 	} else {
-		log.Warn(ctx, "No BeforeCreateHook found", "type", meta.GetTypeCommonMeta().Name, "meta", meta)
+		log.Debug(ctx, "No BeforeCreateHook found", "type", meta.GetTypeCommonMeta().Name, "meta", meta)
 	}
 
 	// Validate the types before they are added
@@ -195,7 +211,11 @@ func BatchAddType[T types.BasicType, F types.Field](ctx context.Context, conn db
 	for i := range elems {
 		err := validate.Struct(elems[i])
 		if err != nil {
-			errs.AddNew("Validation failed for item at position [%d]: %w", i+1, err)
+			if len(elems) == 1 {
+				errs.AddNew("Validation failed: %w", err)
+			} else {
+				errs.AddNew("Validation failed for item at position [%d]: %w", i+1, err)
+			}
 		}
 	}
 	if !errs.IsNil() {
@@ -278,20 +298,15 @@ func ListTypeByIDs[T types.BasicType, F types.Field](ctx context.Context, conn d
 	for rows.Next() {
 		elem, errInner := meta.ScanDBNextRow(rows)
 		if errInner != nil {
-			return resp, err
+			return resp, errInner
 		}
 		elems = append(elems, elem)
 	}
 
-	llog.Debug(ctx, "Sql rows fetched", "type", meta.GetTypeCommonMeta().Name, "count", len(elems), "data", elems)
-
-	// Unique Primary IDs of the fetched type
-	var ids []scalars.ID
-	for _, elem := range elems {
-		ids = append(ids, elem.GetID())
-	}
+	llog.Debug(ctx, "SQL query executed. Rows fetched.", "type", meta.GetTypeCommonMeta().Name, "count", len(elems), "data", elems)
 
 	// Nested Fields
+	llog.Debug(ctx, "Fetching sub-table fields", "type", meta.GetTypeCommonMeta().Name)
 	elems, err = meta.FetchSubTableFields(ctx, conn, params, elems)
 	if err != nil {
 		return resp, err
@@ -303,14 +318,21 @@ func ListTypeByIDs[T types.BasicType, F types.Field](ctx context.Context, conn d
 }
 
 func UpdateType[T types.BasicType, F types.Field](ctx context.Context, conn db.Connection, req UpdateTypeRequest[T, F], meta ITypeDALMeta[T, F]) (UpdateTypeResponse[T], error) {
+	llog.Info(ctx, "Updating type", "type", meta.GetTypeCommonMeta().Name, "data", req.Object)
 	var resp UpdateTypeResponse[T]
 	now := scalars.NewTime(time.Now().UTC())
 
-	if req.Object.GetID().IsEmpty() {
-		return resp, fmt.Errorf("object has an empty ID")
-	}
-
 	elem := req.Object
+
+	if elem.GetID().IsEmpty() {
+		llog.Warn(ctx, "Object has an empty ID, therefore it will be added", "type", meta.GetTypeCommonMeta().Name)
+		addedElem, err := AddType(ctx, conn, db.InsertTypeParams{TableName: req.TableName}, meta, req.Object)
+		if err != nil {
+			return resp, fmt.Errorf("could not add object with empty ID: %w", err)
+		}
+		resp.Object = addedElem
+		return resp, nil
+	}
 
 	fields := req.Fields
 	excludeFields := req.ExcludeFields
@@ -319,20 +341,21 @@ func UpdateType[T types.BasicType, F types.Field](ctx context.Context, conn db.C
 	var errs = errutil.NewMultiErr()
 
 	// Validate that the ID exists
+	llog.Debug(ctx, "Fetching existing type", "type", meta.GetTypeCommonMeta().Name, "id", elem.GetID())
 	subParams := db.ListTypeByIDsParams{
 		TableName: req.TableName,
 		IDColumn:  "id",
-		IDs:       []scalars.ID{req.Object.GetID()},
+		IDs:       []scalars.ID{elem.GetID()},
 	}
-	existingElemsResp, err := ListTypeByIDs[T, F](ctx, conn, subParams, meta)
+	oldElemsResp, err := ListTypeByIDs[T, F](ctx, conn, subParams, meta)
 	if err != nil {
-		return resp, fmt.Errorf("could not list by ID %s: %w", req.Object.GetID(), err)
+		return resp, fmt.Errorf("could not list by ID %s: %w", elem.GetID(), err)
 	}
-	if len(existingElemsResp.Items) < 1 {
-		errs.AddNew("Type with ID %s does not exist: %w", req.Object.GetID(), errutil.ErrNotFound)
+	if len(oldElemsResp.Items) < 1 {
+		return resp, fmt.Errorf("Type [%s] with ID [%s] not found: %w", meta.GetTypeCommonMeta().Name, elem.GetID(), errutil.ErrNotFound)
 	}
-	panics.If(len(existingElemsResp.Items) > 1, "Multiple elements founds for ID %s in table %s", req.Object.GetID(), req.TableName)
-	existingElem := existingElemsResp.Items[0]
+	panics.If(len(oldElemsResp.Items) > 1, "Multiple elements founds for ID %s in table %s", elem.GetID(), req.TableName)
+	oldElem := oldElemsResp.Items[0]
 
 	// (Included) Fields (provided by the caller) should not include any field updatable only by DAL
 	for _, f := range meta.GetCommonDALMeta().SetInternallyByDALFields {
@@ -364,55 +387,65 @@ func UpdateType[T types.BasicType, F types.Field](ctx context.Context, conn db.C
 		}
 	}
 
-	// Get Updatable Columns (taking field mask into account)
-	var cols = meta.GetCommonDALMeta().DatabaseColumnFields
-	allowedCols := types.PruneFields(cols, fields, excludeFields)
-	if len(cols) < 1 {
-		return resp, fmt.Errorf("no fields provided for update: nothing to update")
+	// Get updatable fields (taking field mask into account)
+	allFields := meta.GetTypeCommonMeta().Fields
+	allowedFields := types.PruneFields(allFields, fields, excludeFields)
+	if len(allowedFields) < 1 {
+		return resp, fmt.Errorf("no fields available for update")
 	}
 
-	llog.Debug(ctx, "Updating fields", "type", meta.GetTypeCommonMeta().Name, "columns", allowedCols)
+	// Direct table
+	{
+		cols := meta.GetCommonDALMeta().DatabaseColumnFields
+		allowedCols := types.PruneFields(allowedFields, cols, nil)
+		if len(allowedCols) < 1 {
+			// nothing to update on the main table
+			llog.Warn(ctx, "No direct database columns to update", "type", meta.GetTypeCommonMeta().Name)
+		} else {
 
-	// Convert timestamps to UTC
-	elem = meta.ConvertTimestampColumnsToUTC(elem)
+			llog.Debug(ctx, "Updating direct database fields", "type", meta.GetTypeCommonMeta().Name, "columns", allowedCols)
+			// Convert timestamps to UTC
+			elem = meta.ConvertTimestampColumnsToUTC(elem)
 
-	// Get changed fields and values
-	colsWithValueChange, vals := meta.GetChangedFieldsAndValues(existingElem, elem, allowedCols)
+			// Get changed fields and values
+			colsWithValueChange, vals := meta.GetChangedFieldsAndValues(oldElem, elem, allowedCols)
+			// If nothing needs to be updated, return
+			if len(colsWithValueChange) < 1 {
+				llog.Warn(ctx, "No difference found in existing and provided type", "type", meta.GetTypeCommonMeta().Name)
+			} else {
 
-	// If nothing needs to be updated, return
-	if len(colsWithValueChange) < 1 {
-		return resp, fmt.Errorf("No difference found in existing and provided type: %w", errutil.ErrNothingToUpdate)
-	}
+				// Set UpdateAt field values
+				elem.SetUpdatedAt(now)
 
-	// Set UpdateAt field values
-	elem.SetUpdatedAt(now)
+				// Add UpdatedAt fields to update columns
+				colsWithValueChange = append(colsWithValueChange, meta.GetCommonDALMeta().UpdatedAtField)
+				vals = append(vals, elem.GetUpdatedAt())
 
-	// Add UpdatedAt fields to update columns
-	colsWithValueChange = append(colsWithValueChange, meta.GetCommonDALMeta().UpdatedAtField)
-	vals = append(vals, elem.GetUpdatedAt())
+				// Get Query
+				updateBuilderRequest := db.UpdateBuilderRequest{
+					TableName: req.TableName,
+					ID:        elem.GetID(),
+					Columns:   FieldsToStrings(colsWithValueChange),
+					Values:    vals,
+				}
+				query, args, err := conn.ConstructUpdateQuery(ctx, updateBuilderRequest)
+				if err != nil {
+					return resp, fmt.Errorf("Could not construct Update SQL query: %w", err)
+				}
 
-	// Get Query
-	updateBuilderRequest := db.UpdateBuilderRequest{
-		TableName: req.TableName,
-		ID:        elem.GetID(),
-		Columns:   FieldsToStrings(colsWithValueChange),
-		Values:    vals,
-	}
-	query, args, err := conn.ConstructUpdateQuery(ctx, updateBuilderRequest)
-	if err != nil {
-		return resp, fmt.Errorf("Could not construct Update SQL query: %w", err)
-	}
-
-	rowsAffected, err := conn.ExecuteQuery(ctx, query, args...)
-	if err != nil {
-		return resp, err
-	}
-	if rowsAffected != 1 {
-		return resp, fmt.Errorf("expected 1 row to be affected but got %d rows affected", rowsAffected)
+				rowsAffected, err := conn.ExecuteQuery(ctx, query, args...)
+				if err != nil {
+					return resp, err
+				}
+				if rowsAffected != 1 {
+					return resp, fmt.Errorf("expected 1 row to be affected but got %d rows affected", rowsAffected)
+				}
+			}
+		}
 	}
 
 	// Update Nested (1:1 & 1:Many)
-	elem, err = meta.UpdateSubTableFields(ctx, conn, req, allowedCols, elem)
+	elem, err = meta.UpdateSubTableFields(ctx, conn, req, allowedFields, elem, oldElem)
 	if err != nil {
 		return resp, fmt.Errorf("Updating sub table fields: %w", err)
 	}

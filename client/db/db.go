@@ -199,7 +199,7 @@ func (c *Connection) Begin(ctx context.Context) error {
 	}
 
 	// Otherwise start a transaction
-	log.Info(ctx, "Begin transaction")
+	log.Debug(ctx, "Begin transaction", "number", c.NumTxs)
 	txn, err := c.DB.BeginTx(ctx, &sql.TxOptions{})
 	if err != nil {
 		return err
@@ -225,10 +225,10 @@ func (c *Connection) Commit(ctx context.Context) error {
 
 	// If we have another deeper transaction left, don't do anything. Only commit on final commit.
 	if c.NumTxs > 0 {
-		log.Warn(ctx, "Attempting to commit a nested SQL transaction")
+		log.Warn(ctx, "Committing a nested SQL transaction. This is a dummy commit, the actual commit will happen on the final commit", "number", c.NumTxs+1)
 		return nil
 	}
-	log.Info(ctx, "Commiting transaction")
+	log.Debug(ctx, "Commiting transaction", "number", c.NumTxs+1)
 	err := c.Tx.Commit()
 	if err != nil {
 		return err

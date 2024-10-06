@@ -128,6 +128,12 @@ func NewEmailCondition(op Operator, values ...scalars.Email) *EmailCondition {
 	return NewGenericCondition(op, values...)
 }
 
+type JSONCondition = GenericCondition[scalars.JSON]
+
+func NewJSONCondition(op Operator, values ...scalars.JSON) *JSONCondition {
+	return NewGenericCondition(op, values...)
+}
+
 func SecretCondition(op Operator, values ...string) *StringCondition {
 	return NewStringCondition(op, values...)
 }
