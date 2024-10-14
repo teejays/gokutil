@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/doug-martin/goqu/v9"
+	"github.com/teejays/gokutil/log"
 	"github.com/teejays/gokutil/scalars"
 )
 
@@ -62,6 +63,7 @@ func InjectConditionIntoSqlBuilder(f Condition, sb *goqu.SelectDataset, col stri
 	}
 	// Get Values
 	values := ListConditionValues(f)
+	log.DebugWithoutCtx("Injecting condition into SQL Builder", "Operator", info, "Column", col, "Values", values)
 	sb = info.InjectSqlBuilderWhereCond_Goqu(sb, col, values...)
 	return sb, nil
 }
@@ -83,6 +85,7 @@ func (f GenericCondition[T]) GetValue(i int) interface{} { return f.Values[i] }
 type StringCondition = GenericCondition[string]
 
 func NewStringCondition(op Operator, values ...string) *StringCondition {
+	log.DebugWithoutCtx("Creating new StringCondition", "Operator", op, "Values", values)
 	return NewGenericCondition(op, values...)
 }
 
@@ -128,9 +131,9 @@ func NewEmailCondition(op Operator, values ...scalars.Email) *EmailCondition {
 	return NewGenericCondition(op, values...)
 }
 
-type JSONCondition = GenericCondition[scalars.JSON]
+type GenericDataCondition = GenericCondition[scalars.GenericData]
 
-func NewJSONCondition(op Operator, values ...scalars.JSON) *JSONCondition {
+func NewGenericDataCondition(op Operator, values ...scalars.GenericData) *GenericDataCondition {
 	return NewGenericCondition(op, values...)
 }
 

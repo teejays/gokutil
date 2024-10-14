@@ -125,6 +125,12 @@ func TestUnmarshalJSON(t *testing.T) {
 			want:    Name{words: "sample_app"},
 			wantErr: false,
 		},
+		{
+			name:    "With qoutes",
+			data:    []byte(`"Sample App"`),
+			want:    Name{words: "sample_app"},
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

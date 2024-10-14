@@ -49,12 +49,15 @@ type ITypeDALMeta[T types.BasicType, F types.Field] interface {
 	GetDirectDBValues(T) []interface{} // Returns all the values that need to be added to DB
 	AddSubTableFieldsToDB(context.Context, db.Connection, db.InsertTypeParams, T) (T, error)
 	// ListType
-	ScanDBNextRow(*sql.Rows) (T, error)
+	ScanDBNextRow(context.Context, *sql.Rows) (T, error)
 	FetchSubTableFields(context.Context, db.Connection, db.ListTypeByIDsParams, []T) ([]T, error)
 	// Update Type
 	GetChangedFieldsAndValues(old, new T, allowedFields []F) ([]F, []interface{})
 	UpdateSubTableFields(context.Context, db.Connection, UpdateTypeRequest[T, F], []F, T, T) (T, error) // TODO
 
+	InternalHookSavePre(ctx context.Context, elem T, now scalars.Timestamp) (T, error)
+	// InternalHookCreatePre(ctx context.Context, elem T, now scalars.Timestamp) (T, error)
+	// InternalHookFetchPre(ctx context.Context, elem T) (T, error)
 }
 
 // TypeCommonDALMeta
@@ -169,41 +172,60 @@ func AddType[T types.BasicType, F types.Field](ctx context.Context, conn db.Conn
 }
 
 func BatchAddType[T types.BasicType, F types.Field](ctx context.Context, conn db.Connection, params db.InsertTypeParams, meta ITypeDALMeta[T, F], elems ...T) ([]T, error) {
-	now := time.Now()
+	now := scalars.NewTimestampNow()
+
+	var err error
 
 	// Meta info
 
-	// Set the Meta field values for each elem
+	// Make any internal changes to the data before saving and after custom hooks
 	for i := range elems {
-		elems[i] = meta.SetMetaFieldValues(ctx, elems[i], now)
-	}
-
-	// Convert all timestamps to UTC
-	for i := range elems {
-		elems[i] = meta.ConvertTimestampColumnsToUTC(elems[i])
+		elems[i], err = meta.InternalHookSavePre(ctx, elems[i], now)
+		if err != nil {
+			return nil, fmt.Errorf("Running InternalHookSavePre [item %d]: %w", i+1, err)
+		}
 	}
 
 	// Add any default values for missing fields
+	// Todo: this should be a part of InternalHookCreatePre
 	for i := range elems {
 		elems[i] = meta.SetDefaultFieldValues(elems[i])
 	}
 
 	// Run any before create hooks
 	if fn := meta.GetHookCreatePre(); fn != nil {
-		log.Info(ctx, "Running BeforeCreateHook", "type", meta.GetTypeCommonMeta().Name)
+		log.Info(ctx, "Running HookCreatePre", "type", meta.GetTypeCommonMeta().Name)
 		for i := range elems {
 			var err error
 			elems[i], err = fn(ctx, elems[i])
 			if err != nil {
 				if len(elems) == 1 {
-					return nil, fmt.Errorf("BeforeCreateHook failed: %w", err)
+					return nil, fmt.Errorf("HookCreatePre failed: %w", err)
 				} else {
-					return nil, fmt.Errorf("BeforeCreateHook failed for item index [%d]: %w", i, err)
+					return nil, fmt.Errorf("HookCreatePre failed for item index [%d]: %w", i, err)
 				}
 			}
 		}
 	} else {
-		log.Debug(ctx, "No BeforeCreateHook found", "type", meta.GetTypeCommonMeta().Name, "meta", meta)
+		log.Debug(ctx, "No HookCreatePre found", "type", meta.GetTypeCommonMeta().Name, "meta", meta)
+	}
+
+	// Run any before save hooks
+	if fn := meta.GetHookSavePre(); fn != nil {
+		log.Info(ctx, "Running HookSavePre", "type", meta.GetTypeCommonMeta().Name)
+		for i := range elems {
+			var err error
+			elems[i], err = fn(ctx, elems[i])
+			if err != nil {
+				if len(elems) == 1 {
+					return nil, fmt.Errorf("HookSavePre failed: %w", err)
+				} else {
+					return nil, fmt.Errorf("HookSavePre failed for item index [%d]: %w", i, err)
+				}
+			}
+		}
+	} else {
+		log.Debug(ctx, "No HookSavePre found", "type", meta.GetTypeCommonMeta().Name, "meta", meta)
 	}
 
 	// Validate the types before they are added
@@ -296,7 +318,7 @@ func ListTypeByIDs[T types.BasicType, F types.Field](ctx context.Context, conn d
 	// Convert rows to the item
 	var elems = []T{}
 	for rows.Next() {
-		elem, errInner := meta.ScanDBNextRow(rows)
+		elem, errInner := meta.ScanDBNextRow(ctx, rows)
 		if errInner != nil {
 			return resp, errInner
 		}
@@ -310,6 +332,24 @@ func ListTypeByIDs[T types.BasicType, F types.Field](ctx context.Context, conn d
 	elems, err = meta.FetchSubTableFields(ctx, conn, params, elems)
 	if err != nil {
 		return resp, err
+	}
+
+	// Run any before save hooks
+	if fn := meta.GetHookReadPost(); fn != nil {
+		log.Info(ctx, "Running HookReadPost", "type", meta.GetTypeCommonMeta().Name)
+		for i := range elems {
+			var err error
+			elems[i], err = fn(ctx, elems[i])
+			if err != nil {
+				if len(elems) == 1 {
+					return resp, fmt.Errorf("HookReadPost failed: %w", err)
+				} else {
+					return resp, fmt.Errorf("HookReadPost failed for item index [%d]: %w", i, err)
+				}
+			}
+		}
+	} else {
+		log.Debug(ctx, "No HookReadPost found", "type", meta.GetTypeCommonMeta().Name, "meta", meta)
 	}
 
 	resp.Items = elems
@@ -394,6 +434,38 @@ func UpdateType[T types.BasicType, F types.Field](ctx context.Context, conn db.C
 		return resp, fmt.Errorf("no fields available for update")
 	}
 
+	// Make any internal changes to the data before saving and before custom hooks
+	elem, err = meta.InternalHookSavePre(ctx, elem, now)
+	if err != nil {
+		return resp, fmt.Errorf("Running InternalHookSavePre (before custom hooks): %w", err)
+	}
+
+	// Update Pre Hooks
+	if fn := meta.GetHookUpdatePre(); fn != nil {
+		log.Info(ctx, "Running HookUpdatePre", "type", meta.GetTypeCommonMeta().Name)
+		var err error
+		elem, err = fn(ctx, elem)
+		if err != nil {
+			return resp, fmt.Errorf("HookUpdatePre failed: %w", err)
+		}
+
+	} else {
+		log.Debug(ctx, "No HookUpdatePre found", "type", meta.GetTypeCommonMeta().Name, "meta", meta)
+	}
+
+	// Save Pre Hooks
+	if fn := meta.GetHookSavePre(); fn != nil {
+		log.Info(ctx, "Running HookSavePre", "type", meta.GetTypeCommonMeta().Name)
+		var err error
+		elem, err = fn(ctx, elem)
+		if err != nil {
+			return resp, fmt.Errorf("HookSavePre failed: %w", err)
+		}
+
+	} else {
+		log.Debug(ctx, "No HookSavePre found", "type", meta.GetTypeCommonMeta().Name, "meta", meta)
+	}
+
 	// Direct table
 	{
 		cols := meta.GetCommonDALMeta().DatabaseColumnFields
@@ -404,8 +476,6 @@ func UpdateType[T types.BasicType, F types.Field](ctx context.Context, conn db.C
 		} else {
 
 			llog.Debug(ctx, "Updating direct database fields", "type", meta.GetTypeCommonMeta().Name, "columns", allowedCols)
-			// Convert timestamps to UTC
-			elem = meta.ConvertTimestampColumnsToUTC(elem)
 
 			// Get changed fields and values
 			colsWithValueChange, vals := meta.GetChangedFieldsAndValues(oldElem, elem, allowedCols)
@@ -413,9 +483,6 @@ func UpdateType[T types.BasicType, F types.Field](ctx context.Context, conn db.C
 			if len(colsWithValueChange) < 1 {
 				llog.Warn(ctx, "No difference found in existing and provided type", "type", meta.GetTypeCommonMeta().Name)
 			} else {
-
-				// Set UpdateAt field values
-				elem.SetUpdatedAt(now)
 
 				// Add UpdatedAt fields to update columns
 				colsWithValueChange = append(colsWithValueChange, meta.GetCommonDALMeta().UpdatedAtField)

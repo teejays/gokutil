@@ -73,6 +73,22 @@ var testCases = []TestCase{
 		KebabCase:  "parent--first-ids-last",
 		TitleCase:  "Parent - First IDs Last",
 	},
+	{
+		Input:      "common",
+		PascalCase: "Common",
+		CamelCase:  "common",
+		SnakeCase:  "common",
+		KebabCase:  "common",
+		TitleCase:  "Common",
+	},
+	{
+		Input:      `"common"`,
+		PascalCase: "Common",
+		CamelCase:  "common",
+		SnakeCase:  "common",
+		KebabCase:  "common",
+		TitleCase:  "Common",
+	},
 }
 
 func TestMain(t *testing.T) {

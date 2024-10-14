@@ -3,6 +3,7 @@ package scalars
 import (
 	"crypto/sha256"
 	"database/sql/driver"
+	"encoding/json"
 	"fmt"
 	"net/mail"
 	"os"
@@ -155,6 +156,42 @@ func NewIDFromString(str string) (ID, error) {
 	return ID{uid}, nil
 }
 
+// /* * * * * * *
+//  * Short ID
+// * * * * * * */
+
+// type ShortID struct {
+// 	GenericStringScalar
+// }
+
+// func NewShortID() ShortID {
+// 	panics.If(shortIDGenerator == nil, "ShortID Generator not initialized. Did you call InitShortID() first?")
+
+// 	// Get a random 4 digit numbers to use as input to the short ID generator
+// 	// This is to ensure that the short ID is not predictable
+// 	randNum := rand.Uint64()
+// 	shortID, err := shortIDGenerator.Encode([]uint64{randNum})
+// 	panics.IfError(err, "Generating short ID: %s", err)
+// 	return ShortID{GenericStringScalar: NewGenericStringScalar(shortID)}
+// }
+
+// // Custom
+
+// var shortIDGenerator *squids.Sqids
+
+// func InitShortID() error {
+// 	sqid, err := squids.New(squids.Options{
+// 		// All uppercase letters and numbers, other than 0 (since it confuse with O)
+// 		Alphabet:  "ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789",
+// 		MinLength: 5,
+// 	})
+// 	if err != nil {
+// 		return err
+// 	}
+// 	shortIDGenerator = sqid
+// 	return nil
+// }
+
 /* * * * * * *
  * Timestamp
 * * * * * * */
@@ -235,6 +272,11 @@ func NewTimestampFromString(str string) (Timestamp, error) {
 
 func (t Timestamp) ToGolangTime() time.Time {
 	return t.Time.Time
+}
+
+// Standardize ensures that the time is stored in the correct format i.e. in UTC.
+func (t *Timestamp) Standardize() {
+	t.Time.Time = t.Time.Time.UTC()
 }
 
 /* * * * * * *
@@ -458,39 +500,87 @@ func (s Secret) ImplementsGraphQLType(name string) bool {
 }
 
 /* * * * * * *
- * JSON
+ * GenericData
 * * * * * * */
 
-type JSON struct {
-	GenericStringScalar
+type GenericData struct {
+	value string // JSON. We could use []byte, but string is comparable
 }
 
-func NewJSON(value string) JSON {
-	return JSON{GenericStringScalar: NewGenericStringScalar(value)}
+func (g GenericData) String() string {
+	return string(g.value)
 }
 
-func (g *JSON) Scan(value interface{}) error {
+func (g GenericData) IsEmpty() bool {
+	return g.value == ""
+}
+
+func (g *GenericData) ParseString(str string) error {
+	// Assume the string is a JSON string
+	// Ensure it is valid JSON
+	m := map[string]interface{}{}
+	err := json.Unmarshal([]byte(str), &m)
+	if err != nil {
+		return err
+	}
+	g.value = str
+	return nil
+}
+
+func (g GenericData) MarshalJSON() ([]byte, error) {
+	return []byte(g.value), nil
+}
+
+func (g *GenericData) UnmarshalJSON(data []byte) error {
+	return g.ParseString(string(data))
+}
+
+func (g *GenericData) Scan(value interface{}) error {
 	if value == nil {
 		return nil
 	}
 	// Stored in SQL as type jsonb
 	switch v := value.(type) {
 	case []byte:
-		str := string(v)
-		g.value = str
+		err := g.ParseString(string(v))
+		if err != nil {
+			return err
+		}
 		return nil
 	default:
-		return fmt.Errorf("could not scan SQL db value into scalar.JSON field: %v", v)
+		return fmt.Errorf("could not scan SQL db value into scalar.GenericData field: %v", v)
 	}
 
 }
 
-func (s JSON) ImplementsGraphQLType(name string) bool {
-	return name == "JSON"
+func (s GenericData) ImplementsGraphQLType(name string) bool {
+	return name == "GenericData"
 }
 
-func NewJSONFromBytes(b []byte) JSON {
-	return NewJSON(string(b))
+func (g GenericData) Value() (driver.Value, error) {
+	return g.value, nil
+}
+
+func NewGenericDataFromStruct(value interface{}) (GenericData, error) {
+	// Assume the value is an object
+	bytes, err := json.Marshal(value)
+	if err != nil {
+		return GenericData{}, err
+	}
+	var m = map[string]interface{}{}
+	err = json.Unmarshal(bytes, &m)
+	if err != nil {
+		return GenericData{}, err
+	}
+
+	return GenericData{value: string(bytes)}, nil
+}
+
+func (g GenericData) LoadTo(v interface{}) error {
+	if g.IsEmpty() {
+		return fmt.Errorf("Cannot LoadTo an empty GenericData value")
+	}
+	return json.Unmarshal([]byte(g.value), v)
 }
 
 /* * * * * * *

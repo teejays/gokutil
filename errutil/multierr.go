@@ -26,6 +26,13 @@ func (e MultiErr) Error() string {
 	return e.ErrorIndent(0)
 }
 
+func (e MultiErr) ErrOrNil() error {
+	if e.IsNil() {
+		return nil
+	}
+	return e
+}
+
 func (e MultiErr) ErrorIndent(ind int) string {
 	// Case: When MultiErr is empty?
 	if len(e.errs) == 0 {

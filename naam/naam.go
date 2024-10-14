@@ -113,6 +113,9 @@ func (s *Name) UnmarshalYAML(unmarshal func(interface{}) error) error {
 
 // ParseString is a helper function that parses a string into a Name.
 func (s *Name) ParseString(str string) {
+	// unqoute
+	str = strings.Trim(str, "\"")
+	str = strings.Trim(str, "'")
 	words := cleanWords(str)
 	s.words = words
 }

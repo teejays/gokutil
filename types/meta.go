@@ -5,7 +5,6 @@ import (
 	"database/sql/driver"
 	"fmt"
 	"slices"
-	"time"
 
 	"github.com/teejays/gokutil/naam"
 	"github.com/teejays/gokutil/scalars"
@@ -15,39 +14,39 @@ import (
  * With MetaFields
  * * * * * */
 
-type IWithMetaFields interface {
-	GetID() scalars.ID
-	GetUpdatedAt() scalars.Timestamp
-	SetUpdatedAt(scalars.Timestamp)
-	SetDeletedAt(scalars.Timestamp)
-}
+// type IWithMetaFields interface {
+// 	GetID() scalars.ID
+// 	GetUpdatedAt() scalars.Timestamp
+// 	SetUpdatedAt(scalars.Timestamp)
+// 	SetDeletedAt(scalars.Timestamp)
+// }
 
-type WithMetaFields struct {
-	ID        scalars.ID
-	CreatedAt scalars.Timestamp
-	UpdatedAt scalars.Timestamp
-	DeletedAt *scalars.Timestamp
-}
+// type WithMetaFields struct {
+// 	ID        scalars.ID
+// 	CreatedAt scalars.Timestamp
+// 	UpdatedAt scalars.Timestamp
+// 	DeletedAt *scalars.Timestamp
+// }
 
-func (t WithMetaFields) GetID() scalars.ID {
-	return t.ID
-}
+// func (t WithMetaFields) GetID() scalars.ID {
+// 	return t.ID
+// }
 
-func (t WithMetaFields) GetCreatedAt() scalars.Timestamp {
-	return t.CreatedAt
-}
+// func (t WithMetaFields) GetCreatedAt() scalars.Timestamp {
+// 	return t.CreatedAt
+// }
 
-func (t WithMetaFields) GetUpdatedAt() scalars.Timestamp {
-	return t.UpdatedAt
-}
+// func (t WithMetaFields) GetUpdatedAt() scalars.Timestamp {
+// 	return t.UpdatedAt
+// }
 
-func (t *WithMetaFields) SetUpdatedAt(v scalars.Timestamp) {
-	t.UpdatedAt = v
-}
+// func (t *WithMetaFields) SetUpdatedAt(v scalars.Timestamp) {
+// 	t.UpdatedAt = v
+// }
 
-func (t *WithMetaFields) SetDeletedAt(v scalars.Timestamp) {
-	t.DeletedAt = &v
-}
+// func (t *WithMetaFields) SetDeletedAt(v scalars.Timestamp) {
+// 	t.DeletedAt = &v
+// }
 
 // type TypeWithMetaFields[T any] struct {
 // 	WithMetaFields
@@ -258,8 +257,7 @@ func (t WithHooks[T]) GetHookReadPost() TypeHookFunc[T] {
 type ITypeMeta[T BasicType, F Field] interface {
 	ITypeCommonMeta[T, F]
 
-	SetMetaFieldValues(context.Context, T, time.Time) T
-	ConvertTimestampColumnsToUTC(T) T
+	SetMetaFieldValues(context.Context, T, scalars.Timestamp) T
 	SetDefaultFieldValues(T) T
 }
 
@@ -289,9 +287,14 @@ func (t *TypeCommonMeta[T, F]) GetTypeCommonMeta() *TypeCommonMeta[T, F] {
  * Basic Type
  * * * * * */
 
+// BasicType should really have been called BasicTypeWithMeta (since it has meta fields)
 type BasicType interface {
 	GetID() scalars.ID
 	GetUpdatedAt() scalars.Timestamp
+}
+
+type BasicTypeMutable interface {
+	BasicType
 	SetUpdatedAt(scalars.Timestamp)
 }
 
@@ -302,7 +305,6 @@ type BasicType interface {
 type EntityType interface {
 	GetID() scalars.ID
 	GetUpdatedAt() scalars.Timestamp
-	SetUpdatedAt(scalars.Timestamp)
 }
 
 /* * * * * *
