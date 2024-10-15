@@ -25,7 +25,10 @@ var acronyms = []string{
 	"JS",
 	"JSON",
 	"JWT",
+	"PEM", // Private Key format
+	"RSA",
 	"SHA",
+	"SSH",
 	"SQL",
 	"SQL",
 	"TS",
