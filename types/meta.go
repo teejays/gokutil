@@ -60,7 +60,20 @@ type HookType string
 
 func (h HookType) Name() naam.Name { return naam.New(string(h)) }
 
+func (h HookType) IsInit() bool       { return h == HookPoint_Init }
+func (h HookType) IsCreatePre() bool  { return h == HookPoint_CreatePre }
+func (h HookType) IsCreatePost() bool { return h == HookPoint_CreatePost }
+func (h HookType) IsUpdatePre() bool  { return h == HookPoint_UpdatePre }
+func (h HookType) IsUpdatePost() bool { return h == HookPoint_UpdatePost }
+func (h HookType) IsSavePre() bool    { return h == HookPoint_SavePre }
+func (h HookType) IsSavePost() bool   { return h == HookPoint_SavePost }
+func (h HookType) IsDeletePre() bool  { return h == HookPoint_DeletePre }
+func (h HookType) IsDeletePost() bool { return h == HookPoint_DeletePost }
+func (h HookType) IsReadPre() bool    { return h == HookPoint_ReadPre }
+func (h HookType) IsReadPost() bool   { return h == HookPoint_ReadPost }
+
 const (
+	HookPoint_Init       HookType = "init"
 	HookPoint_CreatePre  HookType = "create_pre"
 	HookPoint_CreatePost HookType = "create_post"
 	HookPoint_UpdatePre  HookType = "update_pre"
@@ -77,6 +90,7 @@ type TypeHookFunc[T BasicType] func(context.Context, T) (T, error)
 
 type IWithHooks[T BasicType] interface {
 	// Setters
+	SetHookInit(TypeHookFunc[T]) error
 	SetHookCreatePre(TypeHookFunc[T]) error
 	SetHookCreatePost(TypeHookFunc[T]) error
 	SetHookUpdatePre(TypeHookFunc[T]) error
@@ -89,6 +103,7 @@ type IWithHooks[T BasicType] interface {
 	SetHookReadPost(TypeHookFunc[T]) error
 
 	// Getters
+	GetHookInit() TypeHookFunc[T]
 	GetHookCreatePre() TypeHookFunc[T]
 	GetHookCreatePost() TypeHookFunc[T]
 	GetHookUpdatePre() TypeHookFunc[T]
@@ -102,6 +117,7 @@ type IWithHooks[T BasicType] interface {
 }
 
 type WithHooks[T BasicType] struct {
+	Init       TypeHookFunc[T]
 	CreatePre  TypeHookFunc[T]
 	CreatePost TypeHookFunc[T]
 	UpdatePre  TypeHookFunc[T]
@@ -128,6 +144,14 @@ func setHookHelper[T BasicType](fn TypeHookFunc[T], dst *TypeHookFunc[T]) error 
 
 func NewWithHooks[T BasicType]() IWithHooks[T] {
 	return &WithHooks[T]{}
+}
+
+func (t *WithHooks[T]) SetHookInit(fn TypeHookFunc[T]) error {
+	err := setHookHelper(fn, &t.Init)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (t *WithHooks[T]) SetHookCreatePre(fn TypeHookFunc[T]) error {
@@ -208,6 +232,10 @@ func (t *WithHooks[T]) SetHookReadPost(fn TypeHookFunc[T]) error {
 		return err
 	}
 	return nil
+}
+
+func (t WithHooks[T]) GetHookInit() TypeHookFunc[T] {
+	return t.Init
 }
 
 func (t WithHooks[T]) GetHookCreatePre() TypeHookFunc[T] {
