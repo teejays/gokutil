@@ -9,6 +9,7 @@ import (
 
 type TestCase struct {
 	Input      string
+	Plural     string
 	PascalCase string
 	CamelCase  string
 	SnakeCase  string
@@ -19,6 +20,7 @@ type TestCase struct {
 var testCases = []TestCase{
 	{
 		Input:      "id",
+		Plural:     "ids",
 		PascalCase: "ID",
 		CamelCase:  "id",
 		SnakeCase:  "id",
@@ -27,6 +29,7 @@ var testCases = []TestCase{
 	},
 	{
 		Input:      "ids",
+		Plural:     "idss",
 		PascalCase: "IDs",
 		CamelCase:  "ids",
 		SnakeCase:  "ids",
@@ -35,6 +38,7 @@ var testCases = []TestCase{
 	},
 	{
 		Input:      "first_id",
+		Plural:     "first_ids",
 		PascalCase: "FirstID",
 		CamelCase:  "firstID",
 		SnakeCase:  "first_id",
@@ -43,6 +47,7 @@ var testCases = []TestCase{
 	},
 	{
 		Input:      "first_ids",
+		Plural:     "first_ids",
 		PascalCase: "FirstIDs",
 		CamelCase:  "firstIDs",
 		SnakeCase:  "first_ids",
@@ -51,6 +56,7 @@ var testCases = []TestCase{
 	},
 	{
 		Input:      "first_id_last",
+		Plural:     "first_id_lasts",
 		PascalCase: "FirstIDLast",
 		CamelCase:  "firstIDLast",
 		SnakeCase:  "first_id_last",
@@ -59,6 +65,7 @@ var testCases = []TestCase{
 	},
 	{
 		Input:      "first_ids_last",
+		Plural:     "first_ids_lasts",
 		PascalCase: "FirstIDsLast",
 		CamelCase:  "firstIDsLast",
 		SnakeCase:  "first_ids_last",
@@ -67,6 +74,7 @@ var testCases = []TestCase{
 	},
 	{
 		Input:      "parent___first_ids_last",
+		Plural:     "parent___first_ids_lasts",
 		PascalCase: "Parent_FirstIDsLast",
 		CamelCase:  "parent_firstIDsLast",
 		SnakeCase:  "parent__first_ids_last",
@@ -75,6 +83,7 @@ var testCases = []TestCase{
 	},
 	{
 		Input:      "common",
+		Plural:     "commons",
 		PascalCase: "Common",
 		CamelCase:  "common",
 		SnakeCase:  "common",
@@ -83,6 +92,7 @@ var testCases = []TestCase{
 	},
 	{
 		Input:      `"common"`,
+		Plural:     `"commons"`,
 		PascalCase: "Common",
 		CamelCase:  "common",
 		SnakeCase:  "common",
@@ -93,6 +103,9 @@ var testCases = []TestCase{
 
 func TestMain(t *testing.T) {
 	for _, tc := range testCases {
+		t.Run("Pluralize: "+tc.Input, func(t *testing.T) {
+			assert.Equalf(t, tc.Plural, Pluralize(tc.Input), "Input: %s", tc.Input)
+		})
 		t.Run("PascalCase: "+tc.Input, func(t *testing.T) {
 			assert.Equalf(t, tc.PascalCase, ToPascal(tc.Input), "Input: %s", tc.Input)
 		})

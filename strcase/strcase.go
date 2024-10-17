@@ -198,19 +198,22 @@ func Pluralize(s string) string {
 	}
 	snakeS := ToSnake(s)
 	if snakeS != s {
-		log.WarnWithoutCtx("library strcase: Pluralize should only be called on a snake cased string. Got [%s]", s)
+		panics.P("library strcase: Pluralize should only be called on a snake cased string. Got [%s]. Snake Case should be: [%s]", s, snakeS)
 	}
 	// We only need to pluralize the last word
 	words := strings.Split(s, "_")
 	lastWord := words[len(words)-1]
+
+	// Last word has an override set? Use that
 	if ans, exists := pluralOverrides[lastWord]; exists {
 		words[len(words)-1] = ans
 		return strings.Join(words, "_")
 	}
 
-	// If ends with `s`, don't know what to do
+	// If ends with `s`, don't know what to do. For now, return it as is
 	if s[len(s)-1] == 's' {
-		log.WarnWithoutCtx("library strcase: couldn't determine plural form of [%s]", s)
+		log.WarnWithoutCtx("[library strcase]: determining plural form of a word that ends with 's'", "word", s)
+		return s
 	}
 	// If ends with `y`, change `y` to `ies` e.g. company -> companies
 	if s[len(s)-1] == 'y' {
