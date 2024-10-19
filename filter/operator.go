@@ -332,3 +332,15 @@ func getOperatorInfo(op Operator) (OperatorInfo, error) {
 	}
 	return OperatorInfo{}, fmt.Errorf("invalid operator: %d", op)
 }
+
+func GetOperatorInfo(op Operator) (OperatorInfo, error) {
+	return getOperatorInfo(op)
+}
+
+// GetRawSQLConditionForArrayColumn returns the raw SQL which is a single where condition (with the WHERE keyword)
+// for comparing a array SQL column with a value.
+// Assume that the condition is already validated
+func GetRawSQLConditionForArrayColumn(oi OperatorInfo, col string) string {
+	// <value> = ANY("<column>")
+	return fmt.Sprintf(`? %s ANY("%s")`, oi.GetSqlSign(), col)
+}

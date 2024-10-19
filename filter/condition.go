@@ -54,19 +54,49 @@ func ListConditionValues(f Condition) []interface{} {
 	return r
 }
 
-func InjectConditionIntoSqlBuilder(f Condition, sb *goqu.SelectDataset, col string) (*goqu.SelectDataset, error) {
+// type QueryWhereInjectionRequest struct {
+// 	Condition                  Condition
+// 	Column                     string
+// 	ExistingSelectQueryBuilder *goqu.SelectDataset
+// 	IsColumnArray              bool
+// }
+
+func InjectConditionIntoSqlBuilder(f Condition, sb *goqu.SelectDataset, col string, isColArray bool) (*goqu.SelectDataset, error) {
 	// Get operator
 	op := f.GetOperator()
 	info, err := getOperatorInfo(op)
 	if err != nil {
-		return sb, err
+		return nil, err
 	}
 	// Get Values
 	values := ListConditionValues(f)
-	log.DebugWithoutCtx("Injecting condition into SQL Builder", "Operator", info, "Column", col, "Values", values)
+	log.DebugWithoutCtx("Injecting condition into SQL Builder", "Operator", info, "Column", col, "Values", values, "IsColumnArray", isColArray)
+	// Handle when column is a SQL array
+	if isColArray {
+		sb := sb.Where(
+			goqu.L(
+				GetRawSQLConditionForArrayColumn(info, col), values[0],
+			),
+		)
+		return sb, nil
+	}
 	sb = info.InjectSqlBuilderWhereCond_Goqu(sb, col, values...)
 	return sb, nil
 }
+
+// func GetRawSQLConditionForArrayColumn(f Condition, col string) (string, error) {
+// 	// Get operator
+// 	op := f.GetOperator()
+// 	info, err := getOperatorInfo(op)
+// 	if err != nil {
+// 		return "", err
+// 	}
+// 	// Get Values
+// 	values := ListConditionValues(f)
+// 	log.DebugWithoutCtx("Getting raw SQL condition for array column", "Operator", info, "Column", col, "Values", values)
+
+// 	return info.GetSqlSign(), nil
+// }
 
 // Primitive Conditions
 type GenericCondition[T comparable] struct {

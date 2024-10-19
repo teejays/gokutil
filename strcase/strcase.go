@@ -120,8 +120,11 @@ func ToKebab(s string) string {
 	return s
 }
 
+// ToTitle expects a string with multiple words separated by `_` and `___` and converts it to a title case
 func ToTitle(s string) string {
-	parts := strings.Split(s, PartsSep)
+	// Convert to snake case so we can distinguish between words
+	s = strcase.ToSnake(s)
+	parts := strings.Split(s, "__")
 	for i := range parts {
 		words := strings.Split(parts[i], "_")
 		for j := range words {
@@ -191,14 +194,15 @@ var pluralOverrides = map[string]string{
 	"process": "processes",
 }
 
-// Pluralize should only be called on a snake cased string
+// Pluralize should only be called on lower case
 func Pluralize(s string) string {
 	if s == "" {
 		return s
 	}
-	snakeS := ToSnake(s)
-	if snakeS != s {
-		panics.P("library strcase: Pluralize should only be called on a snake cased string. Got [%s]. Snake Case should be: [%s]", s, snakeS)
+	// Convert the word to snake case
+	lowerS := strings.ToLower(s)
+	if lowerS != s {
+		panics.P("library strcase: Pluralize should only be called on a lower cased string. Got [%s]. Lower should be: [%s]", s, lowerS)
 	}
 	// We only need to pluralize the last word
 	words := strings.Split(s, "_")

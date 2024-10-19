@@ -1,6 +1,7 @@
 package json
 
 import (
+	"bytes"
 	"encoding/json"
 
 	"github.com/Rican7/conjson"
@@ -33,4 +34,25 @@ func Unmarshal(src []byte, v interface{}) error {
 
 	return nil
 
+}
+
+func MustPrettyPrint(v interface{}) string {
+	pretty, err := PrettyPrint(v)
+	if err != nil {
+		panic(err)
+	}
+	return pretty
+}
+
+func PrettyPrint(v interface{}) (string, error) {
+	encoded, err := Marshal(v)
+	if err != nil {
+		return "", err
+	}
+	var pretty bytes.Buffer
+	err = json.Indent(&pretty, encoded, "", "  ")
+	if err != nil {
+		return "", err
+	}
+	return pretty.String(), nil
 }

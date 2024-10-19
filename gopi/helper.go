@@ -241,7 +241,7 @@ func GetGenericGetHandler[ReqT, RespT any](fn func(context.Context, ReqT) (RespT
 				WriteError(w, http.StatusBadRequest, err)
 				return
 			}
-			log.Debug(ctx, "[HTTP Handler] Request unmarshaled from URL", "req", req)
+			log.Debug(ctx, "[HTTP Handler] Request unmarshaled from URL", "req", json.MustPrettyPrint(req))
 		}
 
 		// Call the method
@@ -270,6 +270,8 @@ func GetGenericPostPutPatchHandler[ReqT, RespT any](fn func(context.Context, Req
 			WriteError(w, http.StatusBadRequest, err)
 			return
 		}
+
+		log.Debug(ctx, "[HTTP Handler] Request unmarshaled from body", "req", json.MustPrettyPrint(req))
 
 		// Call the method
 		resp, err := fn(r.Context(), req)
