@@ -31,10 +31,12 @@ func LoadEnvFiles(ctx context.Context, wd string) error {
 		files[i] = filepath.Join(wd, file)
 	}
 	for _, file := range files {
-		log.Debug(ctx, "Loading env file", "file", file)
+		log.None(ctx, "Looking for env file", "file", file)
 		err := godotenv.Load(file)
 		if err != nil {
-			log.Debug(ctx, "Could not load env file", "file", file, "error", err)
+			log.None(ctx, "Could not load env file", "file", file, "error", err)
+		} else {
+			log.Debug(ctx, "Loaded env file", "file", file)
 		}
 	}
 

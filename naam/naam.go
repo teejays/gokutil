@@ -123,6 +123,9 @@ func (s *Name) ParseString(str string) {
 // MarshalText implements in the `encoding.TextMarshaler` interface.
 // NOTE: Not sure why want to implement it.
 func (s Name) MarshalText() ([]byte, error) {
+	if s.IsEmpty() {
+		return []byte{}, nil
+	}
 	return []byte(s.ToSnake()), nil
 }
 
