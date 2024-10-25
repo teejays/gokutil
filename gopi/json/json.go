@@ -37,6 +37,17 @@ func Unmarshal(src []byte, v interface{}) error {
 
 }
 
+func UnmarshalStrict(src []byte, v interface{}) error {
+	decoder := json.NewDecoder(bytes.NewReader(src))
+	// Disallow unknown fields
+	decoder.DisallowUnknownFields()
+	err := decoder.Decode(&v)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func MustPrettyPrint(v interface{}) string {
 	pretty, err := PrettyPrint(v)
 	if err != nil {
