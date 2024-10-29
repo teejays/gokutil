@@ -31,7 +31,8 @@ var colorMap = map[slog.Level]decoration.Decoration{
 type Handler struct {
 	color     bool
 	timestamp bool
-	out       io.Writer
+	stdOut    io.Writer
+	stdErr    io.Writer
 	level     slog.Level
 
 	commonAttrs    []slog.Attr
@@ -39,7 +40,8 @@ type Handler struct {
 }
 
 type NewHandlerRequest struct {
-	Out       io.Writer
+	StdOut    io.Writer
+	StdErr    io.Writer
 	Level     slog.Level
 	Color     bool
 	Timestamp bool
@@ -49,7 +51,8 @@ func NewHandler(req NewHandlerRequest) Handler {
 	return Handler{
 		color:          req.Color,
 		timestamp:      req.Timestamp,
-		out:            req.Out,
+		stdOut:         req.StdOut,
+		stdErr:         req.StdErr,
 		level:          req.Level,
 		commonAttrs:    []slog.Attr{},
 		prefixHeadings: []string{},
@@ -128,7 +131,13 @@ func (l Handler) Handle(ctx context.Context, rec slog.Record) error {
 		msg = fmt.Sprintf("%s %s", rec.Time.Format("2006/01/02 15:04:05"), msg)
 	}
 
-	_, err = l.out.Write([]byte(msg + "\n"))
+	// Where to send the log
+	out := l.stdOut
+	if rec.Level >= slog.LevelWarn {
+		out = l.stdErr
+	}
+
+	_, err = out.Write([]byte(msg + "\n"))
 	return err
 }
 
@@ -196,7 +205,8 @@ func copy(l Handler) Handler {
 	return Handler{
 		color:          l.color,
 		timestamp:      l.timestamp,
-		out:            l.out,
+		stdOut:         l.stdOut,
+		stdErr:         l.stdErr,
 		level:          l.level,
 		commonAttrs:    l.commonAttrs,
 		prefixHeadings: l.prefixHeadings,

@@ -6,7 +6,7 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/graph-gophers/graphql-go v1.5.0
 	github.com/stretchr/testify v1.9.0
-	github.com/teejays/gokutil/panics v0.0.0-20241029185420-2f6df02c9bce
+	github.com/teejays/gokutil/panics v0.0.0-20241029192917-2b3a00ee1f17
 )
 
 require (
