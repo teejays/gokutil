@@ -17,6 +17,7 @@ var (
 	_ContextKeyIndent     string = "sclog_indent_level"
 	_ContextSkipTimestamp string = "sclog_skip_timestamp"
 	_ContextSkipLevel     string = "sclog_skip_level"
+	// _ContextSkipColor     string = "sclog_skip_color"
 )
 
 var colorMap = map[slog.Level]decoration.Decoration{
@@ -81,6 +82,10 @@ func (l Handler) Handle(ctx context.Context, rec slog.Record) error {
 	if err != nil {
 		skipLevel = false
 	}
+	// skipColor, err := ctxutil.GetValue[bool](ctx, _ContextSkipColor)
+	// if err != nil {
+	// 	skipColor = false
+	// }
 
 	msg := ""
 
@@ -176,6 +181,16 @@ func ContextSkipLevel(ctx context.Context) context.Context {
 func ContextClearSkipLevel(ctx context.Context) context.Context {
 	return ctxutil.SetValue[bool](ctx, _ContextSkipLevel, false)
 }
+
+// // ContextSkipColor adds a flag to the context to skip the color in the logs.
+// func ContextSkipColor(ctx context.Context) context.Context {
+// 	return ctxutil.SetValue(ctx, _ContextSkipColor, true)
+// }
+
+// // ContextClearSkipColor removes the flag to skip the color from the context.
+// func ContextClearSkipColor(ctx context.Context) context.Context {
+// 	return ctxutil.SetValue[bool](ctx, _ContextSkipColor, false)
+// }
 
 func copy(l Handler) Handler {
 	return Handler{

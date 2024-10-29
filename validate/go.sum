@@ -16,10 +16,10 @@ github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZb
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/stretchr/testify v1.9.0 h1:HtqpIVDClZ4nwg75+f6Lvsy/wHu+3BoSGCbBAcpTsTg=
 github.com/stretchr/testify v1.9.0/go.mod h1:r2ic/lqez/lEtzL7wO/rwa5dbSLXVDPFyf8C91i36aY=
-github.com/teejays/gokutil/errutil v0.0.0-20241022042852-c3ee12a5060b h1:aEYMByeg1Ng7Hff5tUhk4MAY46/Z39ijTexMi5sVnSU=
-github.com/teejays/gokutil/errutil v0.0.0-20241022042852-c3ee12a5060b/go.mod h1:6GVnt3SDxMEp6uV98auIMJo1lU+Xqfa+CTBiREEh/lQ=
-github.com/teejays/gokutil/panics v0.0.0-20241022042852-c3ee12a5060b h1:sKPWAmdgvyCp9SRPOVGOPw2Kw5JZ0IetcrDA7R78gvU=
-github.com/teejays/gokutil/panics v0.0.0-20241022042852-c3ee12a5060b/go.mod h1:ozbKMbDGOPikGWQ5byY801Jv2s1P1gaNxAdtJIQQGRo=
+github.com/teejays/gokutil/errutil v0.0.0-20241029015302-cd6496b9f4e3 h1:8WqR0PnDjWzcG7j2zEXF2JIVD9eU6Yso99IH4Mopt+4=
+github.com/teejays/gokutil/errutil v0.0.0-20241029015302-cd6496b9f4e3/go.mod h1:WNQq4BKUq67ROnN1vSx6qNyZKRETBpCeM4Jgan1TT4U=
+github.com/teejays/gokutil/panics v0.0.0-20241029015302-cd6496b9f4e3 h1:3PHoIwPchHDMwKp6/IHBeVM3L7fw8ZHMFa0JS1xb0Zw=
+github.com/teejays/gokutil/panics v0.0.0-20241029015302-cd6496b9f4e3/go.mod h1:ozbKMbDGOPikGWQ5byY801Jv2s1P1gaNxAdtJIQQGRo=
 golang.org/x/crypto v0.28.0 h1:GBDwsMXVQi34v5CCYUm2jkJvu4cbtru2U4TN2PSyQnw=
 golang.org/x/crypto v0.28.0/go.mod h1:rmgy+3RHxRZMyY0jjAJShp2zgEdOqj2AO7U0pYmeQ7U=
 golang.org/x/net v0.30.0 h1:AcW1SDZMkb8IpzCdQUaIq2sP4sZ4zw+55h6ynffypl4=
