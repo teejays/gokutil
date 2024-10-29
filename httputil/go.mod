@@ -3,8 +3,8 @@ module github.com/teejays/gokutil/httputil
 go 1.22.5
 
 require (
-	github.com/teejays/gokutil/log v0.0.0-20241029185247-e9382be4dc84
-	github.com/teejays/gokutil/validate v0.0.0-20241029015302-cd6496b9f4e3
+	github.com/teejays/gokutil/log v0.0.0-20241029185420-2f6df02c9bce
+	github.com/teejays/gokutil/validate v0.0.0-20241029185420-2f6df02c9bce
 )
 
 require (
@@ -15,13 +15,13 @@ require (
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/graph-gophers/graphql-go v1.5.0 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
-	github.com/teejays/gokutil/clog v0.0.0-20241029015302-cd6496b9f4e3 // indirect
-	github.com/teejays/gokutil/ctxutil v0.0.0-20241029015302-cd6496b9f4e3 // indirect
-	github.com/teejays/gokutil/env v0.0.0-20241029015302-cd6496b9f4e3 // indirect
-	github.com/teejays/gokutil/errutil v0.0.0-20241029015302-cd6496b9f4e3 // indirect
-	github.com/teejays/gokutil/panics v0.0.0-20241029015302-cd6496b9f4e3 // indirect
-	github.com/teejays/gokutil/scalars v0.0.0-20241029015302-cd6496b9f4e3 // indirect
-	github.com/teejays/gokutil/sclog v0.0.0-20241029015302-cd6496b9f4e3 // indirect
+	github.com/teejays/gokutil/clog v0.0.0-20241029185420-2f6df02c9bce // indirect
+	github.com/teejays/gokutil/ctxutil v0.0.0-20241029185420-2f6df02c9bce // indirect
+	github.com/teejays/gokutil/env v0.0.0-20241029185420-2f6df02c9bce // indirect
+	github.com/teejays/gokutil/errutil v0.0.0-20241029185420-2f6df02c9bce // indirect
+	github.com/teejays/gokutil/panics v0.0.0-20241029185420-2f6df02c9bce // indirect
+	github.com/teejays/gokutil/scalars v0.0.0-20241029185420-2f6df02c9bce // indirect
+	github.com/teejays/gokutil/sclog v0.0.0-20241029185420-2f6df02c9bce // indirect
 	golang.org/x/crypto v0.28.0 // indirect
 	golang.org/x/net v0.30.0 // indirect
 	golang.org/x/sys v0.26.0 // indirect
