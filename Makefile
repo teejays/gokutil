@@ -21,5 +21,7 @@ go-mod-upgrade:
 			go mod tidy; \
 			cd -; \
 		fi; \
-	done
+	done && \
+	git commit -a -m "go mod upgrade" && \
+	git push
 	
