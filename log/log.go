@@ -26,7 +26,7 @@ func init() {
 		}
 	default:
 		clogHandler := sclog.NewHandler(sclog.NewHandlerRequest{
-			Out:       os.Stderr,
+			Out:       os.Stdout,
 			Level:     slog.LevelDebug,
 			Color:     true,
 			Timestamp: true,
