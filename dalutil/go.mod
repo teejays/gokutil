@@ -5,7 +5,7 @@ go 1.22.5
 require (
 	github.com/teejays/gokutil/client/db v0.0.0-20241029015302-cd6496b9f4e3
 	github.com/teejays/gokutil/errutil v0.0.0-20241029015302-cd6496b9f4e3
-	github.com/teejays/gokutil/log v0.0.0-20241029015302-cd6496b9f4e3
+	github.com/teejays/gokutil/log v0.0.0-20241029185247-e9382be4dc84
 	github.com/teejays/gokutil/naam v0.0.0-20241029015302-cd6496b9f4e3
 	github.com/teejays/gokutil/panics v0.0.0-20241029015302-cd6496b9f4e3
 	github.com/teejays/gokutil/scalars v0.0.0-20241029015302-cd6496b9f4e3

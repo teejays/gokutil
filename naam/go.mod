@@ -17,7 +17,7 @@ require (
 	github.com/teejays/gokutil/clog v0.0.0-20241029015302-cd6496b9f4e3 // indirect
 	github.com/teejays/gokutil/ctxutil v0.0.0-20241029015302-cd6496b9f4e3 // indirect
 	github.com/teejays/gokutil/env v0.0.0-20241029015302-cd6496b9f4e3 // indirect
-	github.com/teejays/gokutil/log v0.0.0-20241029015302-cd6496b9f4e3 // indirect
+	github.com/teejays/gokutil/log v0.0.0-20241029185247-e9382be4dc84 // indirect
 	github.com/teejays/gokutil/scalars v0.0.0-20241029015302-cd6496b9f4e3 // indirect
 	github.com/teejays/gokutil/sclog v0.0.0-20241029015302-cd6496b9f4e3 // indirect
 	golang.org/x/text v0.19.0 // indirect

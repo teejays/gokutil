@@ -9,7 +9,7 @@ require (
 	github.com/stretchr/testify v1.9.0
 	github.com/teejays/gokutil/errutil v0.0.0-20241029015302-cd6496b9f4e3
 	github.com/teejays/gokutil/httputil v0.0.0-20241029015302-cd6496b9f4e3
-	github.com/teejays/gokutil/log v0.0.0-20241029015302-cd6496b9f4e3
+	github.com/teejays/gokutil/log v0.0.0-20241029185247-e9382be4dc84
 	github.com/teejays/gokutil/panics v0.0.0-20241029015302-cd6496b9f4e3
 	golang.org/x/net v0.30.0
 	gopkg.in/go-playground/validator.v9 v9.31.0
