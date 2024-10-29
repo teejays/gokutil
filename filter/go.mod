@@ -4,8 +4,10 @@ go 1.22.5
 
 require (
 	github.com/doug-martin/goqu/v9 v9.19.0
-	github.com/huandu/go-sqlbuilder v1.30.0
-	github.com/teejays/gokutil/scalars v0.0.0-20240924175405-eddc126c032f
+	github.com/huandu/go-sqlbuilder v1.31.0
+	github.com/teejays/gokutil/log v0.0.0-20241022042852-c3ee12a5060b
+	github.com/teejays/gokutil/panics v0.0.0-20241022042852-c3ee12a5060b
+	github.com/teejays/gokutil/scalars v0.0.0-20241022042852-c3ee12a5060b
 )
 
 require (
@@ -14,5 +16,8 @@ require (
 	github.com/huandu/xstrings v1.5.0 // indirect
 	github.com/lib/pq v1.10.9 // indirect
 	github.com/stretchr/objx v0.5.2 // indirect
-	github.com/teejays/gokutil/panics v0.0.0-20240924175405-eddc126c032f // indirect
+	github.com/teejays/gokutil/clog v0.0.0-20241022042852-c3ee12a5060b // indirect
+	github.com/teejays/gokutil/ctxutil v0.0.0-20241022042852-c3ee12a5060b // indirect
+	github.com/teejays/gokutil/env v0.0.0-20241022042852-c3ee12a5060b // indirect
+	github.com/teejays/gokutil/sclog v0.0.0-20241022042852-c3ee12a5060b // indirect
 )
