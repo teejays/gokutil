@@ -557,6 +557,20 @@ func (s GenericData) ImplementsGraphQLType(name string) bool {
 	return name == "GenericData"
 }
 
+func (g *GenericData) UnmarshalGraphQL(input interface{}) error {
+	var err error
+	switch input := input.(type) {
+	case string:
+		err = g.ParseString(input)
+		if err != nil {
+			return err
+		}
+		return nil
+	default:
+		return fmt.Errorf("wrong type for GenericData: %T", input)
+	}
+}
+
 func (g GenericData) Value() (driver.Value, error) {
 	return g.value, nil
 }
