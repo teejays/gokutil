@@ -9,7 +9,8 @@ import (
 
 func main() {
 	devHandler := sclog.NewHandler(sclog.NewHandlerRequest{
-		Out:       os.Stderr,
+		StdOut:    os.Stderr,
+		StdErr:    os.Stderr,
 		Level:     slog.LevelDebug,
 		Color:     true,
 		Timestamp: true,

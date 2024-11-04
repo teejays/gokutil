@@ -192,6 +192,7 @@ var pluralOverrides = map[string]string{
 	"fish":    "fish",
 	"address": "addresses",
 	"process": "processes",
+	"key":     "keys",
 }
 
 // Pluralize should only be called on lower case
@@ -231,6 +232,7 @@ var singularOverrides = map[string]string{
 	"fish":      "fish",
 	"addresses": "address",
 	"processes": "process",
+	"keys":      "key",
 }
 
 func Singularize(s string) string {
