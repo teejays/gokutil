@@ -3,9 +3,9 @@ module github.com/teejays/gokutil/ctxutil
 go 1.22.5
 
 require (
-	github.com/teejays/gokutil/env v0.0.0-20241030014035-c798cbab1846
-	github.com/teejays/gokutil/panics v0.0.0-20241030014035-c798cbab1846
-	github.com/teejays/gokutil/scalars v0.0.0-20241030014035-c798cbab1846
+	github.com/teejays/gokutil/env v0.0.0-20241030182005-63e4076a8cd5
+	github.com/teejays/gokutil/panics v0.0.0-20241030182005-63e4076a8cd5
+	github.com/teejays/gokutil/scalars v0.0.0-20241030182005-63e4076a8cd5
 )
 
 require (
