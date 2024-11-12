@@ -156,42 +156,6 @@ func NewIDFromString(str string) (ID, error) {
 	return ID{uid}, nil
 }
 
-// /* * * * * * *
-//  * Short ID
-// * * * * * * */
-
-// type ShortID struct {
-// 	GenericStringScalar
-// }
-
-// func NewShortID() ShortID {
-// 	panics.If(shortIDGenerator == nil, "ShortID Generator not initialized. Did you call InitShortID() first?")
-
-// 	// Get a random 4 digit numbers to use as input to the short ID generator
-// 	// This is to ensure that the short ID is not predictable
-// 	randNum := rand.Uint64()
-// 	shortID, err := shortIDGenerator.Encode([]uint64{randNum})
-// 	panics.IfError(err, "Generating short ID: %s", err)
-// 	return ShortID{GenericStringScalar: NewGenericStringScalar(shortID)}
-// }
-
-// // Custom
-
-// var shortIDGenerator *squids.Sqids
-
-// func InitShortID() error {
-// 	sqid, err := squids.New(squids.Options{
-// 		// All uppercase letters and numbers, other than 0 (since it confuse with O)
-// 		Alphabet:  "ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789",
-// 		MinLength: 5,
-// 	})
-// 	if err != nil {
-// 		return err
-// 	}
-// 	shortIDGenerator = sqid
-// 	return nil
-// }
-
 /* * * * * * *
  * Timestamp
 * * * * * * */
@@ -595,6 +559,144 @@ func (g GenericData) LoadTo(v interface{}) error {
 		return fmt.Errorf("Cannot LoadTo an empty GenericData value")
 	}
 	return json.Unmarshal([]byte(g.value), v)
+}
+
+/* * * * * * *
+ * Money
+* * * * * * */
+
+type Money struct {
+	value    uint
+	subValue uint
+	init     bool
+}
+
+func NewMoney(dollar uint, subValue uint) (Money, error) {
+	v := Money{value: dollar, subValue: subValue, init: true}
+	if err := v.Validate(); err != nil {
+		return Money{}, err
+	}
+	return v, nil
+}
+
+func (v Money) String() string {
+	return fmt.Sprintf("%d.%d", v.value, v.subValue)
+}
+
+func (v Money) IsEmpty() bool {
+	return !v.init
+}
+
+func (v Money) Validate() error {
+	if v.IsEmpty() {
+		return fmt.Errorf("value is empty")
+	}
+
+	if v.subValue > 99 {
+		return fmt.Errorf("subValue [%d] is out of range [0-99]", v.subValue)
+	}
+	return nil
+}
+
+func (v *Money) ParseString(str string) error {
+	_v, err := NewMoneyFromString(str)
+	if err != nil {
+		return err
+	}
+	// Validate that the date is valid
+	if err := _v.Validate(); err != nil {
+		return err
+	}
+	*v = _v
+	return nil
+}
+
+// JSON
+
+func (v Money) MarshalJSON() ([]byte, error) {
+	return strconv.AppendQuote(nil, v.String()), nil
+}
+
+func (v *Money) UnmarshalJSON(data []byte) error {
+	s, err := strconv.Unquote(string(data))
+	if err != nil {
+		return err
+	}
+	if s == "" {
+		// money is nil
+		return nil
+	}
+	// Parse
+	_v, err := NewMoneyFromString(s)
+	if err != nil {
+		return err
+	}
+	*v = _v
+	return nil
+}
+
+// SQL
+
+func (v *Money) Scan(value interface{}) error {
+	if value == nil {
+		return nil
+	}
+
+	var _v Money
+	var err error
+
+	switch v := value.(type) {
+	case string:
+		err = _v.ParseString(v)
+		if err != nil {
+			return err
+		}
+	default:
+		return fmt.Errorf("could not decode SQL db value into scalar.Money field: %v", v)
+	}
+	// Validate that the date is valid
+	if err := _v.Validate(); err != nil {
+		return err
+	}
+	*v = _v
+	return nil
+}
+
+func (v Money) Value() (driver.Value, error) {
+	return fmt.Sprintf("%d.%d", v.value, v.subValue), nil
+}
+
+// GraphQL
+
+func (v Money) ImplementsGraphQLType(name string) bool {
+	return name == "Money"
+}
+
+func (v *Money) UnmarshalGraphQL(input interface{}) error {
+	var err error
+	switch input := input.(type) {
+	case string:
+		money, err := NewMoneyFromString(input)
+		if err != nil {
+			return err
+		}
+		*v = money
+	default:
+		err = fmt.Errorf("wrong type for Money: %T", input)
+	}
+	return err
+}
+
+// Custom Methods
+
+func NewMoneyFromString(str string) (Money, error) {
+	// Expect string to be in the format "XY.MN" where XY is the dollar value and MN is the subValue
+	var dollar, subValue uint
+	_, err := fmt.Sscanf(str, "%d.%d", &dollar, &subValue)
+	if err != nil {
+		return Money{}, err
+	}
+	return NewMoney(dollar, subValue)
 }
 
 /* * * * * * *
