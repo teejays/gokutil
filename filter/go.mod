@@ -5,9 +5,9 @@ go 1.22.5
 require (
 	github.com/doug-martin/goqu/v9 v9.19.0
 	github.com/huandu/go-sqlbuilder v1.32.0
-	github.com/teejays/gokutil/log v0.0.0-20241104212521-5d8ad2542d76
-	github.com/teejays/gokutil/panics v0.0.0-20241104212521-5d8ad2542d76
-	github.com/teejays/gokutil/scalars v0.0.0-20241112230123-12d7bb16e352
+	github.com/teejays/gokutil/log v0.0.0-20241112230224-8848d208ad7f
+	github.com/teejays/gokutil/panics v0.0.0-20241112230224-8848d208ad7f
+	github.com/teejays/gokutil/scalars v0.0.0-20241112230224-8848d208ad7f
 )
 
 require (
@@ -17,8 +17,8 @@ require (
 	github.com/lib/pq v1.10.9 // indirect
 	github.com/stretchr/objx v0.5.2 // indirect
 	github.com/stretchr/testify v1.8.4 // indirect
-	github.com/teejays/gokutil/clog v0.0.0-20241112230123-12d7bb16e352 // indirect
-	github.com/teejays/gokutil/ctxutil v0.0.0-20241104212521-5d8ad2542d76 // indirect
-	github.com/teejays/gokutil/env v0.0.0-20241104212521-5d8ad2542d76 // indirect
-	github.com/teejays/gokutil/sclog v0.0.0-20241112230123-12d7bb16e352 // indirect
+	github.com/teejays/gokutil/clog v0.0.0-20241112230224-8848d208ad7f // indirect
+	github.com/teejays/gokutil/ctxutil v0.0.0-20241113030527-e83dce6a820e // indirect
+	github.com/teejays/gokutil/env v0.0.0-20241112230224-8848d208ad7f // indirect
+	github.com/teejays/gokutil/sclog v0.0.0-20241112230224-8848d208ad7f // indirect
 )
