@@ -256,6 +256,7 @@ type Date struct {
 }
 
 var dateDefaultFormat = "2006-01-02"
+var dateFullFormat = "2006-01-02T15:04:05.000Z" // Sometimes clients send the date in this format, since it's the default format for JS Date
 
 func NewDate(year int, month time.Month, day int) (Date, error) {
 	d := Date{year: year, month: month, day: day}
@@ -392,7 +393,16 @@ func MustNewDate(year int, month time.Month, day int) Date {
 }
 
 func NewDateFromString(str string) (Date, error) {
-	return NewDateFromStringFormat(str, dateDefaultFormat)
+	v, err1 := NewDateFromStringFormat(str, dateDefaultFormat)
+	if err1 == nil {
+		return v, nil
+	}
+	v, err2 := NewDateFromStringFormat(str, dateFullFormat)
+	if err2 == nil {
+		return v, nil
+	}
+	return Date{}, fmt.Errorf("Could not parse date string [%s]: expected format [%s] or [%s]", str, dateDefaultFormat, dateFullFormat)
+
 }
 
 func NewDateFromStringFormat(str, format string) (Date, error) {
