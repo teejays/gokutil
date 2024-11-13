@@ -7,7 +7,6 @@ import (
 
 	"github.com/teejays/gokutil/env"
 	"github.com/teejays/gokutil/panics"
-	"github.com/teejays/gokutil/scalars"
 )
 
 var ErrValueNotSet = fmt.Errorf("context value is not set")
@@ -22,10 +21,9 @@ const (
 	UserIDKey
 )
 
-type UserIDType = scalars.ID
-type ContextValueType interface {
-	UserIDType | env.Environment | string | int | bool
-}
+// type UserIDType = scalars.ID
+type ContextValueType = any
+
 type ContextKeyType interface {
 	ContextKey | string
 }
@@ -55,30 +53,6 @@ func GetEnv(ctx context.Context) env.Environment {
 	}
 	panics.IfError(err, "context.GetEnv()")
 	return val
-}
-
-func SetUserID(ctx context.Context, val UserIDType) context.Context {
-	panics.If(val.IsEmpty(), "UserID is nil: cannot set nil UserID in context")
-	return setValue(ctx, UserIDKey, val)
-}
-
-func GetUserID(ctx context.Context) (UserIDType, error) {
-	val, err := getValue[UserIDType](ctx, UserIDKey)
-	if err != nil {
-		return val, err
-	}
-	if val.IsEmpty() {
-		return val, fmt.Errorf("UserID stored in context is nil")
-	}
-	return val, nil
-}
-
-func SetJWTToken(ctx context.Context, token string) context.Context {
-	return setValue(ctx, JWTTokenKey, token)
-}
-
-func GetJWTToken(ctx context.Context) (string, error) {
-	return getValue[string](ctx, JWTTokenKey)
 }
 
 func SetValue[V any, K ContextKeyType](ctx context.Context, key K, val V) context.Context {

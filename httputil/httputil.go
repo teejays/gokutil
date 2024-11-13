@@ -20,7 +20,9 @@ var ErrEmptyBody = fmt.Errorf("no content provided with the HTTP request")
 // ErrInvalidJSON is used when we expect to receive a JSON request but we don't
 var ErrInvalidJSON = fmt.Errorf("content is not a valid JSON")
 
-func UnmarshalJSONFromRequest(r *http.Request, v interface{}) error {
+func UnmarshalJSONFromRequest[ReqT any](r *http.Request, v *ReqT) error {
+	ctx := r.Context()
+
 	// Read the HTTP request body
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
@@ -32,16 +34,16 @@ func UnmarshalJSONFromRequest(r *http.Request, v interface{}) error {
 		return ErrEmptyBody
 	}
 
-	llog.Debug(r.Context(), "unmarshaling to JSON", "body", string(body))
+	llog.Debug(ctx, "Unmarshaling to JSON", "body", string(body))
 
 	// Unmarshal JSON into Go type
-	err = json.Unmarshal(body, &v)
+	err = json.Unmarshal(body, v)
 	if err != nil {
-		llog.Error(r.Context(), "Couldn't unmarshal JSON", "error", err)
+		llog.Error(ctx, "Couldn't unmarshal JSON", "error", err)
 		return ErrInvalidJSON
 	}
 
-	llog.Warn(r.Context(), "Unmarshaled JSON", "v", v)
+	llog.Warn(ctx, "Unmarshaled JSON", "v", v)
 
 	err = validate.Struct(v)
 	if err != nil {

@@ -8,6 +8,7 @@ import (
 	"net/mail"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -566,13 +567,13 @@ func (g GenericData) LoadTo(v interface{}) error {
 * * * * * * */
 
 type Money struct {
-	value    uint
-	subValue uint
-	init     bool
+	whole   uint
+	decimal uint
+	init    bool
 }
 
-func NewMoney(dollar uint, subValue uint) (Money, error) {
-	v := Money{value: dollar, subValue: subValue, init: true}
+func NewMoney(whole uint, decimal uint) (Money, error) {
+	v := Money{whole: whole, decimal: decimal, init: true}
 	if err := v.Validate(); err != nil {
 		return Money{}, err
 	}
@@ -580,7 +581,7 @@ func NewMoney(dollar uint, subValue uint) (Money, error) {
 }
 
 func (v Money) String() string {
-	return fmt.Sprintf("%d.%d", v.value, v.subValue)
+	return fmt.Sprintf("%d.%d", v.whole, v.decimal)
 }
 
 func (v Money) IsEmpty() bool {
@@ -589,11 +590,11 @@ func (v Money) IsEmpty() bool {
 
 func (v Money) Validate() error {
 	if v.IsEmpty() {
-		return fmt.Errorf("value is empty")
+		return fmt.Errorf("is empty")
 	}
 
-	if v.subValue > 99 {
-		return fmt.Errorf("subValue [%d] is out of range [0-99]", v.subValue)
+	if v.decimal > 99 {
+		return fmt.Errorf("decimal value [%d] is out of range [0-99]", v.decimal)
 	}
 	return nil
 }
@@ -614,13 +615,20 @@ func (v *Money) ParseString(str string) error {
 // JSON
 
 func (v Money) MarshalJSON() ([]byte, error) {
-	return strconv.AppendQuote(nil, v.String()), nil
+	// If the value is empty, return nil
+	if v.IsEmpty() {
+		return nil, nil
+	}
+	// Otherwise, return as a two decimal float
+	s := fmt.Sprintf("%d.%02d", v.whole, v.decimal)
+	return []byte(s), nil
 }
 
 func (v *Money) UnmarshalJSON(data []byte) error {
 	s, err := strconv.Unquote(string(data))
 	if err != nil {
-		return err
+		// the value did not have qoutes. Try using the raw value.
+		s = string(data)
 	}
 	if s == "" {
 		// money is nil
@@ -663,7 +671,7 @@ func (v *Money) Scan(value interface{}) error {
 }
 
 func (v Money) Value() (driver.Value, error) {
-	return fmt.Sprintf("%d.%d", v.value, v.subValue), nil
+	return fmt.Sprintf("%d.%d", v.whole, v.decimal), nil
 }
 
 // GraphQL
@@ -690,13 +698,44 @@ func (v *Money) UnmarshalGraphQL(input interface{}) error {
 // Custom Methods
 
 func NewMoneyFromString(str string) (Money, error) {
-	// Expect string to be in the format "XY.MN" where XY is the dollar value and MN is the subValue
-	var dollar, subValue uint
-	_, err := fmt.Sscanf(str, "%d.%d", &dollar, &subValue)
-	if err != nil {
-		return Money{}, err
+	// Expect string to be in the format "XY.MN" where XY is the whole value and MN is the decimal value
+	// split the string into whole and decimal parts
+	if str == "" {
+		return Money{}, fmt.Errorf("empty string")
 	}
-	return NewMoney(dollar, subValue)
+	parts := strings.Split(str, ".")
+	// expect 1 or 2 parts
+	if len(parts) > 2 || len(parts) == 0 {
+		return Money{}, fmt.Errorf("invalid string for money [%s]", str)
+	}
+
+	// Function to parse string to uint
+	var parseUint = func(s string) (uint, error) {
+		i, err := strconv.Atoi(s)
+		if err != nil {
+			return 0, fmt.Errorf("could not parse to uint: %w", err)
+		}
+		if i < 0 {
+			return 0, fmt.Errorf("value [%d] is negative", i)
+		}
+		return uint(i), nil
+	}
+
+	// Parse the whole value
+	whole, err := parseUint(parts[0])
+	if err != nil {
+		return Money{}, fmt.Errorf("Parsing whole value [%s]: %w", parts[0], err)
+	}
+
+	var decimal uint
+	if len(parts) > 1 {
+		decimal, err = parseUint(parts[1])
+		if err != nil {
+			return Money{}, fmt.Errorf("Parsing decimal value [%s]: %w", parts[1], err)
+		}
+	}
+
+	return NewMoney(whole, decimal)
 }
 
 /* * * * * * *

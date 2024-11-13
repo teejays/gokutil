@@ -3,7 +3,6 @@ package gopi
 import (
 	"context"
 	"fmt"
-	"io"
 	"net/http"
 	"reflect"
 	"strconv"
@@ -16,7 +15,6 @@ import (
 	"github.com/teejays/gokutil/panics"
 
 	"github.com/teejays/gokutil/gopi/json"
-	"github.com/teejays/gokutil/gopi/validator"
 )
 
 // GetQueryParamInt extracts the param value with given name out of the URL query
@@ -166,40 +164,6 @@ func writeError(w http.ResponseWriter, code int, err error) {
 	if err != nil {
 		panic(fmt.Sprintf("Failed to write error to the http response: %v", err))
 	}
-}
-
-// UnmarshalJSONFromRequest takes in a pointer to an object and populates
-// it by reading the content body of the HTTP request, and unmarshaling the
-// body into the variable v.
-func UnmarshalJSONFromRequest(r *http.Request, v interface{}) error {
-	// Read the HTTP request body
-	body, err := io.ReadAll(r.Body)
-	if err != nil {
-		// api.WriteError(w, http.StatusBadRequest, err, false, nil)
-		return err
-	}
-	defer r.Body.Close()
-
-	if len(body) < 1 {
-		// api.WriteError(w, http.StatusBadRequest, api.ErrEmptyBody, false, nil)
-		return ErrEmptyBody
-	}
-
-	log.DebugWithoutCtx("api: Unmarshaling to JSON", "body", string(body))
-
-	// Unmarshal JSON into Go type
-	err = json.Unmarshal(body, &v)
-	if err != nil {
-		log.ErrorWithoutCtx("api: Unmarshaling to JSON", "error", err)
-		return ErrInvalidJSON
-	}
-
-	err = validator.Validate(v)
-	if err != nil {
-		return err
-	}
-
-	return nil
 }
 
 func HandlerWrapper[ReqT any, RespT any](httpMethod string, fn func(context.Context, ReqT) (RespT, error)) http.HandlerFunc {
