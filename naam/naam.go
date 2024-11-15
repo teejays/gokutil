@@ -7,6 +7,8 @@ import (
 
 	_ "fmt"
 
+	"github.com/invopop/jsonschema"
+
 	"github.com/teejays/gokutil/panics"
 	"github.com/teejays/gokutil/strcase"
 )
@@ -93,6 +95,9 @@ func cleanWords(words string) string {
 
 // MarshalJSON implements the `json.Marshaler` interface, so Name can be converted to a human friendly string in JSON.
 func (s Name) MarshalJSON() ([]byte, error) {
+	if s.IsEmpty() {
+		return json.Marshal("")
+	}
 	return json.Marshal(s.String())
 }
 
@@ -100,6 +105,13 @@ func (s Name) MarshalJSON() ([]byte, error) {
 func (s *Name) UnmarshalJSON(b []byte) error {
 	s.ParseString(string(b))
 	return nil
+}
+
+func (Name) JSONSchema() *jsonschema.Schema {
+	return &jsonschema.Schema{
+		Type:        "string",
+		Description: "A name provided as a string in snake_case.",
+	}
 }
 
 func (s *Name) UnmarshalYAML(unmarshal func(interface{}) error) error {
