@@ -21,10 +21,18 @@ const PartsSeperator = strcase.PartsSep
 var Empty = Name{words: ""}
 var ID = Name{words: "id"}
 
+/* * * * * * * *
+ * Named Interface
+ * * * * * * * */
+
 // Named is any object/struct that has a name
 type Named interface {
 	GetName() Name
 }
+
+/* * * * * * * *
+ * Name
+ * * * * * * * */
 
 // Name is the ry struct that stores our name.
 type Name struct {
