@@ -4,16 +4,16 @@ go 1.22.5
 
 require (
 	github.com/stretchr/testify v1.9.0
-	github.com/teejays/gokutil/log v0.0.0-20241113030546-6a85f28acb11
+	github.com/teejays/gokutil/log v0.0.0-20241119013542-aab438b616dd
 )
 
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	github.com/teejays/gokutil/clog v0.0.0-20241113030546-6a85f28acb11 // indirect
-	github.com/teejays/gokutil/ctxutil v0.0.0-20241113030546-6a85f28acb11 // indirect
-	github.com/teejays/gokutil/env v0.0.0-20241113030546-6a85f28acb11 // indirect
-	github.com/teejays/gokutil/panics v0.0.0-20241113030546-6a85f28acb11 // indirect
-	github.com/teejays/gokutil/sclog v0.0.0-20241113030546-6a85f28acb11 // indirect
+	github.com/teejays/gokutil/clog v0.0.0-20241119013542-aab438b616dd // indirect
+	github.com/teejays/gokutil/ctxutil v0.0.0-20241119013542-aab438b616dd // indirect
+	github.com/teejays/gokutil/env v0.0.0-20241119013542-aab438b616dd // indirect
+	github.com/teejays/gokutil/panics v0.0.0-20241119013542-aab438b616dd // indirect
+	github.com/teejays/gokutil/sclog v0.0.0-20241119013542-aab438b616dd // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
