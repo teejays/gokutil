@@ -226,15 +226,7 @@ func (s Name) Truncate(n int) Name {
 func (s Name) Pluralize() Name {
 	parts := s.wordParts()
 	lastPart := parts[len(parts)-1]
-	parts[len(parts)-1] = strcase.Pluralize(lastPart)
-	return New(strings.Join(parts, " "))
-}
-
-// Pluralize attempts to make Name `s` into a singular version of itself.
-func (s Name) Singularize() Name {
-	parts := s.wordParts()
-	lastPart := parts[len(parts)-1]
-	parts[len(parts)-1] = strcase.Singularize(lastPart)
+	parts[len(parts)-1] = strcase.MustPluralize(lastPart)
 	return New(strings.Join(parts, " "))
 }
 

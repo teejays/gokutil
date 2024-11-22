@@ -1,10 +1,11 @@
 package strcase
 
 import (
+	"errors"
+	"regexp"
 	"strings"
 
 	"github.com/iancoleman/strcase"
-	"github.com/teejays/gokutil/log"
 	"github.com/teejays/gokutil/panics"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
@@ -187,64 +188,146 @@ func capitalizeFirstLetterInWord(word string) string {
 	return strings.ToUpper(word[:1]) + word[1:]
 }
 
-var pluralOverrides = map[string]string{
-	"sheep":   "sheep",
-	"fish":    "fish",
-	"address": "addresses",
-	"process": "processes",
-	"key":     "keys",
+/* * * * * * *
+* Pluralization and Singularization
+* * * * * * */
+
+func MustPluralize(s string) string {
+	pl, err := Pluralize(s)
+	panics.IfError(err, "Failed to pluralize the string")
+	return pl
 }
 
-// Pluralize should only be called on lower case
-func Pluralize(s string) string {
+func Pluralize(s string) (string, error) {
+
 	if s == "" {
-		return s
-	}
-	// Convert the word to snake case
-	lowerS := strings.ToLower(s)
-	if lowerS != s {
-		panics.P("library strcase: Pluralize should only be called on a lower cased string. Got [%s]. Lower should be: [%s]", s, lowerS)
-	}
-	// We only need to pluralize the last word
-	words := strings.Split(s, "_")
-	lastWord := words[len(words)-1]
-
-	// Last word has an override set? Use that
-	if ans, exists := pluralOverrides[lastWord]; exists {
-		words[len(words)-1] = ans
-		return strings.Join(words, "_")
+		return "", nil
 	}
 
-	// If ends with `s`, don't know what to do. For now, return it as is
-	if s[len(s)-1] == 's' {
-		log.WarnWithoutCtx("[library strcase]: determining plural form of a word that ends with 's'", "word", s)
-		return s
-	}
-	// If ends with `y`, change `y` to `ies` e.g. company -> companies
-	if s[len(s)-1] == 'y' {
-		return s[:len(s)-1] + "ies"
-	}
-	return s + "s"
+	return toPlural(s)
+
 }
 
-var singularOverrides = map[string]string{
-	"sheep":     "sheep",
-	"fish":      "fish",
-	"addresses": "address",
-	"processes": "process",
-	"keys":      "key",
+// Map of irregular singular to plural nouns
+var irregularNouns = map[string]string{
+	"child":  "children",
+	"person": "people",
+	"man":    "men",
+	"woman":  "women",
+	"mouse":  "mice",
+	"goose":  "geese",
+	"ox":     "oxen",
+	"foot":   "feet",
+	"tooth":  "teeth",
+	// Add other irregulars as needed
 }
 
-func Singularize(s string) string {
-	if s == "" {
-		return s
+// Words that stay the same in plural
+var unchangingNouns = []string{
+	"sheep",
+	"deer",
+	"fish",
+	"series",
+	"species",
+	"aircraft",
+	"watercraft",
+	"hovercraft",
+}
+
+// Checks if a word is an unchanging noun
+func isUnchangingNoun(word string) bool {
+	lowerWord := strings.ToLower(word)
+	for _, noun := range unchangingNouns {
+		if lowerWord == noun {
+			return true
+		}
 	}
-	if ans, exists := singularOverrides[strings.ToLower(s)]; exists {
-		return ans
+	return false
+}
+
+// Main pluralization function
+func toPlural(word string) (string, error) {
+	if word == "" {
+		return "", errors.New("input word cannot be empty")
 	}
-	if s[len(s)-1] == 's' {
-		return s[:len(s)-1]
+
+	// Split the word into parts by underscores
+	parts := strings.Split(word, "_")
+	if len(parts) == 0 {
+		return word, nil
 	}
-	panics.P("library strcase: couldn't determine singular form of '%s'", s)
-	return s
+
+	// Pluralize only the last part
+	lastPart := parts[len(parts)-1]
+	pluralizedLastPart, err := pluralizeWord(lastPart)
+	if err != nil {
+		return "", err
+	}
+
+	// Replace the last part with its pluralized version
+	parts[len(parts)-1] = pluralizedLastPart
+
+	// Rejoin the parts with underscores
+	return strings.Join(parts, "_"), nil
+}
+
+// Pluralizes a single word according to English pluralization rules
+func pluralizeWord(word string) (string, error) {
+	if word == "" {
+		return "", errors.New("word to pluralize cannot be empty")
+	}
+
+	lowerWord := strings.ToLower(word)
+
+	// Check if word is unchanging in plural
+	if isUnchangingNoun(lowerWord) {
+		return word, nil
+	}
+
+	// Check if word is an irregular noun
+	if plural, ok := irregularNouns[lowerWord]; ok {
+		// Preserve capitalization
+		if isCapitalized(word) {
+			return capitalize(plural), nil
+		}
+		return plural, nil
+	}
+
+	// Apply general pluralization rules
+	switch {
+	// Words ending with 's', 'x', 'z', 'ch', 'sh', 'ss' => add 'es'
+	case regexp.MustCompile(`(?i)(s|x|z|ch|sh|ss)$`).MatchString(lowerWord):
+		return word + "es", nil
+	// Words ending with 'y' preceded by a consonant => replace 'y' with 'ies'
+	case regexp.MustCompile(`(?i)[^aeiou]y$`).MatchString(lowerWord):
+		return word[:len(word)-1] + "ies", nil
+	// Words ending with 'f' or 'fe' => replace with 'ves'
+	case regexp.MustCompile(`(?i)(f|fe)$`).MatchString(lowerWord):
+		if strings.HasSuffix(lowerWord, "fe") {
+			return word[:len(word)-2] + "ves", nil
+		}
+		return word[:len(word)-1] + "ves", nil
+	// Words ending with 'o' preceded by a consonant => add 'es'
+	case regexp.MustCompile(`(?i)[^aeiou]o$`).MatchString(lowerWord):
+		return word + "es", nil
+	// Default rule: add 's'
+	default:
+		return word + "s", nil
+	}
+}
+
+// Checks if a word starts with an uppercase letter
+func isCapitalized(word string) bool {
+	if len(word) == 0 {
+		return false
+	}
+	return strings.ToUpper(string(word[0])) == string(word[0])
+}
+
+// Capitalizes the first letter of a word
+func capitalize(word string) string {
+	if len(word) == 0 {
+		return word
+	}
+	return strings.ToUpper(string(word[0])) + word[1:]
 }

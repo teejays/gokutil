@@ -33,6 +33,8 @@ func (e MultiErr) ErrOrNil() error {
 	return e
 }
 
+var _stdIndentGap = "  "
+
 func (e MultiErr) ErrorIndent(ind int) string {
 	// Case: When MultiErr is empty?
 	if len(e.errs) == 0 {
@@ -45,11 +47,6 @@ func (e MultiErr) ErrorIndent(ind int) string {
 
 	str := fmt.Sprintf("There are %d errors:\n", len(e.errs))
 	for i, err := range e.errs {
-		// add indentation
-		space := ""
-		for j := 0; j < ind; j++ {
-			space += "\t"
-		}
 
 		errMessage := ""
 		if inErr, ok := err.(MultiErr); ok {
@@ -57,6 +54,15 @@ func (e MultiErr) ErrorIndent(ind int) string {
 		} else {
 			errMessage = err.Error()
 		}
+
+		// Print
+
+		// add indentation
+		space := ""
+		for j := 0; j < ind; j++ {
+			space += _stdIndentGap
+		}
+
 		str += fmt.Sprintf(" %s- [%d] %s", space, i+1, errMessage)
 		if i < len(e.errs)-1 {
 			str += "\n"

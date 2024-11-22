@@ -113,7 +113,7 @@ var testCases = []TestCase{
 func TestMain(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run("Pluralize: "+tc.Input, func(t *testing.T) {
-			assert.Equalf(t, tc.Plural, Pluralize(tc.Input), "Input: %s", tc.Input)
+			assert.Equalf(t, tc.Plural, MustPluralize(tc.Input), "Input: %s", tc.Input)
 		})
 		t.Run("PascalCase: "+tc.Input, func(t *testing.T) {
 			assert.Equalf(t, tc.PascalCase, ToPascal(tc.Input), "Input: %s", tc.Input)
@@ -215,7 +215,7 @@ func TestPluralize(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.s, func(t *testing.T) {
-			if got := Pluralize(tt.s); got != tt.want {
+			if got := MustPluralize(tt.s); got != tt.want {
 				t.Errorf("got = %s, want %s", got, tt.want)
 			}
 		})
