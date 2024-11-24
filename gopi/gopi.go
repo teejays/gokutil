@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
@@ -171,9 +172,7 @@ func SetJSONHeaderMiddleware(next http.Handler) http.Handler {
 
 // returns the url match pattern for the route
 func GetRoutePattern(r Route) string {
-	// Strip out any `/` if provided by upstream
-	if len(r.Path) > 0 && r.Path[0] == '/' {
-		r.Path = r.Path[1:]
-	}
+	// remove any leading or trailing slashes
+	r.Path = strings.Trim(r.Path, "/")
 	return fmt.Sprintf("/v%d/%s", r.Version, r.Path)
 }
