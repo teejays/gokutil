@@ -100,8 +100,8 @@ func InjectConditionIntoSqlBuilder(f Condition, sb *goqu.SelectDataset, col stri
 
 // Primitive Conditions
 type GenericCondition[T comparable] struct {
-	Op     Operator
-	Values []T
+	Op     Operator `json:"op" yaml:"op"`
+	Values []T      `json:"values" yaml:"values"`
 }
 
 func NewGenericCondition[T comparable](op Operator, values ...T) *GenericCondition[T] {

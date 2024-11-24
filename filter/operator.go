@@ -27,6 +27,22 @@ const (
 	IS_NOT_NULL
 )
 
+// OperatorsList is a list of all the operators. It allows us to iterate over all the operators.
+var OperatorsList = []Operator{
+	EQUAL,
+	NOT_EQUAL,
+	IN,
+	GREATER_THAN,
+	GREATER_THAN_EQUAL,
+	LESS_THAN,
+	LESS_THAN_EQUAL,
+	LIKE,
+	ILIKE,
+	NOT_LIKE,
+	IS_NULL,
+	IS_NOT_NULL,
+}
+
 func (o *Operator) UnmarshalJSON(data []byte) error {
 	str, err := strconv.Unquote(string(data))
 	if err != nil {

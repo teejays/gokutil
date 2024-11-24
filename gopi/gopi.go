@@ -101,7 +101,8 @@ func GetHandler(ctx context.Context, routes []Route, middlewares MiddlewareFuncs
 	// Range over routes and register them
 	for _, route := range routes {
 		// If the route is supposed to be authenticated, use auth mux
-		r := m
+		r := m.NewRoute().Subrouter()
+
 		if route.Authenticate {
 			if a == nil {
 				// We marked a route as requiring authentication but provided no auth middleware func :(
@@ -122,8 +123,7 @@ func GetHandler(ctx context.Context, routes []Route, middlewares MiddlewareFuncs
 			return nil, fmt.Errorf("route [%s] has no HandlerFunc", route.Path)
 		}
 
-		mRoute := r.HandleFunc(GetRoutePattern(route), route.HandlerFunc).
-			Methods(route.Method)
+		mRoute := r.HandleFunc(GetRoutePattern(route), route.HandlerFunc).Methods(route.Method)
 
 		fullPath, err := mRoute.GetPathTemplate()
 		if err != nil {
@@ -145,20 +145,27 @@ func GetHandler(ctx context.Context, routes []Route, middlewares MiddlewareFuncs
 // LoggerMiddleware is a http.Handler middleware function that logs any request received
 func LoggerMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := r.Context()
 		// Log the request
-		llog.DebugWithoutCtx("HTTP request received", "method", r.Method, "path", r.URL.Path, "query", r.URL.String())
+		llog.Debug(ctx, "START: HTTP request", "method", r.Method, "path", r.URL.String())
 		// Call the next handler
 		next.ServeHTTP(w, r)
+		llog.Debug(ctx, "END: HTTP request", "method", r.Method, "path", r.URL.String())
 	})
 }
 
 // SetJSONHeaderMiddleware sets the header for the response
 func SetJSONHeaderMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Set the header
-		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-		// Call the next handler
+		ctx := r.Context()
+
 		next.ServeHTTP(w, r)
+
+		// Set the header after the underlying handler has run (but only do it if it's not already set)
+		if w.Header().Get("Content-Type") == "" {
+			log.Debug(ctx, "Setting JSON header", "key", "Content-Type", "value", "application/json; charset=UTF-8")
+			w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+		}
 	})
 }
 

@@ -25,12 +25,9 @@ func Struct(data interface{}) error {
 	case validator.ValidationErrors:
 		errs := errutil.NewMultiErr()
 		for _, e := range err {
-			errs.Add(fmt.Errorf("Validation Error: %w", e))
+			errs.Wrap(e, "Validation Error")
 		}
-		if errs.IsNil() {
-			return nil
-		}
-		return errs
+		return errs.ErrOrNil()
 	default:
 		return fmt.Errorf("Failed to validate struct: %w", err)
 	}
