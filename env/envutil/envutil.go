@@ -8,6 +8,7 @@ import (
 
 	"github.com/joho/godotenv"
 	"github.com/teejays/gokutil/env"
+	"github.com/teejays/gokutil/errutil"
 	"github.com/teejays/gokutil/log"
 	"github.com/teejays/gokutil/panics"
 )
@@ -59,8 +60,26 @@ func GetEnvVarInt(key string) int {
 	return valInt
 }
 
+func GetEnvVarBool(key string) (bool, error) {
+	val := os.Getenv(key)
+	if val == "" {
+		return false, nil
+	}
+	valBool, err := strconv.ParseBool(val)
+	if err != nil {
+		return false, errutil.Wrap(err, "Expected env variable [%s] to be a boolean or empty, got [%s]", key, val)
+	}
+	return valBool, nil
+}
+
 func MustGetEnvVarStr(key string) string {
 	val := os.Getenv(key)
-	panics.If(val == "", "Env var not found [%s]", key)
+	panics.If(val == "", "An env var is not found [%s]", key)
+	return val
+}
+
+func MustGetEnvVarBool(key string) bool {
+	val, err := GetEnvVarBool(key)
+	panics.IfError(err, "An env var is invalid")
 	return val
 }

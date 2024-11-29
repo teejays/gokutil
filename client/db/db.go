@@ -29,6 +29,7 @@ type ServiceInitConnectionRequest struct {
 	Port     int
 	User     string
 	Password string
+	SSLMode  string
 }
 
 type Options struct {
@@ -269,6 +270,7 @@ func (c *Connection) Rollback(ctx context.Context) error {
 type SQLConnection interface {
 	ExecContext(ctx context.Context, query string, args ...interface{}) (sql.Result, error)
 	QueryContext(ctx context.Context, query string, args ...interface{}) (*sql.Rows, error)
+	QueryRowContext(ctx context.Context, query string, args ...interface{}) *sql.Row
 }
 
 // GetSQLConnection returns a direct sql.DB or sql.Tx object that can be used to run queries
@@ -323,6 +325,32 @@ func (c Connection) QueryRows(ctx context.Context, query string, args ...interfa
 	log.Debug(ctx, "Query ran successfully.")
 
 	return rows, nil
+}
+
+func (c Connection) QueryRow(ctx context.Context, v interface{}, query string, args ...interface{}) error {
+
+	log.Debug(ctx, "SQL Query for fetch", "query", query, "args", args)
+
+	conn := c.GetSQLConnection()
+
+	row := conn.QueryRowContext(ctx, query, args...)
+	err := row.Err()
+	if err != nil {
+		log.Debug(ctx, "Error quering row", "query", query, "args", args, "error", err)
+		return row.Err()
+
+	}
+
+	err = row.Scan(v)
+	if err != nil {
+		// if !errors.Is(err, sql.ErrNoRows) { // unexpected error
+		// 	return nil, errutil.Wrap(err, "Checking if user [goku] exists")
+		// }
+		log.Debug(ctx, "Error scanning row", "query", query, "args", args, "error", err)
+		return err
+	}
+
+	return nil
 }
 
 type InsertBuilderRequest struct {
