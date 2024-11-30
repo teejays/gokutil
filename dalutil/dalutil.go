@@ -47,13 +47,13 @@ type ITypeDALMeta[T types.BasicType, F types.Field] interface {
 	GetDatabaseColumns() []string
 	// Add
 	GetDirectDBValues(T) []interface{} // Returns all the values that need to be added to DB
-	AddSubTableFieldsToDB(context.Context, db.Connection, db.InsertTypeParams, T) (T, error)
+	AddSubTableFieldsToDB(context.Context, db.ConnectionProvider, db.InsertTypeParams, T) (T, error)
 	// ListType
 	ScanDBNextRow(context.Context, *sql.Rows) (T, error)
-	FetchSubTableFields(context.Context, db.Connection, db.ListTypeByIDsParams, []T) ([]T, error)
+	FetchSubTableFields(context.Context, db.ConnectionProvider, db.ListTypeByIDsParams, []T) ([]T, error)
 	// Update Type
 	GetChangedFieldsAndValues(old, new T, allowedFields []F) ([]F, []interface{})
-	UpdateSubTableFields(context.Context, db.Connection, UpdateTypeRequest[T, F], []F, T, T) (T, error) // TODO
+	UpdateSubTableFields(context.Context, db.ConnectionProvider, UpdateTypeRequest[T, F], []F, T, T) (T, error) // TODO
 
 	InternalHookSavePre(ctx context.Context, elem T, now scalars.Timestamp) (T, error)
 	// InternalHookCreatePre(ctx context.Context, elem T, now scalars.Timestamp) (T, error)
@@ -158,7 +158,7 @@ func FieldsToStrings[T types.Field](fields []T) []string {
 	return colNames
 }
 
-func AddType[T types.BasicType, F types.Field](ctx context.Context, conn db.Connection, params db.InsertTypeParams, meta ITypeDALMeta[T, F], elem T) (T, error) {
+func AddType[T types.BasicType, F types.Field](ctx context.Context, conn db.ConnectionProvider, params db.InsertTypeParams, meta ITypeDALMeta[T, F], elem T) (T, error) {
 	log.Info(ctx, "Adding type", "type", meta.GetTypeCommonMeta().Name, "data", elem)
 	var emptyT T
 	items, err := BatchAddType(ctx, conn, params, meta, elem)
@@ -171,7 +171,7 @@ func AddType[T types.BasicType, F types.Field](ctx context.Context, conn db.Conn
 	return items[0], nil
 }
 
-func BatchAddType[T types.BasicType, F types.Field](ctx context.Context, conn db.Connection, params db.InsertTypeParams, meta ITypeDALMeta[T, F], elems ...T) ([]T, error) {
+func BatchAddType[T types.BasicType, F types.Field](ctx context.Context, conn db.ConnectionProvider, params db.InsertTypeParams, meta ITypeDALMeta[T, F], elems ...T) ([]T, error) {
 	now := scalars.NewTimestampNow()
 
 	var err error
@@ -262,7 +262,7 @@ func BatchAddType[T types.BasicType, F types.Field](ctx context.Context, conn db
 		Values:      vals,
 	}
 
-	query, args, err := conn.ConstructInsertQuery(ctx, subReq)
+	query, args, err := db.ConstructInsertQuery(ctx, conn.Dialect, subReq)
 	if err != nil {
 		return nil, fmt.Errorf("failed to construct insert query: %w", err)
 	}
@@ -289,7 +289,7 @@ func BatchAddType[T types.BasicType, F types.Field](ctx context.Context, conn db
 }
 
 // ListTypeByIDs fetches a list of type T based on the IDs provided.
-func ListTypeByIDs[T types.BasicType, F types.Field](ctx context.Context, conn db.Connection, params db.ListTypeByIDsParams, meta ITypeDALMeta[T, F]) (ListTypeResponse[T], error) {
+func ListTypeByIDs[T types.BasicType, F types.Field](ctx context.Context, conn db.ConnectionProvider, params db.ListTypeByIDsParams, meta ITypeDALMeta[T, F]) (ListTypeResponse[T], error) {
 	var resp ListTypeResponse[T]
 
 	// If no ID's provided, can't fetch nothing
@@ -304,7 +304,7 @@ func ListTypeByIDs[T types.BasicType, F types.Field](ctx context.Context, conn d
 		IDs:       params.IDs,
 	}
 
-	query, args, err := conn.ConstructSelectByIDQuery(ctx, subReq)
+	query, args, err := db.ConstructSelectByIDQuery(ctx, conn.Dialect, subReq)
 	if err != nil {
 		return resp, err
 	}
@@ -357,7 +357,7 @@ func ListTypeByIDs[T types.BasicType, F types.Field](ctx context.Context, conn d
 	return resp, nil
 }
 
-func UpdateType[T types.BasicType, F types.Field](ctx context.Context, conn db.Connection, req UpdateTypeRequest[T, F], meta ITypeDALMeta[T, F]) (UpdateTypeResponse[T], error) {
+func UpdateType[T types.BasicType, F types.Field](ctx context.Context, conn db.ConnectionProvider, req UpdateTypeRequest[T, F], meta ITypeDALMeta[T, F]) (UpdateTypeResponse[T], error) {
 	llog.Info(ctx, "Updating type", "type", meta.GetTypeCommonMeta().Name, "data", req.Object)
 	var resp UpdateTypeResponse[T]
 	now := scalars.NewTime(time.Now().UTC())
@@ -495,7 +495,7 @@ func UpdateType[T types.BasicType, F types.Field](ctx context.Context, conn db.C
 					Columns:   FieldsToStrings(colsWithValueChange),
 					Values:    vals,
 				}
-				query, args, err := conn.ConstructUpdateQuery(ctx, updateBuilderRequest)
+				query, args, err := db.ConstructUpdateQuery(ctx, conn.Dialect, updateBuilderRequest)
 				if err != nil {
 					return resp, fmt.Errorf("Could not construct Update SQL query: %w", err)
 				}
