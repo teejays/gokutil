@@ -15,10 +15,10 @@ github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZb
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/stretchr/testify v1.9.0 h1:HtqpIVDClZ4nwg75+f6Lvsy/wHu+3BoSGCbBAcpTsTg=
 github.com/stretchr/testify v1.9.0/go.mod h1:r2ic/lqez/lEtzL7wO/rwa5dbSLXVDPFyf8C91i36aY=
-github.com/teejays/gokutil/panics v0.0.0-20241129080937-a3d0cf712dbd h1:M5ELFqVD+z0b+Dvx7H2zrlf/tpbvVimXVcnxrTbb3r8=
-github.com/teejays/gokutil/panics v0.0.0-20241129080937-a3d0cf712dbd/go.mod h1:ozbKMbDGOPikGWQ5byY801Jv2s1P1gaNxAdtJIQQGRo=
-github.com/teejays/gokutil/strcase v0.0.0-20241129080937-a3d0cf712dbd h1:Gisk8JT5557mCX+wMjapgc75SJxJXZ2nr+aK8iBcME0=
-github.com/teejays/gokutil/strcase v0.0.0-20241129080937-a3d0cf712dbd/go.mod h1:TYxDRjGMZXRKPtz1lxLW4S+43cFTuy58Auiyf8wSzmI=
+github.com/teejays/gokutil/panics v0.0.0-20241130081608-fa66021237f7 h1:xEd1RsTwP+j6heHS+ETgBk35j3yjVVsWNTTf7/oTFLc=
+github.com/teejays/gokutil/panics v0.0.0-20241130081608-fa66021237f7/go.mod h1:ozbKMbDGOPikGWQ5byY801Jv2s1P1gaNxAdtJIQQGRo=
+github.com/teejays/gokutil/strcase v0.0.0-20241130081608-fa66021237f7 h1:NJvHoInMzTk+TfTk16rKt8WkEselVx2ShEF0mOuyru0=
+github.com/teejays/gokutil/strcase v0.0.0-20241130081608-fa66021237f7/go.mod h1:WH8FHYZexG51Q5kLWIaH7mYVT/rL8lGQFmoW7wsG4v0=
 github.com/wk8/go-ordered-map/v2 v2.1.8 h1:5h/BUHu93oj4gIdvHHHGsScSTMijfx5PeYkE/fJgbpc=
 github.com/wk8/go-ordered-map/v2 v2.1.8/go.mod h1:5nJHM5DyteebpVlHnWMV0rPz6Zp7+xBAnxjb1X5vnTw=
 golang.org/x/text v0.20.0 h1:gK/Kv2otX8gz+wn7Rmb3vT96ZwuoxnQlY+HlJVj7Qug=

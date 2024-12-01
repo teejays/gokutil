@@ -3,11 +3,11 @@ module github.com/teejays/gokutil/sclog
 go 1.22.5
 
 require (
-	github.com/teejays/gokutil/clog v0.0.0-20241129080937-a3d0cf712dbd
-	github.com/teejays/gokutil/ctxutil v0.0.0-20241129080937-a3d0cf712dbd
+	github.com/teejays/gokutil/clog v0.0.0-20241130081608-fa66021237f7
+	github.com/teejays/gokutil/ctxutil v0.0.0-20241130081608-fa66021237f7
 )
 
 require (
-	github.com/teejays/gokutil/env v0.0.0-20241129080937-a3d0cf712dbd // indirect
-	github.com/teejays/gokutil/panics v0.0.0-20241129080937-a3d0cf712dbd // indirect
+	github.com/teejays/gokutil/env v0.0.0-20241130081608-fa66021237f7 // indirect
+	github.com/teejays/gokutil/panics v0.0.0-20241130081608-fa66021237f7 // indirect
 )
