@@ -32,8 +32,8 @@ type Server struct {
 	rootHandler http.Handler
 }
 
-func NewServer(ctx context.Context, routes []Route, middlewares MiddlewareFuncs) (Server, error) {
-	m, err := GetHandler(ctx, routes, middlewares)
+func NewServer(ctx context.Context, routes []Route, middlewares MiddlewareFuncs, pathPrefix string) (Server, error) {
+	m, err := GetHandler(ctx, routes, middlewares, pathPrefix)
 	if err != nil {
 		return Server{}, fmt.Errorf("could not setup the http handler: %w", err)
 	}
@@ -60,10 +60,15 @@ func (s *Server) StartServer(ctx context.Context, addr string, port int) error {
 }
 
 // GetHandler constructs a HTTP handler with all the routes and middleware funcs configured
-func GetHandler(ctx context.Context, routes []Route, middlewares MiddlewareFuncs) (http.Handler, error) {
+func GetHandler(ctx context.Context, routes []Route, middlewares MiddlewareFuncs, pathPrefix string) (http.Handler, error) {
 
 	// Initiate a router
-	m := mux.NewRouter().PathPrefix("/api").Subrouter()
+	m := mux.NewRouter()
+	if pathPrefix != "" {
+		// Remove any leading or trailing slashes and then add a leading slash
+		pathPrefix = "/" + strings.Trim(pathPrefix, "/")
+		m = m.PathPrefix(pathPrefix).Subrouter()
+	}
 
 	// Enable CORS
 	// TODO: Have tighter control over CORS policy, but okay for

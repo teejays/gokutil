@@ -28,7 +28,7 @@ func mainCtx(ctx context.Context) error {
 	}
 
 	mws := gopi.MiddlewareFuncs{}
-	s, err := gopi.NewServer(ctx, routes, mws)
+	s, err := gopi.NewServer(ctx, routes, mws, "api")
 	if err != nil {
 		return err
 	}

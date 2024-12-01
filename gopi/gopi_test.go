@@ -134,7 +134,7 @@ func TestNewServer(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			ctx := context.TODO()
-			_, err := gopi.NewServer(ctx, tt.routes, tt.middleware)
+			_, err := gopi.NewServer(ctx, tt.routes, tt.middleware, "api")
 			if tt.wantErr != nil {
 				assert.ErrorContains(t, err, tt.wantErr.Error())
 			}
