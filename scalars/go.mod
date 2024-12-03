@@ -5,5 +5,5 @@ go 1.22.5
 require (
 	github.com/google/uuid v1.6.0
 	github.com/graph-gophers/graphql-go v1.5.0
-	github.com/teejays/gokutil/panics v0.0.0-20241130081608-fa66021237f7
+	github.com/teejays/gokutil/panics v0.0.0-20241201003442-35ecb8c4ee3f
 )

@@ -6,8 +6,8 @@ require (
 	github.com/stretchr/testify v1.9.0
 	github.com/teejays/gokutil/dalutil v0.0.0-20240807004339-2e36dbb93e96
 	github.com/teejays/gokutil/httputil v0.0.0-20240809215203-b7a72841374f
-	github.com/teejays/gokutil/naam v0.0.0-20241130081608-fa66021237f7
-	github.com/teejays/gokutil/scalars v0.0.0-20241130081608-fa66021237f7
+	github.com/teejays/gokutil/naam v0.0.0-20241201003442-35ecb8c4ee3f
+	github.com/teejays/gokutil/scalars v0.0.0-20241201003442-35ecb8c4ee3f
 )
 
 require (
@@ -33,9 +33,9 @@ require (
 	github.com/teejays/gokutil/env v0.0.0-20241124014017-33a80187ef14 // indirect
 	github.com/teejays/gokutil/errutil v0.0.0-20240809214320-31c9daaaa6fe // indirect
 	github.com/teejays/gokutil/log v0.0.0-20241124014017-33a80187ef14 // indirect
-	github.com/teejays/gokutil/panics v0.0.0-20241130081608-fa66021237f7 // indirect
+	github.com/teejays/gokutil/panics v0.0.0-20241201003442-35ecb8c4ee3f // indirect
 	github.com/teejays/gokutil/sclog v0.0.0-20241124014017-33a80187ef14 // indirect
-	github.com/teejays/gokutil/strcase v0.0.0-20241130081608-fa66021237f7 // indirect
+	github.com/teejays/gokutil/strcase v0.0.0-20241201003442-35ecb8c4ee3f // indirect
 	github.com/teejays/gokutil/validate v0.0.0-20240807004339-2e36dbb93e96 // indirect
 	github.com/wk8/go-ordered-map/v2 v2.1.8 // indirect
 	golang.org/x/crypto v0.26.0 // indirect

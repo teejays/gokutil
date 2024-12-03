@@ -6,8 +6,8 @@ github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZb
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/stretchr/testify v1.9.0 h1:HtqpIVDClZ4nwg75+f6Lvsy/wHu+3BoSGCbBAcpTsTg=
 github.com/stretchr/testify v1.9.0/go.mod h1:r2ic/lqez/lEtzL7wO/rwa5dbSLXVDPFyf8C91i36aY=
-github.com/teejays/gokutil/panics v0.0.0-20241130081608-fa66021237f7 h1:xEd1RsTwP+j6heHS+ETgBk35j3yjVVsWNTTf7/oTFLc=
-github.com/teejays/gokutil/panics v0.0.0-20241130081608-fa66021237f7/go.mod h1:ozbKMbDGOPikGWQ5byY801Jv2s1P1gaNxAdtJIQQGRo=
+github.com/teejays/gokutil/panics v0.0.0-20241201003442-35ecb8c4ee3f h1:Nz/dcSeF4JVRtwBJiwFeNlikpExFvuG55CtV3W+hTT4=
+github.com/teejays/gokutil/panics v0.0.0-20241201003442-35ecb8c4ee3f/go.mod h1:ozbKMbDGOPikGWQ5byY801Jv2s1P1gaNxAdtJIQQGRo=
 golang.org/x/text v0.20.0 h1:gK/Kv2otX8gz+wn7Rmb3vT96ZwuoxnQlY+HlJVj7Qug=
 golang.org/x/text v0.20.0/go.mod h1:D4IsuqiFMhST5bX19pQ9ikHC2GsaKyk/oF+pn3ducp4=
 gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405 h1:yhCVgyC4o1eVCa2tZl7eS0r+SDo693bJlVdllGtEeKM=
