@@ -153,14 +153,19 @@ func (c *Connection) Close(ctx context.Context) error {
 	// if connection has transactions, rollthem back.
 	if c.IsInTransaction(ctx) {
 		if err := c.Rollback(ctx); err != nil {
+			log.Error(ctx, "Error closing Connection: rolling back transactions", "error", err)
 			return err
 		}
 	}
 
 	// Close the connection (if any)
 	if c.DB != nil {
-		c.DB.Close()
-		c.DB = nil
+		if err := c.DB.Close(); err != nil {
+			log.Error(ctx, "Error closing DB.Connection", "error", err)
+			return err
+		} else {
+			c.DB = nil
+		}
 	}
 
 	return nil
