@@ -5,8 +5,8 @@ go 1.22.5
 require (
 	github.com/invopop/jsonschema v0.12.0
 	github.com/stretchr/testify v1.9.0
-	github.com/teejays/gokutil/panics v0.0.0-20241201003442-35ecb8c4ee3f
-	github.com/teejays/gokutil/strcase v0.0.0-20241201003442-35ecb8c4ee3f
+	github.com/teejays/gokutil/panics v0.0.0-20241203082758-aa4200554049
+	github.com/teejays/gokutil/strcase v0.0.0-20241203082758-aa4200554049
 )
 
 require (
@@ -17,6 +17,6 @@ require (
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/wk8/go-ordered-map/v2 v2.1.8 // indirect
-	golang.org/x/text v0.20.0 // indirect
+	golang.org/x/text v0.21.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

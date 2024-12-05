@@ -105,7 +105,7 @@ func NewOrExistingConnectionProvider(ctx context.Context, o Options) (*Connectio
 
 	// Check if the connection is already present
 	if connProv, exists := _connectionProviders[key]; exists {
-		log.Warn(ctx, "Database connection already initialized", "connStr", key)
+		log.Debug(ctx, "Database connection already initialized", "connStr", key)
 		return connProv, nil
 	}
 
