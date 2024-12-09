@@ -319,11 +319,14 @@ func (t *TypeCommonMeta[T, F]) GetTypeCommonMeta() *TypeCommonMeta[T, F] {
 type BasicType interface {
 	GetID() scalars.ID
 	GetUpdatedAt() scalars.Timestamp
+	GetDeletedAt() *scalars.Timestamp
 }
 
+// BasicTypeMutable is usually the pointer version of BasicType.
 type BasicTypeMutable interface {
 	BasicType
 	SetUpdatedAt(scalars.Timestamp)
+	SetDeletedAt(scalars.Timestamp)
 }
 
 /* * * * * *
@@ -331,8 +334,11 @@ type BasicTypeMutable interface {
  * * * * * */
 
 type EntityType interface {
-	GetID() scalars.ID
-	GetUpdatedAt() scalars.Timestamp
+	BasicType
+}
+
+type EntityTypeMutable interface {
+	BasicTypeMutable
 }
 
 /* * * * * *
@@ -435,3 +441,10 @@ func RemoveFieldFromFields[T Field](column T, fields []T) []T {
 	}
 	return fields
 }
+
+/* * * * * *
+ * Empty Struct
+ * * * * * */
+
+// EmptyStruct allows to have a common type for empty structs (so the same type can be passed around without conversions)
+type EmptyStruct struct{}

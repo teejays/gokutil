@@ -14,6 +14,7 @@ type EntityBaseClient[T types.EntityType, inT any, F types.Field, Flt types.Filt
 	Add(ctx context.Context, req dalutil.EntityAddRequest[inT]) (T, error)
 	Get(ctx context.Context, req dalutil.GetEntityRequest[T]) (T, error)
 	Update(ctx context.Context, req dalutil.UpdateEntityRequest[T, F]) (dalutil.UpdateEntityResponse[T], error)
+	Delete(ctx context.Context, req dalutil.DeleteEntityRequest) (dalutil.DeleteTypeResponse, error)
 	List(ctx context.Context, req dalutil.ListEntityRequest[Flt]) (dalutil.ListEntityResponse[T], error)
 	QueryByText(ctx context.Context, req dalutil.QueryByTextEntityRequest[T]) (dalutil.ListEntityResponse[T], error)
 }
@@ -51,6 +52,14 @@ func (c entityHTTPBaseClient[T, inT, F, Flt]) Get(ctx context.Context, req dalut
 	resp, err := httputil.MakeRequest[dalutil.GetEntityRequest[T], T](ctx, c.client, http.MethodGet, req)
 	if err != nil {
 		return resp, fmt.Errorf("Making HTTP %s request: %w", http.MethodGet, err)
+	}
+	return resp, nil
+}
+
+func (c entityHTTPBaseClient[T, inT, F, Flt]) Delete(ctx context.Context, req dalutil.DeleteEntityRequest) (dalutil.DeleteTypeResponse, error) {
+	resp, err := httputil.MakeRequest[dalutil.DeleteEntityRequest, dalutil.DeleteTypeResponse](ctx, c.client, http.MethodDelete, req)
+	if err != nil {
+		return resp, fmt.Errorf("Making HTTP %s request: %w", http.MethodDelete, err)
 	}
 	return resp, nil
 }

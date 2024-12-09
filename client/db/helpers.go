@@ -7,6 +7,7 @@ import (
 	"fmt"
 
 	"github.com/doug-martin/goqu/v9"
+	"github.com/teejays/gokutil/errutil"
 	"github.com/teejays/gokutil/log"
 	"github.com/teejays/gokutil/panics"
 	"github.com/teejays/gokutil/scalars"
@@ -61,12 +62,87 @@ func ConstructInsertQuery(ctx context.Context, dialectStr string, req InsertBuil
 	return query, args, nil
 }
 
+type ConstructUpsertQueryRequest struct {
+	Dialect      string
+	TableName    string
+	UpsertColumn string // The column that is the primary key, used to check if the row exists
+	ColumnNames  []string
+	Values       []interface{}
+}
+
+func ConstructUpsertQuery(ctx context.Context, req ConstructUpsertQueryRequest) (string, []interface{}, error) {
+	log.Debug(ctx, "Constructing upsert query", "request", PrettyPrint(req))
+
+	// Validate
+	if len(req.ColumnNames) < 1 {
+		return "", nil, fmt.Errorf("no column names provided")
+	}
+	if len(req.Values) < 1 {
+		return "", nil, fmt.Errorf("no values provided")
+	}
+	if len(req.ColumnNames) != len(req.Values) {
+		return "", nil, fmt.Errorf("number of values [%d] does not match the number of columns [%d]", len(req.Values), len(req.ColumnNames))
+	}
+
+	// Get the value of the upsert column
+	upsertColumnIndex := -1
+	for i, col := range req.ColumnNames {
+		if col == req.UpsertColumn {
+			upsertColumnIndex = i
+			break
+		}
+	}
+	if upsertColumnIndex == -1 {
+		return "", nil, fmt.Errorf("upsert column [%s] not found in the column names [%v]", req.UpsertColumn, req.ColumnNames)
+	}
+	upsertValue := req.Values[upsertColumnIndex]
+
+	// Construct the query
+	dialect := goqu.Dialect(req.Dialect)
+
+	// Goqu does not have a built-in upsert function, so we will have to check if the row exists and then insert or update
+	// Check if the row exists
+	cnt, err := dialect.From(req.TableName).Where(goqu.C(req.UpsertColumn).Eq(upsertValue)).Count()
+	if err != nil {
+		return "", nil, errutil.Wrap(err, "Creating 'count' query to check if the row exists")
+	}
+
+	// If the row exists, update it
+	if cnt > 0 {
+		// Construct the update query
+		query, args, err := ConstructUpdateQuery(ctx, req.Dialect, UpdateBuilderRequest{
+			TableName:        req.TableName,
+			Columns:          req.ColumnNames,
+			Values:           req.Values,
+			IdentifierColumn: req.UpsertColumn,
+			IdentifierValue:  upsertValue,
+		})
+		if err != nil {
+			return "", nil, errutil.Wrap(err, "Constructing update query")
+		}
+		return query, args, nil
+	}
+
+	// If the row does not exist, insert it
+	query, args, err := ConstructInsertQuery(ctx, req.Dialect, InsertBuilderRequest{
+		TableName:   req.TableName,
+		ColumnNames: req.ColumnNames,
+		Values:      [][]interface{}{req.Values},
+	})
+
+	if err != nil {
+		return "", nil, errutil.Wrap(err, "Constructing insert query")
+	}
+	return query, args, nil
+}
+
 type UpdateBuilderRequest struct {
 	TableName string
 	Columns   []string
 	Values    []interface{}
 	// For where condition, so we only update the required row
-	ID scalars.ID
+	IdentifierColumn string
+	IdentifierValue  interface{}
 }
 
 // ConstructSelectQuery creates a string SQL query with args
@@ -94,7 +170,7 @@ func ConstructUpdateQuery(ctx context.Context, dialectStr string, req UpdateBuil
 	// Query: Select Part
 	ds := dialect.Update(req.TableName).
 		Set(mp).
-		Where(goqu.C("id").Eq(req.ID))
+		Where(goqu.C(req.IdentifierColumn).Eq(req.IdentifierValue))
 
 	// Fetch the main entities
 	query, args, err := ds.ToSQL()

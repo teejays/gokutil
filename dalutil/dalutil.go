@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"net/http"
 	"time"
 
 	"github.com/teejays/gokutil/log"
@@ -19,7 +20,7 @@ import (
 
 var llog = log.GetLogger().WithHeading("DALUtil")
 
-type IEntityDALMeta[T types.EntityType, F types.Field] interface {
+type IEntityDALMeta[T types.EntityTypeMutable, F types.Field] interface {
 	types.IEntityMeta[T, F]
 	GetDbTableName() naam.Name
 	GetTypeDALMeta() ITypeDALMeta[T, F]
@@ -48,6 +49,7 @@ type ITypeDALMeta[T types.BasicType, F types.Field] interface {
 	// Add
 	GetDirectDBValues(T) []interface{} // Returns all the values that need to be added to DB
 	AddSubTableFieldsToDB(context.Context, *db.Connection, db.InsertTypeParams, T) (T, error)
+	// ForEachSubType(context.Context, func(ITypeDALMeta[T, F])) error
 	// ListType
 	ScanDBNextRow(context.Context, *sql.Rows) (T, error)
 	FetchSubTableFields(context.Context, *db.Connection, db.ListTypeByIDsParams, []T) ([]T, error)
@@ -139,17 +141,6 @@ type UpdateEntityResponse[T types.BasicType] struct {
 	Object T
 }
 
-type UpdateTypeRequest[T types.BasicType, F types.Field] struct {
-	TableName     string
-	Object        T
-	Fields        []F
-	ExcludeFields []F
-}
-
-type UpdateTypeResponse[T types.BasicType] struct {
-	Object T
-}
-
 func FieldsToStrings[T types.Field](fields []T) []string {
 	var colNames []string
 	for _, f := range fields {
@@ -175,8 +166,6 @@ func BatchAddType[T types.BasicType, F types.Field](ctx context.Context, conn *d
 	now := scalars.NewTimestampNow()
 
 	var err error
-
-	// Meta info
 
 	// Make any internal changes to the data before saving and after custom hooks
 	for i := range elems {
@@ -234,9 +223,9 @@ func BatchAddType[T types.BasicType, F types.Field](ctx context.Context, conn *d
 		err := validate.Struct(elems[i])
 		if err != nil {
 			if len(elems) == 1 {
-				errs.AddNew("Validation failed: %w", err)
+				errs.Wrap(err, "Validation failed")
 			} else {
-				errs.AddNew("Validation failed for item at position [%d]: %w", i+1, err)
+				errs.Wrap(err, "Validation failed for item at position [%d]", i+1)
 			}
 		}
 	}
@@ -357,7 +346,29 @@ func ListTypeByIDs[T types.BasicType, F types.Field](ctx context.Context, conn *
 	return resp, nil
 }
 
-func UpdateType[T types.BasicType, F types.Field](ctx context.Context, conn *db.Connection, req UpdateTypeRequest[T, F], meta ITypeDALMeta[T, F]) (UpdateTypeResponse[T], error) {
+type UpdateTypeParams[T types.BasicType, F types.Field] struct {
+	UpdateEntityRequest[T, F]
+	TableName string
+}
+
+type UpdateTypeRequest[T types.BasicType, F types.Field] struct {
+	Connection    *db.Connection
+	TableName     string
+	Object        T
+	Fields        []F
+	ExcludeFields []F
+	Meta          ITypeDALMeta[T, F]
+	AdminMode     bool
+}
+
+type UpdateTypeResponse[T types.BasicType] struct {
+	Object T
+}
+
+func UpdateType[T types.BasicType, F types.Field](ctx context.Context, req UpdateTypeRequest[T, F]) (UpdateTypeResponse[T], error) {
+	conn := req.Connection
+	meta := req.Meta
+
 	llog.Info(ctx, "Updating type", "type", meta.GetTypeCommonMeta().Name, "data", req.Object)
 	var resp UpdateTypeResponse[T]
 	now := scalars.NewTime(time.Now().UTC())
@@ -398,15 +409,17 @@ func UpdateType[T types.BasicType, F types.Field](ctx context.Context, conn *db.
 	oldElem := oldElemsResp.Items[0]
 
 	// (Included) Fields (provided by the caller) should not include any field updatable only by DAL
-	for _, f := range meta.GetCommonDALMeta().SetInternallyByDALFields {
-		if types.IsFieldInFields(f, fields) {
-			errs.AddNew("Mutations on field '%s' are allowed only in DAL", f)
+	if !req.AdminMode {
+		for _, f := range meta.GetCommonDALMeta().SetInternallyByDALFields {
+			if types.IsFieldInFields(f, fields) {
+				errs.AddNew("Mutations on field '%s' are allowed only in DAL", f)
+			}
 		}
-	}
-	// (Included) Fields (provided by the caller) should not include any non-mutable
-	for _, f := range meta.GetCommonDALMeta().ImmutableFields {
-		if types.IsFieldInFields(f, fields) {
-			errs.AddNew("Mutations on field '%s' are not allowed", f)
+		// (Included) Fields (provided by the caller) should not include any non-mutable
+		for _, f := range meta.GetCommonDALMeta().ImmutableFields {
+			if types.IsFieldInFields(f, fields) {
+				errs.AddNew("Mutations on field '%s' are not allowed", f)
+			}
 		}
 	}
 	if !errs.IsNil() {
@@ -414,16 +427,18 @@ func UpdateType[T types.BasicType, F types.Field](ctx context.Context, conn *db.
 	}
 
 	// Now that we have verified that caller provided fields are okay, we can add stuff to them to make them more useful
-	// - Add IsImmutable fields to ExcludeFields list
-	for _, f := range meta.GetCommonDALMeta().ImmutableFields {
-		if !types.IsFieldInFields(f, excludeFields) {
-			excludeFields = append(excludeFields, f)
+	if !req.AdminMode {
+		// - Add IsImmutable fields to ExcludeFields list
+		for _, f := range meta.GetCommonDALMeta().ImmutableFields {
+			if !types.IsFieldInFields(f, excludeFields) {
+				excludeFields = append(excludeFields, f)
+			}
 		}
-	}
-	// - Add DALOnlyMutable fields to ExcludeFields list
-	for _, f := range meta.GetCommonDALMeta().SetInternallyByDALFields {
-		if !types.IsFieldInFields(f, excludeFields) {
-			excludeFields = append(excludeFields, f)
+		// - Add DALOnlyMutable fields to ExcludeFields list
+		for _, f := range meta.GetCommonDALMeta().SetInternallyByDALFields {
+			if !types.IsFieldInFields(f, excludeFields) {
+				excludeFields = append(excludeFields, f)
+			}
 		}
 	}
 
@@ -481,7 +496,7 @@ func UpdateType[T types.BasicType, F types.Field](ctx context.Context, conn *db.
 			colsWithValueChange, vals := meta.GetChangedFieldsAndValues(oldElem, elem, allowedCols)
 			// If nothing needs to be updated, return
 			if len(colsWithValueChange) < 1 {
-				llog.Warn(ctx, "No difference found in existing and provided type", "type", meta.GetTypeCommonMeta().Name)
+				llog.Warn(ctx, "Updating Type: No difference found in existing and new type, nothing to update.", "type", meta.GetTypeCommonMeta().Name)
 			} else {
 
 				// Add UpdatedAt fields to update columns
@@ -490,10 +505,11 @@ func UpdateType[T types.BasicType, F types.Field](ctx context.Context, conn *db.
 
 				// Get Query
 				updateBuilderRequest := db.UpdateBuilderRequest{
-					TableName: req.TableName,
-					ID:        elem.GetID(),
-					Columns:   FieldsToStrings(colsWithValueChange),
-					Values:    vals,
+					TableName:        req.TableName,
+					IdentifierColumn: "id",
+					IdentifierValue:  elem.GetID(),
+					Columns:          FieldsToStrings(colsWithValueChange),
+					Values:           vals,
 				}
 				query, args, err := db.ConstructUpdateQuery(ctx, conn.Dialect, updateBuilderRequest)
 				if err != nil {
@@ -517,11 +533,315 @@ func UpdateType[T types.BasicType, F types.Field](ctx context.Context, conn *db.
 		return resp, fmt.Errorf("Updating sub table fields: %w", err)
 	}
 
+	// Run any after save hooks
+	// Save Post Hooks
+	if fn := meta.GetHookSavePost(); fn != nil {
+		log.Info(ctx, "Running HookSavePost", "type", meta.GetTypeCommonMeta().Name)
+		var err error
+		elem, err = fn(ctx, elem)
+		if err != nil {
+			return resp, fmt.Errorf("HookSavePost failed: %w", err)
+		}
+
+	} else {
+		log.Debug(ctx, "No HookSavePost found", "type", meta.GetTypeCommonMeta().Name, "meta", meta)
+	}
+
+	// Update Post Hooks
+	if fn := meta.GetHookUpdatePost(); fn != nil {
+		log.Info(ctx, "Running HookUpdatePost", "type", meta.GetTypeCommonMeta().Name)
+		var err error
+		elem, err = fn(ctx, elem)
+		if err != nil {
+			return resp, fmt.Errorf("HookUpdatePost failed: %w", err)
+		}
+	} else {
+		log.Debug(ctx, "No HookUpdatePost found", "type", meta.GetTypeCommonMeta().Name, "meta", meta)
+	}
+
 	resp.Object = elem
 
 	return resp, nil
 
 }
+
+/* * * * * * *
+ * Delete
+ * * * * * * */
+
+type DeleteEntityRequest struct {
+	ID scalars.ID
+}
+
+type DeleteTypeRequest[T types.BasicType, F types.Field] struct {
+	Connection *db.Connection
+	TableName  string
+	ObjectID   scalars.ID
+	Meta       ITypeDALMeta[T, F]
+	Now        scalars.Timestamp
+}
+
+type DeleteTypeResponse struct {
+	ObjectID  scalars.ID        `json:"objectId" yaml:"objectId"`
+	DeletedAt scalars.Timestamp `json:"deletedAt" yaml:"deletedAt"`
+}
+
+func DeleteType[T types.BasicType, F types.Field](ctx context.Context, req DeleteTypeRequest[T, F]) (DeleteTypeResponse, error) {
+	panics.IfNil(req.Connection, "dalutil.DeleteType() called with nil Connection")
+	panics.If(req.Now.IsEmpty(), "dalutil.DeleteType() called with empty timestamp")
+
+	var resp = DeleteTypeResponse{
+		ObjectID:  req.ObjectID,
+		DeletedAt: req.Now,
+	}
+	typName := req.Meta.GetTypeCommonMeta().Name
+
+	llog.Info(ctx, "Deleting type", "type", typName, "id", req.ObjectID)
+
+	// elem := req.Object
+	if req.ObjectID.IsEmpty() {
+		return resp, fmt.Errorf("ID is empty, cannot delete")
+	}
+
+	// Get the existing element.
+	llog.Debug(ctx, "Fetching existing type", "type", typName, "id", req.ObjectID)
+	subParams := db.ListTypeByIDsParams{
+		TableName: req.TableName,
+		IDColumn:  "id",
+		IDs:       []scalars.ID{req.ObjectID},
+	}
+	oldElemsResp, err := ListTypeByIDs[T, F](ctx, req.Connection, subParams, req.Meta)
+	if err != nil {
+		return resp, fmt.Errorf("could not list by ID %s: %w", req.ObjectID, err)
+	}
+	if len(oldElemsResp.Items) < 1 {
+		return resp, errutil.NewGerror("Type [%s] with ID [%s] not found", typName, req.ObjectID).
+			SetHTTPStatus(http.StatusNotFound).
+			SetExternalMsg("We could not find any entity or type with the given ID.")
+	}
+	panics.If(len(oldElemsResp.Items) > 1, "Multiple elements founds for ID %s in table %s", req.ObjectID, req.TableName)
+	oldElem := oldElemsResp.Items[0]
+	if oldElem.GetDeletedAt() != nil {
+		return resp, errutil.NewGerror("Type [%s] with ID [%s] is already deleted", typName, req.ObjectID).
+			SetHTTPStatus(http.StatusConflict).
+			SetExternalMsg("Entity or type is already marked as deleted.")
+	}
+
+	// Run any before delete hooks: Not implemented
+	if fn := req.Meta.GetHookDeletePre(); fn != nil {
+		log.Info(ctx, "Running HookDeletePre", "type", typName)
+		return resp, fmt.Errorf("HookDeletePre not implemented")
+	}
+
+	// Run the update query
+	{
+
+		llog.Debug(ctx, "Updating direct database fields", "type", typName, "columns")
+
+		// Get Query
+		updateBuilderRequest := db.UpdateBuilderRequest{
+			TableName:        req.TableName,
+			IdentifierColumn: "id",
+			IdentifierValue:  req.ObjectID,
+			Columns:          []string{"deleted_at"},
+			Values:           []interface{}{req.Now},
+		}
+		query, args, err := db.ConstructUpdateQuery(ctx, req.Connection.Dialect, updateBuilderRequest)
+		if err != nil {
+			return resp, fmt.Errorf("Could not construct Update SQL query: %w", err)
+		}
+
+		rowsAffected, err := req.Connection.ExecuteQuery(ctx, query, args...)
+		if err != nil {
+			return resp, err
+		}
+		if rowsAffected != 1 {
+			return resp, fmt.Errorf("expected 1 row to be affected but got %d rows affected", rowsAffected)
+		}
+
+	}
+
+	// TODO:  Delete any sub-table fields
+
+	// Run any after delete hooks: Not implemented
+	if fn := req.Meta.GetHookDeletePost(); fn != nil {
+		log.Info(ctx, "Running HookDeletePost", "type", typName)
+		return resp, fmt.Errorf("HookDeletePost not implemented")
+	}
+
+	return resp, nil
+
+}
+
+// type SaveBatchTypeParams[T types.BasicType, F types.Field] struct {
+// 	TableName  string
+// 	Connection *db.Connection
+// 	Objects    []T
+// 	ObjectMeta ITypeDALMeta[T, F]
+// 	Now        scalars.Timestamp
+// }
+
+// func SaveBatchType[T types.BasicType, F types.Field](ctx context.Context, p SaveBatchTypeParams[T, F]) error {
+
+// 	var err error
+
+// 	// Populate vars from params for easier access
+// 	elems := p.Objects
+// 	meta := p.ObjectMeta
+// 	now := p.Now
+// 	if now.IsEmpty() {
+// 		now = scalars.NewTimestampNow()
+// 	}
+
+// 	// Standard internal pre-save hook: populate ID, time fields etc.
+// 	for i := range elems {
+// 		elems[i], err = meta.InternalHookSavePre(ctx, elems[i], now)
+// 		if err != nil {
+// 			return errutil.Wrap(err, "InternalHook [SavePre] [item %d]", i+1)
+// 		}
+// 	}
+
+// 	// A few things we need to do only for new items.
+// 	for i := range elems {
+
+// 		isNew := elems[i].GetID().IsEmpty()
+// 		if !isNew {
+// 			continue
+// 		}
+
+// 		// For new items, we should add any default value for missing fields (when specified)
+// 		// Todo: this should be a part of InternalHookCreatePre?
+// 		elems[i] = meta.SetDefaultFieldValues(elems[i])
+
+// 		// Run any before create hooks
+// 		if fn := meta.GetHookCreatePre(); fn != nil {
+// 			log.Info(ctx, "SaveType: Running Hook [CreatePre]", "type", meta.GetTypeCommonMeta().Name)
+// 			elems[i], err = fn(ctx, elems[i])
+// 			if err != nil {
+// 				if len(elems) == 1 {
+// 					return errutil.Wrap(err, "Hook failed [CreatePre]")
+// 				} else {
+// 					return errutil.Wrap(err, "Hook failed [CreatePre] [item %d]", i+1)
+// 				}
+// 			}
+// 		} else {
+// 			log.Debug(ctx, "SaveType: No HookCreatePre found", "type", meta.GetTypeCommonMeta().Name, "meta", meta)
+// 		}
+
+// 	}
+
+// 	// New items: Create Pre Hooks
+// 	if fn := meta.GetHookCreatePre(); fn != nil {
+// 		log.Info(ctx, "SaveType: Running Hook [CreatePre]", "type", meta.GetTypeCommonMeta().Name)
+
+// 		for i := range elems {
+// 			isNew := elems[i].GetID().IsEmpty()
+// 			if !isNew {
+// 				continue
+// 			}
+
+// 			elems[i], err = fn(ctx, elems[i])
+// 			if err != nil {
+// 				if len(elems) == 1 {
+// 					return errutil.Wrap(err, "Hook failed [CreatePre]")
+// 				} else {
+// 					return errutil.Wrap(err, "Hook failed [CreatePre] [item %d]", i+1)
+// 				}
+// 			}
+// 		}
+// 	} else {
+// 		log.Debug(ctx, "SaveType: No Hook [CreatePre] found", "type", meta.GetTypeCommonMeta().Name, "meta", meta)
+// 	}
+
+// 	// All items: Save Pre Hooks
+// 	if fn := meta.GetHookSavePre(); fn != nil {
+// 		log.Info(ctx, "SaveType: Running Hook [SavePre]", "type", meta.GetTypeCommonMeta().Name)
+// 		for i := range elems {
+// 			var err error
+// 			elems[i], err = fn(ctx, elems[i])
+// 			if err != nil {
+// 				if len(elems) == 1 {
+// 					return errutil.Wrap(err, "Hook failed [SavePre]")
+// 				} else {
+// 					return errutil.Wrap(err, "Hook failed [SavePre] [item %d]", i+1)
+// 				}
+// 			}
+// 		}
+// 	} else {
+// 		log.Debug(ctx, "SaveType: No Hook [SavePre] found", "type", meta.GetTypeCommonMeta().Name, "meta", meta)
+// 	}
+
+// 	// Validate the types before they are added
+// 	// Note: We've only mutated/hooked the outer type so we can really only validate that.
+// 	errs := errutil.NewMultiErr()
+// 	for i := range elems {
+// 		err := validate.Struct(elems[i])
+// 		if err != nil {
+// 			if len(elems) == 1 {
+// 				errs.Wrap(err, "Validation failed")
+// 			} else {
+// 				errs.Wrap(err, "Validation failed [item %d]", i+1)
+// 			}
+// 		}
+// 	}
+// 	if !errs.IsNil() {
+// 		return errs
+// 	}
+
+// 	// Get Columns
+// 	var cols []string = meta.GetDatabaseColumns()
+
+// 	// // Get Values (each value is a row/elem)
+// 	// var vals [][]interface{}
+// 	// for i := range elems {
+// 	// 	var v = meta.GetDirectDBValues(elems[i])
+// 	// 	vals = append(vals, v)
+// 	// }
+
+// 	// Insert Main Type
+
+// 	// Our upsert helper can only handle one upsert query generation at time (because it individually checks if we need to insert or update)
+// 	// So we will have to do this in a loop
+// 	for i := range elems {
+
+// 		vals := meta.GetDirectDBValues(elems[i])
+
+// 		// Construct the query
+// 		subReq := db.ConstructUpsertQueryRequest{
+// 			Dialect:      p.Connection.Dialect,
+// 			TableName:    p.TableName,
+// 			UpsertColumn: "id",
+// 			ColumnNames:  cols,
+// 			Values:       vals,
+// 		}
+
+// 		query, args, err := db.ConstructUpsertQuery(ctx, subReq)
+// 		if err != nil {
+// 			return errutil.Wrap(err, "constructing upsert query")
+// 		}
+
+// 		rowsAffected, err := p.Connection.ExecuteQuery(ctx, query, args...)
+// 		if err != nil {
+// 			return errutil.Wrap(err, "executing query")
+// 		}
+
+// 		if int(rowsAffected) != len(vals) {
+// 			return fmt.Errorf("unexpected number of rows affected, expected %d row but got %d rows", len(vals), rowsAffected)
+// 		}
+
+// 		// Enter the tree (sub-types etc.)
+
+// 		err = meta.ForEachSubType(ctx,
+// 			func(subMeta ITypeDALMeta) {
+// 				// do something
+// 			},
+// 		)
+
+// 	}
+
+// 	return nil
+
+// }
 
 func GetUUIDsUnion(lists ...[]scalars.ID) []scalars.ID {
 	// Edge case

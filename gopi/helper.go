@@ -173,8 +173,10 @@ func HandlerWrapper[ReqT any, RespT any](httpMethod string, fn func(context.Cont
 		return GetGenericGetHandler(fn)
 	case http.MethodPost, http.MethodPut, http.MethodPatch:
 		return GetGenericPostPutPatchHandler(fn)
+	case http.MethodDelete:
+		return GetGenericGetHandler(fn) // because DELETE requests don't have a body but rely on URL params like GET
 	default:
-		// Todo: Implement other method types like DELETE?
+		// Todo: Implement other method types?
 	}
 
 	panics.P("HTTP Method type [%s] not implemented by routes.HandlerWrapper().", httpMethod)
