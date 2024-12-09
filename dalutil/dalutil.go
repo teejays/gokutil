@@ -635,15 +635,15 @@ func DeleteType[T types.BasicType, F types.Field](ctx context.Context, req Delet
 
 	// Run the update query
 	{
-
-		llog.Debug(ctx, "Updating direct database fields", "type", typName, "columns")
+		columns := []string{"deleted_at"}
+		llog.Debug(ctx, "Updating direct database fields", "type", typName, "columns", columns)
 
 		// Get Query
 		updateBuilderRequest := db.UpdateBuilderRequest{
 			TableName:        req.TableName,
 			IdentifierColumn: "id",
 			IdentifierValue:  req.ObjectID,
-			Columns:          []string{"deleted_at"},
+			Columns:          columns,
 			Values:           []interface{}{req.Now},
 		}
 		query, args, err := db.ConstructUpdateQuery(ctx, req.Connection.Dialect, updateBuilderRequest)
