@@ -9,7 +9,7 @@ require (
 	github.com/teejays/gokutil/naam v0.0.0-20241209061137-430390abf901
 	github.com/teejays/gokutil/panics v0.0.0-20241209061137-430390abf901
 	github.com/teejays/gokutil/scalars v0.0.0-20241209061137-430390abf901
-	github.com/teejays/gokutil/types v0.0.0-20241209061137-430390abf901
+	github.com/teejays/gokutil/types v0.0.0-20241211211914-e89ff2b5c84a
 	github.com/teejays/gokutil/validate v0.0.0-20241209061137-430390abf901
 )
 
