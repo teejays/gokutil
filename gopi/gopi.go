@@ -78,7 +78,7 @@ func GetHandler(ctx context.Context, routes []Route, middlewares MiddlewareFuncs
 	m.NotFoundHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		llog.Debug(ctx, "Request received for non-existent route", "method", r.Method, "path", r.URL.String())
 
-		err := errutil.NewGerror("Route not configured").
+		err := errutil.NewGerror("Route not configured: [%s]", r.URL.String()).
 			SetHTTPStatus(http.StatusNotFound).
 			SetExternalMsg("You have reached an API server which is developed and maintained by Ongoku but the route accessed [%s] is non-existent.", r.URL.String())
 
