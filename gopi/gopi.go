@@ -8,6 +8,7 @@ import (
 
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
+	"github.com/teejays/gokutil/errutil"
 	"github.com/teejays/gokutil/log"
 )
 
@@ -69,6 +70,26 @@ func GetHandler(ctx context.Context, routes []Route, middlewares MiddlewareFuncs
 		pathPrefix = "/" + strings.Trim(pathPrefix, "/")
 		m = m.PathPrefix(pathPrefix).Subrouter()
 	}
+
+	// Standard/Common routes
+
+	// NotFound handler:
+	// Make sure non-matching requests are also logged, and a specific response is returned
+	m.NotFoundHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		llog.Debug(ctx, "Request received for non-existent route", "method", r.Method, "path", r.URL.String())
+
+		err := errutil.NewGerror("Route not configured").
+			SetHTTPStatus(http.StatusNotFound).
+			SetExternalMsg("You have reached an API server which is developed and maintained by Ongoku but the route accessed [%s] is non-existent.", r.URL.String())
+
+		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+		writeError(w, http.StatusNotFound, err)
+	})
+
+	// Ping route:
+	m.HandleFunc("/ping", func(w http.ResponseWriter, r *http.Request) {
+		WriteStandardResponse(w, "pong")
+	}).Methods(http.MethodGet)
 
 	// Enable CORS
 	// TODO: Have tighter control over CORS policy, but okay for
