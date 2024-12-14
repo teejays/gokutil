@@ -1,4 +1,4 @@
-github.com/teejays/gokutil/env v0.0.0-20241209061137-430390abf901 h1:IXmOQIXosD6zSCCMVO4zyyFpfTZQ2SDhFDdUbZbu/+E=
-github.com/teejays/gokutil/env v0.0.0-20241209061137-430390abf901/go.mod h1:Y1lbJjncm4dWmBXBzQsx+NIWu3M0Mxdy6jvT4FI1s+c=
-github.com/teejays/gokutil/panics v0.0.0-20241209061137-430390abf901 h1:G1DGWD7CHJRsJVdo405VNqz5cquu0Wf5OZK3Ahk/8Mw=
-github.com/teejays/gokutil/panics v0.0.0-20241209061137-430390abf901/go.mod h1:ozbKMbDGOPikGWQ5byY801Jv2s1P1gaNxAdtJIQQGRo=
+github.com/teejays/gokutil/env v0.0.0-20241214044948-546c88bdb750 h1:6m4BHS6kp4dYgOvIZsX/Ja42Qvzv40JdMviWMiZnx5k=
+github.com/teejays/gokutil/env v0.0.0-20241214044948-546c88bdb750/go.mod h1:1wtBb6Cqzz/nJPCxNuZBx8d4vpnZNMaW9EjpKiivxqM=
+github.com/teejays/gokutil/panics v0.0.0-20241214044948-546c88bdb750 h1:sWlOh664dTxN/lwcW51czgqvH3nLeL3rYPTkVnRfTEw=
+github.com/teejays/gokutil/panics v0.0.0-20241214044948-546c88bdb750/go.mod h1:ozbKMbDGOPikGWQ5byY801Jv2s1P1gaNxAdtJIQQGRo=

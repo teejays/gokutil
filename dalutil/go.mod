@@ -3,17 +3,18 @@ module github.com/teejays/gokutil/dalutil
 go 1.22.5
 
 require (
-	github.com/teejays/gokutil/client/db v0.0.0-20241209061137-430390abf901
-	github.com/teejays/gokutil/errutil v0.0.0-20241209061137-430390abf901
-	github.com/teejays/gokutil/log v0.0.0-20241209061137-430390abf901
-	github.com/teejays/gokutil/naam v0.0.0-20241209061137-430390abf901
-	github.com/teejays/gokutil/panics v0.0.0-20241209061137-430390abf901
-	github.com/teejays/gokutil/scalars v0.0.0-20241209061137-430390abf901
-	github.com/teejays/gokutil/types v0.0.0-20241211211914-e89ff2b5c84a
-	github.com/teejays/gokutil/validate v0.0.0-20241209061137-430390abf901
+	github.com/teejays/gokutil/client/db v0.0.0-20241214044948-546c88bdb750
+	github.com/teejays/gokutil/errutil v0.0.0-20241214044948-546c88bdb750
+	github.com/teejays/gokutil/log v0.0.0-20241214044948-546c88bdb750
+	github.com/teejays/gokutil/naam v0.0.0-20241214044948-546c88bdb750
+	github.com/teejays/gokutil/panics v0.0.0-20241214044948-546c88bdb750
+	github.com/teejays/gokutil/scalars v0.0.0-20241214044948-546c88bdb750
+	github.com/teejays/gokutil/types v0.0.0-20241214044948-546c88bdb750
+	github.com/teejays/gokutil/validate v0.0.0-20241214044948-546c88bdb750
 )
 
 require (
+	github.com/Rican7/conjson v0.1.0 // indirect
 	github.com/bahlo/generic-list-go v0.2.0 // indirect
 	github.com/buger/jsonparser v1.1.1 // indirect
 	github.com/doug-martin/goqu/v9 v9.19.0 // indirect
@@ -29,11 +30,12 @@ require (
 	github.com/lib/pq v1.10.9 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/stretchr/objx v0.5.2 // indirect
-	github.com/teejays/gokutil/clog v0.0.0-20241209061137-430390abf901 // indirect
-	github.com/teejays/gokutil/ctxutil v0.0.0-20241209061137-430390abf901 // indirect
-	github.com/teejays/gokutil/env v0.0.0-20241209061137-430390abf901 // indirect
-	github.com/teejays/gokutil/sclog v0.0.0-20241209061137-430390abf901 // indirect
-	github.com/teejays/gokutil/strcase v0.0.0-20241209061137-430390abf901 // indirect
+	github.com/teejays/gokutil/clog v0.0.0-20241214044948-546c88bdb750 // indirect
+	github.com/teejays/gokutil/ctxutil v0.0.0-20241214044948-546c88bdb750 // indirect
+	github.com/teejays/gokutil/env v0.0.0-20241214044948-546c88bdb750 // indirect
+	github.com/teejays/gokutil/gopi v0.0.0-20241214044948-546c88bdb750 // indirect
+	github.com/teejays/gokutil/sclog v0.0.0-20241214044948-546c88bdb750 // indirect
+	github.com/teejays/gokutil/strcase v0.0.0-20241214044948-546c88bdb750 // indirect
 	github.com/wk8/go-ordered-map/v2 v2.1.8 // indirect
 	golang.org/x/crypto v0.31.0 // indirect
 	golang.org/x/net v0.32.0 // indirect
