@@ -101,6 +101,11 @@ func cleanWords(words string) string {
 	return words
 }
 
+// String makes Name a Stringer, so Names are printed in a slightly nicer manner in print/log statements.
+func (s Name) String() string {
+	return strcase.ToPascal(s.words)
+}
+
 // MarshalJSON implements the `json.Marshaler` interface, so Name can be converted to a human friendly string in JSON.
 func (s Name) MarshalJSON() ([]byte, error) {
 	if s.IsEmpty() {
@@ -262,16 +267,13 @@ func (s Name) HasSuffixString(str string) bool {
 	return s.words[len(s.words)-len(str):] == str
 }
 
-// String makes Name a Stringer, so Names are printed in a slightly nicer manner in print/log statements.
-func (s Name) String() string {
-	return strcase.ToPascal(s.words)
+// Get the `a` or `an` before the Name. It is used in sentences.
+func (s Name) GetArticle() string {
+	if strings.Contains("aeiou", string(s.words[0])) {
+		return "an"
+	}
+	return "a"
 }
-
-// // ToPascal converts the Name `s` into a CamelCase version, however it doesn't respect the parts.
-// func (s Name) ToPascal() string {
-// 	panics.If(s.IsEmpty(), "naam.Name.ToPascal() called on empty Name")
-// 	return strcase.ToPascal(s.String())
-// }
 
 /* * * * * * * *
  * Formatters (Main)

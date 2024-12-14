@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql/driver"
 	"fmt"
+	"reflect"
 	"slices"
 
 	"github.com/teejays/gokutil/naam"
@@ -448,3 +449,12 @@ func RemoveFieldFromFields[T Field](column T, fields []T) []T {
 
 // EmptyStruct allows to have a common type for empty structs (so the same type can be passed around without conversions)
 type EmptyStruct struct{}
+
+// DerefInterface expects an interface with an underlying type that is a pointer, and returns the value that the pointer points to.
+func DerefInterface(i interface{}) interface{} {
+	v := reflect.ValueOf(i)
+	for v.Kind() == reflect.Ptr {
+		v = v.Elem()
+	}
+	return v.Interface()
+}

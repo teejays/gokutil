@@ -304,6 +304,6 @@ func SqlRowsToUUIDs(ctx context.Context, rows *sql.Rows) ([]scalars.ID, error) {
 
 func PrettyPrint(i interface{}) string {
 	s, err := json.MarshalIndent(i, "", "\t")
-	panics.IfError(err, "Cannot json.MarshalIndent: %s", err)
+	panics.IfError(err, "Cannot json.MarshalIndent: %s\ndata: %+v", err, i)
 	return string(s)
 }

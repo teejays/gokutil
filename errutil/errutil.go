@@ -9,6 +9,10 @@ var ErrNotFound = fmt.Errorf("not found")
 var ErrNothingToUpdate = fmt.Errorf("nothing to update")
 var ErrNotAuthorized = fmt.Errorf("you are not authorized to perform this action")
 
+func New(msg string, args ...interface{}) error {
+	// using fmt since it supports wrapping
+	return fmt.Errorf(msg, args...)
+}
 func Combine(errs ...error) error {
 	return MultiErr{errs: removeNilErrs(errs)}
 }

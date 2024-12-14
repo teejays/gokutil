@@ -57,6 +57,11 @@ func WrapGerror(err error) IGerror {
 	}
 }
 
+func WrapGerrorf(err error, msg string, args ...interface{}) IGerror {
+	inerr := Wrap(err, msg, args...)
+	return WrapGerror(inerr)
+}
+
 func WrapBadRequest(err error) error {
 	return WrapGerror(err).SetHTTPStatus(http.StatusBadRequest)
 }

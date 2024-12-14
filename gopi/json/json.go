@@ -37,14 +37,17 @@ func Unmarshal(src []byte, v interface{}) error {
 
 }
 
+// UnmarshalStrict decodes JSON strictly into the provided struct, which should always be a pointer.
 func UnmarshalStrict(src []byte, v interface{}) error {
+
 	decoder := json.NewDecoder(bytes.NewReader(src))
 	// Disallow unknown fields
 	decoder.DisallowUnknownFields()
-	err := decoder.Decode(&v)
+	err := decoder.Decode(v)
 	if err != nil {
 		return err
 	}
+
 	return nil
 }
 

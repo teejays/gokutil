@@ -102,6 +102,7 @@ func GetHandler(ctx context.Context, routes []Route, middlewares MiddlewareFuncs
 
 	// Register routes to the handler
 	// Set up pre handler middlewares
+	m.Use(PaniRecovercMiddleware) // Use it first so that it can recover from panics that happen in other middlewares
 	for _, mw := range middlewares.PreMiddlewares {
 		m.Use(mux.MiddlewareFunc(mw))
 	}
@@ -167,6 +168,19 @@ func GetHandler(ctx context.Context, routes []Route, middlewares MiddlewareFuncs
 	mc := corsEnabler(m)
 
 	return mc, nil
+}
+func PaniRecovercMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := r.Context()
+		defer func() {
+			if r := recover(); r != nil {
+				llog.Error(ctx, "Panic while handling the request", "panic", r)
+				err := errutil.New("Panic while handling the request: %s", r)
+				writeError(w, http.StatusInternalServerError, err)
+			}
+		}()
+		next.ServeHTTP(w, r)
+	})
 }
 
 // LoggerMiddleware is a http.Handler middleware function that logs any request received

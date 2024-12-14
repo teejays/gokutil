@@ -13,6 +13,8 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/graph-gophers/graphql-go"
+
+	jsonhelper "github.com/teejays/gokutil/gopi/json"
 	"github.com/teejays/gokutil/panics"
 )
 
@@ -242,6 +244,10 @@ func (t Timestamp) ToGolangTime() time.Time {
 // Standardize ensures that the time is stored in the correct format i.e. in UTC.
 func (t *Timestamp) Standardize() {
 	t.Time.Time = t.Time.Time.UTC()
+}
+
+func (t Timestamp) Equal(other Timestamp) bool {
+	return t.Time.Equal(other.Time.Time)
 }
 
 /* * * * * * *
@@ -493,6 +499,12 @@ func (g GenericData) IsEmpty() bool {
 func (g *GenericData) ParseString(str string) error {
 	// Assume the string is a JSON string
 	// Ensure it is valid JSON
+	// if str is qouted, assume that it is a string
+	if strings.HasPrefix(str, "\"") && strings.HasSuffix(str, "\"") {
+		g.value = str
+		return nil
+	}
+	// Assume object
 	m := map[string]interface{}{}
 	err := json.Unmarshal([]byte(str), &m)
 	if err != nil {
@@ -503,6 +515,9 @@ func (g *GenericData) ParseString(str string) error {
 }
 
 func (g GenericData) MarshalJSON() ([]byte, error) {
+	if g.IsEmpty() {
+		return []byte("null"), nil
+	}
 	return []byte(g.value), nil
 }
 
@@ -547,10 +562,29 @@ func (g *GenericData) UnmarshalGraphQL(input interface{}) error {
 }
 
 func (g GenericData) Value() (driver.Value, error) {
+	if g.IsEmpty() {
+		return nil, nil
+	}
 	return g.value, nil
 }
 
+// NewGenericDataFromStruct name is misleading because it handles non-struct values as well.
 func NewGenericDataFromStruct(value interface{}) (GenericData, error) {
+	// If value is nil
+	if value == nil {
+		return GenericData{}, nil
+	}
+	// If value is a string
+	if str, ok := value.(string); ok {
+		return GenericData{value: strconv.Quote(str)}, nil
+	}
+	// If value is error
+	if err, ok := value.(error); ok {
+		if err == nil {
+			return GenericData{}, nil
+		}
+		return GenericData{value: strconv.Quote(err.Error())}, nil
+	}
 	// Assume the value is an object
 	bytes, err := json.Marshal(value)
 	if err != nil {
@@ -565,11 +599,13 @@ func NewGenericDataFromStruct(value interface{}) (GenericData, error) {
 	return GenericData{value: string(bytes)}, nil
 }
 
+// LoadTo unmarshals the JSON value into the provided struct. The struct v should be a pointer.
 func (g GenericData) LoadTo(v interface{}) error {
 	if g.IsEmpty() {
 		return fmt.Errorf("Cannot LoadTo an empty GenericData value")
 	}
-	return json.Unmarshal([]byte(g.value), v)
+
+	return jsonhelper.UnmarshalStrict([]byte(g.value), v)
 }
 
 /* * * * * * *
