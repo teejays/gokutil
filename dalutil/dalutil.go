@@ -338,7 +338,7 @@ func ListTypeByIDs[T types.BasicType, F types.Field](ctx context.Context, conn *
 			}
 		}
 	} else {
-		log.Debug(ctx, "No HookReadPost found", "type", meta.GetTypeCommonMeta().Name, "meta", meta)
+		log.None(ctx, "No HookReadPost found", "type", meta.GetTypeCommonMeta().Name, "meta", meta)
 	}
 
 	resp.Items = elems
@@ -465,7 +465,7 @@ func UpdateType[T types.BasicType, F types.Field](ctx context.Context, req Updat
 		}
 
 	} else {
-		log.Debug(ctx, "No HookUpdatePre found", "type", meta.GetTypeCommonMeta().Name, "meta", meta)
+		log.None(ctx, "No HookUpdatePre found", "type", meta.GetTypeCommonMeta().Name, "meta", meta)
 	}
 
 	// Save Pre Hooks
@@ -478,7 +478,7 @@ func UpdateType[T types.BasicType, F types.Field](ctx context.Context, req Updat
 		}
 
 	} else {
-		log.Debug(ctx, "No HookSavePre found", "type", meta.GetTypeCommonMeta().Name, "meta", meta)
+		log.None(ctx, "No HookSavePre found", "type", meta.GetTypeCommonMeta().Name, "meta", meta)
 	}
 
 	// Direct table
@@ -544,7 +544,7 @@ func UpdateType[T types.BasicType, F types.Field](ctx context.Context, req Updat
 		}
 
 	} else {
-		log.Debug(ctx, "No HookSavePost found", "type", meta.GetTypeCommonMeta().Name, "meta", meta)
+		log.None(ctx, "No HookSavePost found", "type", meta.GetTypeCommonMeta().Name, "meta", meta)
 	}
 
 	// Update Post Hooks
@@ -556,7 +556,7 @@ func UpdateType[T types.BasicType, F types.Field](ctx context.Context, req Updat
 			return resp, fmt.Errorf("HookUpdatePost failed: %w", err)
 		}
 	} else {
-		log.Debug(ctx, "No HookUpdatePost found", "type", meta.GetTypeCommonMeta().Name, "meta", meta)
+		log.None(ctx, "No HookUpdatePost found", "type", meta.GetTypeCommonMeta().Name)
 	}
 
 	resp.Object = elem

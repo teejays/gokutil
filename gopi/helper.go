@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-	"reflect"
 	"strconv"
 	"strings"
 
@@ -94,7 +93,6 @@ func WriteResponse(w http.ResponseWriter, code int, v interface{}) {
 
 func writeResponse(w http.ResponseWriter, code int, v interface{}) {
 	w.WriteHeader(code)
-	log.DebugWithoutCtx("writing response", "kind", reflect.ValueOf(v).Kind(), "content", v)
 
 	if v == nil {
 		return
@@ -188,7 +186,7 @@ func GetGenericGetHandler[ReqT, RespT any](fn func(context.Context, ReqT) (RespT
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 
-		log.Debug(ctx, "[HTTP Handler] Handling GET request...")
+		log.Debug(ctx, "[START] HTTP Handle GetDelete")
 
 		// Get the req data from URL
 		reqParam, ok := r.URL.Query()["req"]
@@ -218,6 +216,9 @@ func GetGenericGetHandler[ReqT, RespT any](fn func(context.Context, ReqT) (RespT
 		}
 
 		WriteStandardResponse(w, resp)
+
+		log.Debug(ctx, "[END] HTTP Handle GetDelete")
+
 		return
 	}
 }
@@ -227,7 +228,7 @@ func GetGenericPostPutPatchHandler[ReqT, RespT any](fn func(context.Context, Req
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 
-		log.Debug(ctx, "[HTTP Handler] Starting...")
+		log.Debug(ctx, "[START] HTTP Handle PostPutPatch")
 
 		// Get the req from HTTP body
 		var req ReqT
@@ -248,6 +249,8 @@ func GetGenericPostPutPatchHandler[ReqT, RespT any](fn func(context.Context, Req
 
 		WriteStandardResponse(w, resp)
 
+		log.Debug(ctx, "[END] HTTP Handle PostPutPatch")
+
 	}
 }
 
@@ -257,7 +260,7 @@ func GetDirectRequestHandler[RespT any](fn func(context.Context, *http.Request) 
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 
-		log.Debug(ctx, "[HTTP Handler] Starting...")
+		log.Debug(ctx, "[START] HTTP Handle DirectRequest")
 
 		// Call the method
 		resp, err := fn(r.Context(), r)
@@ -267,6 +270,8 @@ func GetDirectRequestHandler[RespT any](fn func(context.Context, *http.Request) 
 		}
 
 		WriteStandardResponse(w, resp)
+
+		log.Debug(ctx, "[END] HTTP Handle DirectRequest")
 
 	}
 }

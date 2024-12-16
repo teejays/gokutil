@@ -1,6 +1,6 @@
 module github.com/teejays/gokutil/client/file
 
-go 1.22.5
+go 1.23.4
 
 require github.com/teejays/gokutil/scalars v0.0.0-20240914053048-e3c291cb9e80
 

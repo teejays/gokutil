@@ -340,7 +340,7 @@ func NewSqlConnection(ctx context.Context, o Options) (*sql.DB, error) {
 		return nil, err
 	}
 
-	log.Debug(ctx, "Initializing SQL connection", "connectionString", connStr)
+	log.None(ctx, "Initializing SQL connection", "connectionString", connStr)
 
 	// Open the connection
 	sqlDB, err := sql.Open(SQL_DIALECT, connStr)

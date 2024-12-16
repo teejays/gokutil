@@ -1,11 +1,11 @@
 module github.com/teejays/gokutil/strcase
 
-go 1.22.5
+go 1.23.4
 
 require (
 	github.com/iancoleman/strcase v0.3.0
 	github.com/stretchr/testify v1.9.0
-	github.com/teejays/gokutil/panics v0.0.0-20241214044948-546c88bdb750
+	github.com/teejays/gokutil/panics v0.0.0-20241214050840-20749bfa0c76
 	golang.org/x/text v0.21.0
 )
 

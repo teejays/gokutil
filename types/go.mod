@@ -1,13 +1,13 @@
 module github.com/teejays/gokutil/types
 
-go 1.22.5
+go 1.23.4
 
 require (
 	github.com/stretchr/testify v1.9.0
 	github.com/teejays/gokutil/dalutil v0.0.0-20240807004339-2e36dbb93e96
-	github.com/teejays/gokutil/httputil v0.0.0-20241209061137-430390abf901
-	github.com/teejays/gokutil/naam v0.0.0-20241214044948-546c88bdb750
-	github.com/teejays/gokutil/scalars v0.0.0-20241214044948-546c88bdb750
+	github.com/teejays/gokutil/httputil v0.0.0-20241214044948-546c88bdb750
+	github.com/teejays/gokutil/naam v0.0.0-20241214050840-20749bfa0c76
+	github.com/teejays/gokutil/scalars v0.0.0-20241214050840-20749bfa0c76
 )
 
 require (
@@ -26,19 +26,19 @@ require (
 	github.com/invopop/jsonschema v0.12.0 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/lib/pq v1.10.9 // indirect
-	github.com/mailru/easyjson v0.7.7 // indirect
+	github.com/mailru/easyjson v0.9.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/teejays/gokutil/client/db v0.0.0-20240807004339-2e36dbb93e96 // indirect
-	github.com/teejays/gokutil/clog v0.0.0-20241209061137-430390abf901 // indirect
-	github.com/teejays/gokutil/ctxutil v0.0.0-20241209061137-430390abf901 // indirect
-	github.com/teejays/gokutil/env v0.0.0-20241209061137-430390abf901 // indirect
-	github.com/teejays/gokutil/errutil v0.0.0-20241209061137-430390abf901 // indirect
-	github.com/teejays/gokutil/gopi v0.0.0-20241214044948-546c88bdb750 // indirect
-	github.com/teejays/gokutil/log v0.0.0-20241209061137-430390abf901 // indirect
-	github.com/teejays/gokutil/panics v0.0.0-20241214044948-546c88bdb750 // indirect
-	github.com/teejays/gokutil/sclog v0.0.0-20241209061137-430390abf901 // indirect
-	github.com/teejays/gokutil/strcase v0.0.0-20241214044948-546c88bdb750 // indirect
-	github.com/teejays/gokutil/validate v0.0.0-20241209061137-430390abf901 // indirect
+	github.com/teejays/gokutil/clog v0.0.0-20241214044948-546c88bdb750 // indirect
+	github.com/teejays/gokutil/ctxutil v0.0.0-20241214044948-546c88bdb750 // indirect
+	github.com/teejays/gokutil/env v0.0.0-20241214044948-546c88bdb750 // indirect
+	github.com/teejays/gokutil/errutil v0.0.0-20241214044948-546c88bdb750 // indirect
+	github.com/teejays/gokutil/gopi v0.0.0-20241214050840-20749bfa0c76 // indirect
+	github.com/teejays/gokutil/log v0.0.0-20241214044948-546c88bdb750 // indirect
+	github.com/teejays/gokutil/panics v0.0.0-20241214050840-20749bfa0c76 // indirect
+	github.com/teejays/gokutil/sclog v0.0.0-20241214044948-546c88bdb750 // indirect
+	github.com/teejays/gokutil/strcase v0.0.0-20241214050840-20749bfa0c76 // indirect
+	github.com/teejays/gokutil/validate v0.0.0-20241214044948-546c88bdb750 // indirect
 	github.com/wk8/go-ordered-map/v2 v2.1.8 // indirect
 	golang.org/x/crypto v0.31.0 // indirect
 	golang.org/x/net v0.32.0 // indirect
