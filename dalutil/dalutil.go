@@ -124,11 +124,11 @@ type ListTypeResponse[T types.BasicType] struct {
 
 // Todo: Make QueryByText part of the List methods, by including a Query field in the filters
 type QueryByTextEntityRequest[T types.BasicType] struct {
-	QueryByTextTypeRequest[T]
+	QueryText string `json:"queryText"`
 }
 
 type QueryByTextTypeRequest[T types.BasicType] struct {
-	QueryText string `json:"query_text"`
+	QueryText string `json:"queryText"`
 }
 
 type UpdateEntityRequest[T types.BasicType, F types.Field] struct {

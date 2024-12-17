@@ -12,9 +12,11 @@ require (
 )
 
 require (
+	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/graph-gophers/graphql-go v1.5.0 // indirect
-	github.com/stretchr/testify v1.9.0 // indirect
+	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
+	github.com/stretchr/testify v1.10.0 // indirect
 	github.com/teejays/clog v0.0.0-20240330223723-2114569c05a4 // indirect
 	github.com/teejays/gokutil/clog v0.0.0-20240805201441-7ba176910d62 // indirect
 	github.com/teejays/gokutil/env v0.0.0-20240801191936-9caf6e23633a // indirect

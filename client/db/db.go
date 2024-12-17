@@ -289,7 +289,7 @@ func (c Connection) ExecuteQuery(ctx context.Context, query string, args ...inte
 // QueryRows executes a query that returns rows e.g. Select Query
 func (c Connection) QueryRows(ctx context.Context, query string, args ...interface{}) (*sql.Rows, error) {
 
-	log.Debug(ctx, "SQL Query for fetch", "query", query, "args", args)
+	log.Debug(ctx, "Running SQL Query", "query", query, "args", args)
 
 	// Get the connection that we'll use to execute the query. This `conn` can be a direct DB connection or a transaction
 	conn, err := c.GetQueryableConnection(ctx)
@@ -302,14 +302,12 @@ func (c Connection) QueryRows(ctx context.Context, query string, args ...interfa
 		return nil, err
 	}
 
-	log.Debug(ctx, "Query ran successfully.")
-
 	return rows, nil
 }
 
 func (c Connection) QueryRow(ctx context.Context, v interface{}, query string, args ...interface{}) error {
 
-	log.Debug(ctx, "SQL Query for fetch", "query", query, "args", args)
+	log.Debug(ctx, "Running SQL Query (single row)", "query", query, "args", args)
 
 	conn, err := c.GetQueryableConnection(ctx)
 	if err != nil {

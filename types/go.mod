@@ -3,7 +3,7 @@ module github.com/teejays/gokutil/types
 go 1.23.4
 
 require (
-	github.com/stretchr/testify v1.9.0
+	github.com/stretchr/testify v1.10.0
 	github.com/teejays/gokutil/dalutil v0.0.0-20240807004339-2e36dbb93e96
 	github.com/teejays/gokutil/httputil v0.0.0-20241214044948-546c88bdb750
 	github.com/teejays/gokutil/naam v0.0.0-20241214050840-20749bfa0c76
@@ -14,7 +14,7 @@ require (
 	github.com/Rican7/conjson v0.1.0 // indirect
 	github.com/bahlo/generic-list-go v0.2.0 // indirect
 	github.com/buger/jsonparser v1.1.1 // indirect
-	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/doug-martin/goqu/v9 v9.19.0 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.7 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
@@ -24,10 +24,12 @@ require (
 	github.com/graph-gophers/graphql-go v1.5.0 // indirect
 	github.com/iancoleman/strcase v0.3.0 // indirect
 	github.com/invopop/jsonschema v0.12.0 // indirect
+	github.com/kr/pretty v0.3.1 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/lib/pq v1.10.9 // indirect
 	github.com/mailru/easyjson v0.9.0 // indirect
-	github.com/pmezard/go-difflib v1.0.0 // indirect
+	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
+	github.com/rogpeppe/go-internal v1.13.1 // indirect
 	github.com/teejays/gokutil/client/db v0.0.0-20240807004339-2e36dbb93e96 // indirect
 	github.com/teejays/gokutil/clog v0.0.0-20241214044948-546c88bdb750 // indirect
 	github.com/teejays/gokutil/ctxutil v0.0.0-20241214044948-546c88bdb750 // indirect
@@ -44,5 +46,6 @@ require (
 	golang.org/x/net v0.32.0 // indirect
 	golang.org/x/sys v0.28.0 // indirect
 	golang.org/x/text v0.21.0 // indirect
+	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

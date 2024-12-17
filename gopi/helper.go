@@ -200,7 +200,8 @@ func GetGenericGetHandler[ReqT, RespT any](fn func(context.Context, ReqT) (RespT
 
 		var req ReqT
 		if len(reqParam) == 1 {
-			err := json.Unmarshal([]byte(reqParam[0]), &req)
+			// Strict Unmarshal so we don't mess up things.
+			err := json.UnmarshalStrict([]byte(reqParam[0]), &req)
 			if err != nil {
 				WriteError(w, http.StatusBadRequest, err)
 				return
