@@ -379,7 +379,7 @@ func UpdateType[T types.BasicType, F types.Field](ctx context.Context, req Updat
 		llog.Warn(ctx, "Object has an empty ID, therefore it will be added", "type", meta.GetTypeCommonMeta().Name)
 		addedElem, err := AddType(ctx, conn, db.InsertTypeParams{TableName: req.TableName}, meta, req.Object)
 		if err != nil {
-			return resp, fmt.Errorf("could not add object with empty ID: %w", err)
+			return resp, errutil.Wrap(err, "Adding new type [%s]", meta.GetTypeCommonMeta().Name)
 		}
 		resp.Object = addedElem
 		return resp, nil

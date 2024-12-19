@@ -49,6 +49,21 @@ func GetEnvVarStr(key string) string {
 	return val
 }
 
+func MustGetEnvVarStr(key string) string {
+	val := os.Getenv(key)
+	panics.If(val == "", "An env var is not found [%s]", key)
+	return val
+}
+
+func GetEnvVarStrOrDefault(ctx context.Context, key, defaultVal string) string {
+	val := GetEnvVarStr(key)
+	if val == "" {
+		log.Warn(ctx, "Env is not set, using default value", "env", key, "default", defaultVal)
+		return defaultVal
+	}
+	return val
+}
+
 // GetEnvVarInt returns 0 if the variable is not set
 func GetEnvVarInt(key string) int {
 	val := os.Getenv(key)
@@ -70,12 +85,6 @@ func GetEnvVarBool(key string) (bool, error) {
 		return false, errutil.Wrap(err, "Expected env variable [%s] to be a boolean or empty, got [%s]", key, val)
 	}
 	return valBool, nil
-}
-
-func MustGetEnvVarStr(key string) string {
-	val := os.Getenv(key)
-	panics.If(val == "", "An env var is not found [%s]", key)
-	return val
 }
 
 func MustGetEnvVarBool(key string) bool {

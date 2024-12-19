@@ -187,6 +187,12 @@ type SelectByIDBuilderRequest struct {
 	// For where condition, so we only update the required row
 	IDColumn string
 	IDs      []scalars.ID
+	OrderBy  []SelectOrderBy
+}
+
+type SelectOrderBy struct {
+	Column string
+	Order  string // ASC or DESC
 }
 
 // ConstructSelectQuery creates a string SQL query with args
@@ -212,6 +218,24 @@ func ConstructSelectByIDQuery(ctx context.Context, dialectStr string, req Select
 	ds = ds.Where(
 		goqu.C(req.IDColumn).In(UUIDsToInterfaces(req.IDs)...),
 	)
+
+	// Order by
+	if len(req.OrderBy) > 0 {
+		for _, ob := range req.OrderBy {
+			switch ob.Order {
+			case "ASC":
+				ds = ds.OrderAppend(goqu.C(ob.Column).Asc())
+			case "DESC":
+				ds = ds.OrderAppend(goqu.C(ob.Column).Desc())
+			default:
+				return "", nil, fmt.Errorf("invalid order by direction: %s", ob.Order)
+			}
+		}
+	}
+
+	// Default order by
+	ds = ds.OrderAppend(goqu.C("created_at").Asc())
+	ds = ds.OrderAppend(goqu.C(req.IDColumn).Asc())
 
 	query, args, err := ds.ToSQL()
 	if err != nil {
@@ -266,7 +290,6 @@ type With struct {
 
 func (b SelectQueryBuilder) ToGoquDataset() *goqu.SelectDataset {
 	ds := b.Select
-
 	for _, with := range b.Withs {
 		ds = ds.With(with.Alias, with.Select)
 	}

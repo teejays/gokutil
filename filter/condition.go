@@ -161,6 +161,12 @@ func NewEmailCondition(op Operator, values ...scalars.Email) *EmailCondition {
 	return NewGenericCondition(op, values...)
 }
 
+type LinkCondition = GenericCondition[scalars.Link]
+
+func NewLinkCondition(op Operator, values ...scalars.Link) *LinkCondition {
+	return NewGenericCondition(op, values...)
+}
+
 type GenericDataCondition = GenericCondition[scalars.GenericData]
 
 func NewGenericDataCondition(op Operator, values ...scalars.GenericData) *GenericDataCondition {

@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/mail"
+	"net/url"
 	"os"
 	"strconv"
 	"strings"
@@ -14,6 +15,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/graph-gophers/graphql-go"
 
+	"github.com/teejays/gokutil/errutil"
 	jsonhelper "github.com/teejays/gokutil/gopi/json"
 	"github.com/teejays/gokutil/panics"
 )
@@ -782,6 +784,37 @@ func NewMoneyFromString(str string) (Money, error) {
 	}
 
 	return NewMoney(whole, decimal)
+}
+
+/* * * * * * *
+* Link
+* * * * * * */
+
+// Link is a scalar that represents a link/URL. It is a string scalar.
+type Link struct {
+	GenericStringScalar
+}
+
+func NewLink(value string) (Link, error) {
+	link := Link{GenericStringScalar: NewGenericStringScalar(value)}
+	if err := link.Validate(); err != nil {
+		return Link{}, err
+	}
+	return link, nil
+}
+
+func (v Link) Validate() error {
+	if v.IsEmpty() {
+		return fmt.Errorf("link is empty")
+	}
+	if _, err := url.Parse(v.value); err != nil {
+		return errutil.Wrap(err, "Parsing link as a URL")
+	}
+	return nil
+}
+
+func (v Link) ImplementsGraphQLType(name string) bool {
+	return name == "Link"
 }
 
 /* * * * * * *

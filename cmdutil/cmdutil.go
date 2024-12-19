@@ -3,6 +3,7 @@ package cmdutil
 import (
 	"context"
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -23,8 +24,11 @@ type ExecOptions struct {
 	// FailureKeyWords is a list of keywords that, if found in the output of the command, will be considered as a failure.
 	// The command will return an error in this case.
 	FailureKeyWords []string
-	IsLoudCommand   bool // If true, means that the command logs its output generally as errors (e.g. docker commands) and hence we'll log them all as non-error/warn
-	ExtraEnvs       []string
+	// Deprecated: This does not do anything.
+	IsLoudCommand bool // If true, means that the command logs its output generally as errors (e.g. docker commands) and hence we'll log them all as non-error/warn
+	ExtraEnvs     []string
+	OutWriter     io.Writer
+	ErrWriter     io.Writer
 }
 
 func IsMacOS(ctx context.Context) bool {
@@ -47,11 +51,13 @@ func ExecCmd(ctx context.Context, name string, req ...string) error {
 }
 
 func ExecOSCmdWithOpts(ctx context.Context, cmd *exec.Cmd, opts ExecOptions) error {
+	timerStart := time.Now()
+	defer func() {
+		log.Debug(ctx, "Command execution time", "command", cmd.String(), "time", time.Since(timerStart))
+	}()
 
 	startOpts := StartOptions{
-		IsLoudCommand:      opts.IsLoudCommand,
-		ExtraEnvs:          opts.ExtraEnvs,
-		FailureKeyWords:    opts.FailureKeyWords,
+		ExecOptions:        opts,
 		RefFailureDetected: &atomic.Bool{},
 	}
 
@@ -66,11 +72,11 @@ func ExecOSCmdWithOpts(ctx context.Context, cmd *exec.Cmd, opts ExecOptions) err
 		// If the error corresponds to the user signalling the kill command, then we can ignore it
 		if exitErr, ok := err.(*exec.ExitError); ok {
 			if exitErr.Error() == "signal: killed" {
-				log.Debug(ctx, "Command was killed by user.", "command", cmd.String())
-				return nil
+				log.Warn(ctx, "Command received a kill signal (by the user?)", "command", cmd.String())
+				return errutil.Wrap(exitErr, "Command received a kill signal")
 			}
 		}
-		return errutil.Wrap(err, "Command did not run successfully.")
+		return errutil.Wrap(err, "Command did not run successfully")
 	}
 
 	if startOpts.RefFailureDetected.Load() {
@@ -85,75 +91,109 @@ func ExecOSCmd(ctx context.Context, cmd *exec.Cmd) error {
 }
 
 type StartOptions struct {
-	FailureKeyWords    []string
-	IsLoudCommand      bool // If true, means that the command logs its output generally as errors (e.g. docker commands) and hence we'll log them all as non-error/warn
-	ExtraEnvs          []string
+	ExecOptions
 	RefFailureDetected *atomic.Bool
 }
 
 func StartOSCmd(ctx context.Context, cmd *exec.Cmd, opts StartOptions) error {
 	log.Debug(ctx, "Running command...", "command", cmd.String(), "dir", cmd.Dir)
-	if opts.ExtraEnvs != nil && len(opts.ExtraEnvs) > 0 {
-		if cmd.Env == nil || len(cmd.Env) == 0 {
+	if len(opts.ExtraEnvs) > 0 {
+		if len(cmd.Env) == 0 {
 			cmd.Env = os.Environ()
 		}
 		cmd.Env = append(cmd.Env, opts.ExtraEnvs...)
 	}
-	if cmd.Env != nil && len(cmd.Env) > 0 {
-		log.None(ctx, "Running command (with extras env)...", "command", cmd.String(), "dir", cmd.Dir, "extraEnv", jsonutil.MustPrettyPrint(opts.ExtraEnvs))
+	if len(cmd.Env) > 0 {
+		log.Debug(ctx, "Running command (with extras env)...", "command", cmd.String(), "dir", cmd.Dir, "extraEnv", jsonutil.MustPrettyPrint(opts.ExtraEnvs))
+	}
+
+	hasFailed := opts.RefFailureDetected
+	if hasFailed == nil {
+		hasFailed = &atomic.Bool{}
 	}
 
 	detectFailureKeywords := func(ctx context.Context, s string) {
 		// if command has already failed, don't do anything
-		if opts.RefFailureDetected == nil {
-			return
-		}
-		if opts.RefFailureDetected.Load() {
+		if hasFailed.Load() {
 			return
 		}
 		for _, kw := range opts.FailureKeyWords {
-			if strings.Contains(s, kw) {
-				// Kill the command
-				log.Warn(ctx, "While running command, found failure keyword in output. Killing the command...", "keyword", kw, "log", s, "command", cmd.String())
-				opts.RefFailureDetected.Store(true)
-				// Sleep for a bit to let the logs come though
-				time.Sleep(2 * time.Second)
-				killErr := KillCommand(ctx, cmd)
-				if killErr != nil {
-					log.Error(ctx, "Error killing the command", "command", cmd.String(), "error", killErr)
-				}
-				break
+			if !strings.Contains(s, kw) {
+				continue
 			}
+			if hasFailed.Load() { // check again
+				return
+			}
+			// Kill the command
+			hasFailed.Store(true)
+			log.Info(ctx, "While running command, found failure keyword in output. Killing the command...", "keyword", kw, "log", s, "command", cmd.String())
+
+			// Sleep for a bit to let the logs come though
+			time.Sleep(2 * time.Second)
+
+			killErr := KillCommand(ctx, cmd)
+			if killErr != nil {
+				log.Error(ctx, "Error killing the command", "command", cmd.String(), "error", killErr)
+			}
+
 		}
 	}
 
-	// Log the output using the logger
-	cmdLoggerCtx := sclog.ContextIndent(ctx, 8)
-	cmdLoggerCtx = sclog.ContextSkipTimestamp(cmdLoggerCtx)
-	cmdLoggerCtx = sclog.ContextSkipLevel(cmdLoggerCtx)
-
-	outWriter := logwriter.NewLogWriter(strings.Repeat(sclog.IdentSpace, 2), "", func(s string) {
-		s = RemoveANSI(s)
-		log.Debug(cmdLoggerCtx, s)
-		go detectFailureKeywords(cmdLoggerCtx, s)
+	defaultOutWriter := GetDefaultStdOut(ctx)
+	defaultErrWriter := GetDefaultStdErr(ctx)
+	cmd.Stdout = logwriter.NewLogWriter(func(s string) {
+		if opts.OutWriter != nil {
+			opts.OutWriter.Write([]byte(s))
+		} else {
+			defaultOutWriter.Write([]byte(s))
+		}
+		detectFailureKeywords(ctx, s)
 	})
-	errWriter := logwriter.NewLogWriter(strings.Repeat(sclog.IdentSpace, 2), "", func(s string) {
-		s = RemoveANSI(s)
-		log.Warn(cmdLoggerCtx, s)
-		go detectFailureKeywords(cmdLoggerCtx, s)
+	cmd.Stderr = logwriter.NewLogWriter(func(s string) {
+		if opts.ErrWriter != nil {
+			opts.ErrWriter.Write([]byte(s))
+		} else {
+			defaultErrWriter.Write([]byte(s))
+		}
+		detectFailureKeywords(ctx, s)
 	})
-	if opts.IsLoudCommand {
-		errWriter = outWriter
-	}
 
-	cmd.Stdout = outWriter // os.Stdout
-	cmd.Stderr = errWriter // os.Stderr
 	err := cmd.Start()
 	if err != nil {
 		return fmt.Errorf("Starting command: %w", err)
 	}
 
 	return nil
+}
+
+func GetDefaultStdOut(ctx context.Context) io.Writer {
+	// Log the output using the logger
+	cmdLoggerCtx := sclog.ContextIndent(ctx, 8)
+	cmdLoggerCtx = sclog.ContextSkipTimestamp(cmdLoggerCtx)
+	cmdLoggerCtx = sclog.ContextSkipLevel(cmdLoggerCtx)
+	return logwriter.NewLogWriter(
+		func(s string) {
+			s = RemoveANSI(s)
+			// Strip any trailing newlines
+			s = strings.TrimRight(s, "\n")
+			log.Debug(cmdLoggerCtx, s)
+		},
+	)
+}
+
+func GetDefaultStdErr(ctx context.Context) io.Writer {
+	// Log the output using the logger
+	cmdLoggerCtx := sclog.ContextIndent(ctx, 8)
+	cmdLoggerCtx = sclog.ContextSkipTimestamp(cmdLoggerCtx)
+	cmdLoggerCtx = sclog.ContextSkipLevel(cmdLoggerCtx)
+	return logwriter.NewLogWriter(
+		func(s string) {
+			s = RemoveANSI(s)
+			// Strip any trailing newlines
+			s = strings.TrimRight(s, "\n")
+			log.Warn(cmdLoggerCtx, s)
+		},
+	)
 }
 
 // RemoveANSI removes all ANSI escape codes from a given string
@@ -253,4 +293,50 @@ func KillCommand(ctx context.Context, cmd *exec.Cmd) error {
 	log.Error(ctx, "Error stopping the command", "error", err, "command", cmd.String())
 
 	return fmt.Errorf("Could not stop the command after multiple attempts")
+}
+
+type DockerBuildReq struct {
+	DockerfilePath  string // Full path to the Dockerfile
+	DockerImageRepo string // e.g. iamteejay/goku
+	DockerImageTag  string // e.g. og-img-...
+	BuildArgs       map[string]string
+	NoPush          bool
+	Platforms       []string // e.g. linux/amd64,linux/arm64.
+}
+
+func DockerImageBuild(ctx context.Context, req DockerBuildReq, opts ExecOptions) error {
+
+	cmdParts := []string{
+		"docker", "buildx", "build",
+	}
+	if len(req.Platforms) > 0 {
+		cmdParts = append(cmdParts, "--platform", strings.Join(req.Platforms, ","))
+	} else {
+		log.Warn(ctx, "No platforms specified for docker build. Using default linux/amd64,linux/arm64")
+		cmdParts = append(cmdParts, "--platform", "linux/amd64,linux/arm64")
+	}
+	cmdParts = append(cmdParts,
+		"-t", fmt.Sprintf("%s:%s", req.DockerImageRepo, req.DockerImageTag),
+		"-f", req.DockerfilePath,
+	)
+
+	// Pass the envs
+	for k, v := range req.BuildArgs {
+		cmdParts = append(cmdParts, "--build-arg", fmt.Sprintf("%s=%s", k, v))
+	}
+
+	cmdParts = append(cmdParts, "--pull")
+	if !req.NoPush {
+		cmdParts = append(cmdParts, "--push")
+	}
+	cmdParts = append(cmdParts, ".")
+
+	cmd := exec.CommandContext(ctx, cmdParts[0], cmdParts[1:]...)
+	// cmd.Dir = cfg.AppRootPath.Full
+	err := ExecOSCmdWithOpts(ctx, cmd, opts)
+	if err != nil {
+		return errutil.Wrap(err, "Executing command: %v", cmd)
+	}
+
+	return nil
 }
