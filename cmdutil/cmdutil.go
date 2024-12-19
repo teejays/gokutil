@@ -21,6 +21,7 @@ import (
 )
 
 type ExecOptions struct {
+	Dir string
 	// FailureKeyWords is a list of keywords that, if found in the output of the command, will be considered as a failure.
 	// The command will return an error in this case.
 	FailureKeyWords []string
@@ -96,7 +97,7 @@ type StartOptions struct {
 }
 
 func StartOSCmd(ctx context.Context, cmd *exec.Cmd, opts StartOptions) error {
-	log.Debug(ctx, "Running command...", "command", cmd.String(), "dir", cmd.Dir)
+	log.Debug(ctx, "Running command...", "command", cmd.String(), "opts", jsonutil.MustPrettyPrint(opts))
 	if len(opts.ExtraEnvs) > 0 {
 		if len(cmd.Env) == 0 {
 			cmd.Env = os.Environ()
@@ -105,6 +106,12 @@ func StartOSCmd(ctx context.Context, cmd *exec.Cmd, opts StartOptions) error {
 	}
 	if len(cmd.Env) > 0 {
 		log.Debug(ctx, "Running command (with extras env)...", "command", cmd.String(), "dir", cmd.Dir, "extraEnv", jsonutil.MustPrettyPrint(opts.ExtraEnvs))
+	}
+	if opts.Dir != "" {
+		if cmd.Dir != "" {
+			log.Warn(ctx, "Command already has a working directory set. Overwriting it...", "oldDir", cmd.Dir, "newDir", opts.Dir)
+		}
+		cmd.Dir = opts.Dir
 	}
 
 	hasFailed := opts.RefFailureDetected
@@ -142,18 +149,27 @@ func StartOSCmd(ctx context.Context, cmd *exec.Cmd, opts StartOptions) error {
 	defaultOutWriter := GetDefaultStdOut(ctx)
 	defaultErrWriter := GetDefaultStdErr(ctx)
 	cmd.Stdout = logwriter.NewLogWriter(func(s string) {
+		w := defaultOutWriter
 		if opts.OutWriter != nil {
-			opts.OutWriter.Write([]byte(s))
-		} else {
-			defaultOutWriter.Write([]byte(s))
+			w = opts.OutWriter
+		}
+		_, inerr := w.Write([]byte(s))
+		if inerr != nil {
+			log.Warn(ctx, "There was an error writing to the cmd's output writer", "cmd", cmd.String(), "error", inerr, "log", s)
 		}
 		detectFailureKeywords(ctx, s)
 	})
 	cmd.Stderr = logwriter.NewLogWriter(func(s string) {
+		w := defaultErrWriter
+		if opts.IsLoudCommand {
+			w = defaultOutWriter
+		}
 		if opts.ErrWriter != nil {
-			opts.ErrWriter.Write([]byte(s))
-		} else {
-			defaultErrWriter.Write([]byte(s))
+			w = opts.ErrWriter
+		}
+		_, inerr := w.Write([]byte(s))
+		if inerr != nil {
+			log.Warn(ctx, "There was an error writing to the cmd's error writer", "cmd", cmd.String(), "error", inerr, "log", s)
 		}
 		detectFailureKeywords(ctx, s)
 	})
