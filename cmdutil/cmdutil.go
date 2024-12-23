@@ -68,6 +68,7 @@ func ExecOSCmdWithOpts(ctx context.Context, cmd *exec.Cmd, opts ExecOptions) err
 	}
 
 	log.Debug(ctx, "Waiting on command...")
+
 	err = cmd.Wait()
 	if err != nil {
 		// If the error corresponds to the user signalling the kill command, then we can ignore it
@@ -346,6 +347,8 @@ func DockerImageBuild(ctx context.Context, req DockerBuildReq, opts ExecOptions)
 		cmdParts = append(cmdParts, "--push")
 	}
 	cmdParts = append(cmdParts, ".")
+
+	opts.IsLoudCommand = true
 
 	cmd := exec.CommandContext(ctx, cmdParts[0], cmdParts[1:]...)
 	// cmd.Dir = cfg.AppRootPath.Full

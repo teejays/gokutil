@@ -96,11 +96,11 @@ type TypeBatchAddRequest[T any] struct {
 // }
 
 type GetEntityRequest[T types.BasicType] struct {
-	GetTypeRequest[T]
+	GetTypeRequest[T] `json:",inline"`
 }
 
 type GetTypeRequest[T types.BasicType] struct {
-	ID scalars.ID
+	ID scalars.ID `json:"id"`
 }
 
 type ListEntityRequest[T types.FilterType] struct {
@@ -138,7 +138,7 @@ type UpdateEntityRequest[T types.BasicType, F types.Field] struct {
 }
 
 type UpdateEntityResponse[T types.BasicType] struct {
-	Object T
+	Object T `json:"object"`
 }
 
 func FieldsToStrings[T types.Field](fields []T) []string {

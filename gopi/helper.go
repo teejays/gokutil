@@ -12,6 +12,7 @@ import (
 	"github.com/teejays/gokutil/httputil"
 	"github.com/teejays/gokutil/log"
 	"github.com/teejays/gokutil/panics"
+	"github.com/teejays/gokutil/validate"
 
 	"github.com/teejays/gokutil/gopi/json"
 )
@@ -75,6 +76,12 @@ type StandardResponse struct {
 	StatusCode int         `json:"statusCode"`
 	Data       interface{} `json:"data"`
 	Error      interface{} `json:"error"`
+}
+
+type StandardResponseGeneric[T any] struct {
+	StatusCode int    `json:"statusCode"`
+	Data       T      `json:"data"`
+	Error      string `json:"error"`
 }
 
 func WriteStandardResponse(w http.ResponseWriter, v interface{}) {
@@ -207,6 +214,12 @@ func GetGenericGetHandler[ReqT, RespT any](fn func(context.Context, ReqT) (RespT
 				return
 			}
 			log.Debug(ctx, "[HTTP Handler] Request unmarshaled from URL", "req", json.MustPrettyPrint(req))
+			// Validate the request
+			err = validate.Struct(req)
+			if err != nil {
+				WriteError(w, http.StatusBadRequest, err)
+				return
+			}
 		}
 
 		// Call the method

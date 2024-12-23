@@ -13,36 +13,112 @@ import (
 	"github.com/teejays/gokutil/panics"
 )
 
-// LoadEnvFiles loads the env files into the environment as env vars
-func LoadEnvFiles(ctx context.Context, wd string) error {
-	// Load the env file
+func LoadGokuEnvFiles(ctx context.Context, wd string) error {
 	_env := env.GetEnv()
 
-	if wd == "" {
-		wd = "."
+	return LoadEnvFilesV2(ctx, []string{
+		filepath.Join(wd, ".env.goku"),
+		filepath.Join(wd, ".env.goku."+string(_env)),
+	})
+}
+
+func LoadAppEnvFiles(ctx context.Context, wd string) error {
+	_env := env.GetEnv()
+
+	return LoadEnvFilesV2(ctx, []string{
+		filepath.Join(wd, ".env"),
+		filepath.Join(wd, ".env."+string(_env)),
+		filepath.Join(wd, ".env.app"),
+		filepath.Join(wd, ".env.app."+string(_env)),
+	})
+}
+
+func LoadEnvFilesMatch(ctx context.Context, wd string, patterns []string) error {
+
+	files := []string{}
+	for _, pattern := range patterns {
+		matches, err := filepath.Glob(pattern)
+		if err != nil {
+			return errutil.Wrap(err, "Could not match pattern [%s]", pattern)
+		}
+		files = append(files, matches...)
 	}
 
-	files := []string{
-		".env." + string(_env) + ".local",
-		".env.local",
-		".env." + string(_env),
-		".env",
-	}
-	for i, file := range files {
-		files[i] = filepath.Join(wd, file)
-	}
+	// Make sure the files are unique
+	uniqueFiles := map[string]struct{}{}
 	for _, file := range files {
+		uniqueFiles[file] = struct{}{}
+	}
+
+	files = []string{}
+	for file := range uniqueFiles {
+		files = append(files, file)
+	}
+
+	return LoadEnvFilesV2(ctx, files)
+
+}
+
+// LoadEnvFilesV2 loads the env files into the environment as env vars
+func LoadEnvFilesV2(ctx context.Context, filesPaths []string) error {
+	log.Debug(ctx, "Loading env files", "files", filesPaths)
+	// Load the env file
+	for _, file := range filesPaths {
 		log.None(ctx, "Looking for env file", "file", file)
 		err := godotenv.Load(file)
 		if err != nil {
-			log.None(ctx, "Could not load env file", "file", file, "error", err)
+			// If the error is that the file does not exist, that's fine. We can continue.
+			if os.IsNotExist(err) {
+				log.None(ctx, "Env file does not exist", "file", file)
+				continue
+			}
+			return errutil.Wrap(err, "Could not load env file [%s]", file)
 		} else {
 			log.Debug(ctx, "Loaded env file", "file", file)
 		}
 	}
 
 	return nil
+
 }
+
+// // LoadEnvFiles loads the env files into the environment as env vars
+// func LoadEnvFiles(ctx context.Context, wd string) error {
+// 	// Load the env file
+// 	_env := env.GetEnv()
+
+// 	if wd == "" {
+// 		wd = "."
+// 	}
+
+// 	files := []string{
+// 		".env.goku",
+// 		".env.goku." + string(_env),
+// 		".env." + string(_env) + ".local",
+// 		".env.local",
+// 		".env." + string(_env),
+// 		".env",
+// 	}
+// 	for i, file := range files {
+// 		files[i] = filepath.Join(wd, file)
+// 	}
+// 	for _, file := range files {
+// 		log.None(ctx, "Looking for env file", "file", file)
+// 		err := godotenv.Load(file)
+// 		if err != nil {
+// 			// If the error is that the file does not exist, that's fine. We can continue.
+// 			if os.IsNotExist(err) {
+// 				log.None(ctx, "Env file does not exist", "file", file)
+// 				continue
+// 			}
+// 			return errutil.Wrap(err, "Could not load env file [%s]", file)
+// 		} else {
+// 			log.Debug(ctx, "Loaded env file", "file", file)
+// 		}
+// 	}
+
+// 	return nil
+// }
 
 func GetEnvVarStr(key string) string {
 	val := os.Getenv(key)

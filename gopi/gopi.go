@@ -57,7 +57,6 @@ func (s *Server) StartServer(ctx context.Context, addr string, port int) error {
 	}
 
 	return nil
-
 }
 
 // GetHandler constructs a HTTP handler with all the routes and middleware funcs configured
