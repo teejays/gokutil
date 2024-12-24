@@ -6,7 +6,7 @@ require (
 	github.com/joho/godotenv v1.5.1
 	github.com/teejays/gokutil/errutil v0.0.0-20241129080937-a3d0cf712dbd
 	github.com/teejays/gokutil/log v0.0.0-20241124014017-33a80187ef14
-	github.com/teejays/gokutil/panics v0.0.0-20241223215146-d5b4c7d146b2
+	github.com/teejays/gokutil/panics v0.0.0-20241224011709-d7c26ab8d800
 )
 
 require (
