@@ -95,6 +95,11 @@ func (id ID) MarshalJSON() ([]byte, error) {
 }
 
 func (id *ID) UnmarshalJSON(data []byte) error {
+	// If the data is null, set the ID to nil
+	if string(data) == "null" {
+		*id = ID{}
+		return nil
+	}
 	s, err := strconv.Unquote(string(data))
 	if err != nil {
 		return err

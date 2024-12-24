@@ -43,52 +43,67 @@ func NewEntityHTTPClient[T types.BasicType, inT any, F types.Field, Flt types.Fi
 }
 
 func (c entityHTTPBaseClient[T, inT, F, Flt]) Add(ctx context.Context, req dalutil.EntityAddRequest[inT]) (T, error) {
-	resp, err := httputil.MakeRequest[dalutil.EntityAddRequest[inT], T](ctx, c.client, http.MethodPost, c.baseURL, c.bearer, req)
+	resp, err := httputil.MakeRequest[dalutil.EntityAddRequest[inT], gopi.StandardResponseGeneric[T]](ctx, c.client, http.MethodPost, c.baseURL, c.bearer, req)
 	if err != nil {
-		return resp, fmt.Errorf("Making HTTP %s request: %w", http.MethodPost, err)
+		return resp.Data, fmt.Errorf("Making HTTP %s request: %w", http.MethodPut, err)
 	}
-	return resp, nil
+	if resp.Error != "" {
+		return resp.Data, fmt.Errorf("%s", resp.Error)
+	}
+	return resp.Data, nil
 }
 
 func (c entityHTTPBaseClient[T, inT, F, Flt]) Update(ctx context.Context, req dalutil.UpdateEntityRequest[T, F]) (dalutil.UpdateEntityResponse[T], error) {
-	resp, err := httputil.MakeRequest[dalutil.UpdateEntityRequest[T, F], dalutil.UpdateEntityResponse[T]](ctx, c.client, http.MethodPut, c.baseURL, c.bearer, req)
+	resp, err := httputil.MakeRequest[dalutil.UpdateEntityRequest[T, F], gopi.StandardResponseGeneric[dalutil.UpdateEntityResponse[T]]](ctx, c.client, http.MethodPut, c.baseURL, c.bearer, req)
 	if err != nil {
-		return resp, fmt.Errorf("Making HTTP %s request: %w", http.MethodPut, err)
+		return resp.Data, fmt.Errorf("Making HTTP %s request: %w", http.MethodPut, err)
 	}
-	return resp, nil
+	if resp.Error != "" {
+		return resp.Data, fmt.Errorf("%s", resp.Error)
+	}
+	return resp.Data, nil
 }
 
 func (c entityHTTPBaseClient[T, inT, F, Flt]) Get(ctx context.Context, req dalutil.GetEntityRequest[T]) (T, error) {
 	resp, err := httputil.MakeRequest[dalutil.GetEntityRequest[T], gopi.StandardResponseGeneric[T]](ctx, c.client, http.MethodGet, c.baseURL, c.bearer, req)
 	if err != nil {
-		return resp.Data, fmt.Errorf("Making HTTP %s request: %w", http.MethodGet, err)
+		return resp.Data, fmt.Errorf("Making HTTP %s request: %w", http.MethodPut, err)
 	}
 	if resp.Error != "" {
-		return resp.Data, fmt.Errorf("Non-successful response from the server: %s", resp.Error)
+		return resp.Data, fmt.Errorf("%s", resp.Error)
 	}
 	return resp.Data, nil
 }
 
 func (c entityHTTPBaseClient[T, inT, F, Flt]) Delete(ctx context.Context, req dalutil.DeleteEntityRequest) (dalutil.DeleteTypeResponse, error) {
-	resp, err := httputil.MakeRequest[dalutil.DeleteEntityRequest, dalutil.DeleteTypeResponse](ctx, c.client, http.MethodDelete, c.baseURL, c.bearer, req)
+	resp, err := httputil.MakeRequest[dalutil.DeleteEntityRequest, gopi.StandardResponseGeneric[dalutil.DeleteTypeResponse]](ctx, c.client, http.MethodDelete, c.baseURL, c.bearer, req)
 	if err != nil {
-		return resp, fmt.Errorf("Making HTTP %s request: %w", http.MethodDelete, err)
+		return resp.Data, fmt.Errorf("Making HTTP %s request: %w", http.MethodPut, err)
 	}
-	return resp, nil
+	if resp.Error != "" {
+		return resp.Data, fmt.Errorf("%s", resp.Error)
+	}
+	return resp.Data, nil
 }
 
 func (c entityHTTPBaseClient[T, inT, F, Flt]) List(ctx context.Context, req dalutil.ListEntityRequest[Flt]) (dalutil.ListEntityResponse[T], error) {
-	resp, err := httputil.MakeRequest[dalutil.ListEntityRequest[Flt], dalutil.ListEntityResponse[T]](ctx, c.client, http.MethodGet, fmt.Sprintf("%s/list", c.baseURL), c.bearer, req)
+	resp, err := httputil.MakeRequest[dalutil.ListEntityRequest[Flt], gopi.StandardResponseGeneric[dalutil.ListEntityResponse[T]]](ctx, c.client, http.MethodGet, fmt.Sprintf("%s/list", c.baseURL), c.bearer, req)
 	if err != nil {
-		return resp, fmt.Errorf("Making HTTP %s request: %w", http.MethodGet, err)
+		return resp.Data, fmt.Errorf("Making HTTP %s request: %w", http.MethodPut, err)
 	}
-	return resp, nil
+	if resp.Error != "" {
+		return resp.Data, fmt.Errorf("%s", resp.Error)
+	}
+	return resp.Data, nil
 }
 
 func (c entityHTTPBaseClient[T, inT, F, Flt]) QueryByText(ctx context.Context, req dalutil.QueryByTextEntityRequest[T]) (dalutil.ListEntityResponse[T], error) {
-	resp, err := httputil.MakeRequest[dalutil.QueryByTextEntityRequest[T], dalutil.ListEntityResponse[T]](ctx, c.client, http.MethodGet, fmt.Sprintf("%s/query_by_text", c.baseURL), c.bearer, req)
+	resp, err := httputil.MakeRequest[dalutil.QueryByTextEntityRequest[T], gopi.StandardResponseGeneric[dalutil.ListEntityResponse[T]]](ctx, c.client, http.MethodGet, fmt.Sprintf("%s/query_by_text", c.baseURL), c.bearer, req)
 	if err != nil {
-		return resp, fmt.Errorf("Making HTTP %s request: %w", http.MethodGet, err)
+		return resp.Data, fmt.Errorf("Making HTTP %s request: %w", http.MethodPut, err)
 	}
-	return resp, nil
+	if resp.Error != "" {
+		return resp.Data, fmt.Errorf("%s", resp.Error)
+	}
+	return resp.Data, nil
 }

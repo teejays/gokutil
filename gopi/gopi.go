@@ -119,7 +119,7 @@ func GetHandler(ctx context.Context, routes []Route, middlewares MiddlewareFuncs
 	}
 	var routesLookup = map[string]bool{}
 	for _, r := range routes {
-		key := r.Method + " " + r.Path
+		key := r.Method + " " + GetRoutePattern(r)
 		if routesLookup[key] {
 			return nil, fmt.Errorf("multiple routes provided for [%s]", key)
 		}

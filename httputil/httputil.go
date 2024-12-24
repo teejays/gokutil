@@ -41,7 +41,7 @@ func UnmarshalJSONFromRequest[ReqT any](r *http.Request, v *ReqT) error {
 	// Unmarshal JSON into Go type
 	err = json.Unmarshal(body, v)
 	if err != nil {
-		llog.Error(ctx, "Couldn't unmarshal JSON", "error", err)
+		llog.Error(ctx, "Couldn't unmarshal JSON", "error", err, "body", string(body), "type", fmt.Sprintf("%T", v))
 		return ErrInvalidJSON
 	}
 
@@ -133,6 +133,10 @@ func MakeRequest[ReqT any, RespT any](ctx context.Context, c http.Client, method
 	err = json.Unmarshal(respBody, &resp)
 	if err != nil {
 		return resp, fmt.Errorf("Parsing HTTP response: %w", err)
+	}
+
+	if httpResp.StatusCode != http.StatusOK {
+		return resp, fmt.Errorf("HTTP request failed with status: %s", httpResp.Status)
 	}
 
 	return resp, nil
