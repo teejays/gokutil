@@ -14,7 +14,7 @@ require (
 	github.com/rogpeppe/go-internal v1.13.1 // indirect
 	github.com/teejays/gokutil/clog v0.0.0-20241224040923-8e1162d54511 // indirect
 	github.com/teejays/gokutil/ctxutil v0.0.0-20241224040923-8e1162d54511 // indirect
-	github.com/teejays/gokutil/env v0.0.0-20241224040923-8e1162d54511 // indirect
+	github.com/teejays/gokutil/env v0.0.0-20241226031657-3aca9f31068a // indirect
 	github.com/teejays/gokutil/panics v0.0.0-20241224040923-8e1162d54511 // indirect
 	github.com/teejays/gokutil/sclog v0.0.0-20241224040923-8e1162d54511 // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
