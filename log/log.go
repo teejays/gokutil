@@ -4,37 +4,64 @@ package log
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 	"os"
+	"strings"
 
 	"github.com/teejays/gokutil/env"
-	"github.com/teejays/gokutil/panics"
 	"github.com/teejays/gokutil/sclog"
 )
 
+// LevelTrace is a custom log level that is lower than Debug.
+// Other log levels are defined in slog package, with the values of -4 (debug) to 8 (error) in increments of 4.
+var LevelTrace slog.Level = -8
+
 var defaultLogger LoggerI = nil
 
+func parseLevel(levelStr string) slog.Level {
+	switch strings.ToLower(levelStr) {
+	case "trace":
+		return LevelTrace
+	case "debug":
+		return slog.LevelDebug
+	case "info":
+		return slog.LevelInfo
+	case "warn":
+		return slog.LevelWarn
+	case "error":
+		return slog.LevelError
+	default:
+		panic(fmt.Sprintf("Invalid log level: %s", levelStr))
+	}
+}
+
 func init() {
+
+	logLevel := slog.LevelDebug // default to debug
+	if logLevelStr := os.Getenv("GOKU_LOG_LEVEL"); logLevelStr != "" {
+		logLevel = parseLevel(logLevelStr)
+	}
+	fmt.Print("Log level: ", logLevel)
+
 	switch env.GetEnv() {
 	/*
 		Can split the logging functionality based on env: env.PROD, env.STG, env.DEV
 	*/
 	case env.PROD:
 		defaultLogger = Logger{
-			sclogHandler: nil,
-			logger:       slog.New(slog.NewJSONHandler(os.Stderr, &slog.HandlerOptions{})),
+			logger: slog.New(slog.NewJSONHandler(os.Stderr, &slog.HandlerOptions{AddSource: true, Level: logLevel})),
 		}
 	default:
 		clogHandler := sclog.NewHandler(sclog.NewHandlerRequest{
 			StdOut:    os.Stdout,
 			StdErr:    os.Stderr,
-			Level:     slog.LevelDebug,
+			Level:     logLevel,
 			Color:     true,
 			Timestamp: true,
 		})
 		defaultLogger = Logger{
-			logger:       slog.New(clogHandler),
-			sclogHandler: &clogHandler,
+			logger: slog.New(clogHandler),
 		}
 	}
 }
@@ -56,8 +83,11 @@ type LoggerI interface {
 }
 
 type Logger struct {
-	sclogHandler *sclog.Handler
-	logger       *slog.Logger
+	logger *slog.Logger
+}
+
+func (l Logger) Trace(ctx context.Context, msg string, args ...interface{}) {
+	l.logger.Log(ctx, LevelTrace, msg, args...)
 }
 
 func (l Logger) Debug(ctx context.Context, msg string, args ...interface{}) {
@@ -74,6 +104,10 @@ func (l Logger) Error(ctx context.Context, msg string, args ...interface{}) {
 }
 func (l Logger) None(ctx context.Context, msg string, args ...interface{}) {}
 
+func (l Logger) TraceWithoutCtx(msg string, args ...interface{}) {
+	l.logger.Log(context.Background(), LevelTrace, msg, args...)
+}
+
 func (l Logger) DebugWithoutCtx(msg string, args ...interface{}) {
 	l.logger.Debug(msg, args...)
 }
@@ -89,13 +123,16 @@ func (l Logger) ErrorWithoutCtx(msg string, args ...interface{}) {
 func (l Logger) NoneWithoutCtx(msg string, args ...interface{}) {}
 
 func (l Logger) WithHeading(heading string) LoggerI {
-	panics.IfNil(l.sclogHandler, "Cannot set heading on a logger that does not have a sclog handler")
 
-	handler := l.sclogHandler.WithHeading(heading)
-	return Logger{
-		sclogHandler: &handler,
-		logger:       slog.New(handler),
+	handler := l.logger.Handler()
+	if sclogHandler, ok := handler.(sclog.Handler); ok {
+		newHandler := sclogHandler.WithHeading(heading)
+		return Logger{
+			logger: slog.New(newHandler),
+		}
 	}
+
+	return l
 }
 
 // Default Logger methods
