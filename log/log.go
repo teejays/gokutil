@@ -42,7 +42,7 @@ func init() {
 	if logLevelStr := os.Getenv("GOKU_LOG_LEVEL"); logLevelStr != "" {
 		logLevel = parseLevel(logLevelStr)
 	}
-	fmt.Print("Log level: ", logLevel)
+	fmt.Printf("Log level: %s\n", logLevel)
 
 	switch env.GetEnv() {
 	/*

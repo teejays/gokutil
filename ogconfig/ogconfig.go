@@ -1,6 +1,7 @@
 package ogconfig
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -96,6 +97,9 @@ func InitializeConfig(gokuVersion string, cli *CLIConfig) error {
 	// Load File Config
 	fileCfg, err := LoadAppGokuYaml(cli.AppRootFromCurrDirPath)
 	if err != nil {
+		if errors.Is(err, os.ErrNotExist) {
+			return fmt.Errorf("Could not find an Ongoku app at [%s]. Make sure you are in the right directory, or specify the correct app directory using the -d flag.", cli.AppRootFromCurrDirPath)
+		}
 		return fmt.Errorf("loading goku.yaml file: %w", err)
 	}
 
