@@ -105,9 +105,6 @@ func StartOSCmd(ctx context.Context, cmd *exec.Cmd, opts StartOptions) error {
 		}
 		cmd.Env = append(cmd.Env, opts.ExtraEnvs...)
 	}
-	if len(cmd.Env) > 0 {
-		log.Debug(ctx, "Running command (with extras env)...", "command", cmd.String(), "dir", cmd.Dir, "extraEnv", jsonutil.MustPrettyPrint(opts.ExtraEnvs))
-	}
 	if opts.Dir != "" {
 		if cmd.Dir != "" {
 			log.Warn(ctx, "Command already has a working directory set. Overwriting it...", "oldDir", cmd.Dir, "newDir", opts.Dir)
@@ -312,7 +309,12 @@ func KillCommand(ctx context.Context, cmd *exec.Cmd) error {
 	return fmt.Errorf("Could not stop the command after multiple attempts")
 }
 
+type Creds struct {
+	Username string
+	Token    string
+}
 type DockerBuildReq struct {
+	Creds           Creds  // Dockerhub creds, only used if passed
 	DockerfilePath  string // Full path to the Dockerfile
 	DockerImageRepo string // e.g. iamteejay/goku
 	DockerImageTag  string // e.g. og-img-...
@@ -321,7 +323,39 @@ type DockerBuildReq struct {
 	Platforms       []string // e.g. linux/amd64,linux/arm64.
 }
 
+func DockerLogin(ctx context.Context, username, password string) error {
+	// Login using the docker login command but password using stdin, and pipe the password in
+	cmd := exec.CommandContext(ctx, "docker", "login", "--username", username, "--password-stdin")
+	cmd.Env = append(os.Environ(), "LC_CTYPE=C", "LANG=C")
+	stdin, err := cmd.StdinPipe()
+	if err != nil {
+		return fmt.Errorf("Getting stdin pipe: %w", err)
+	}
+	go func() {
+		defer stdin.Close()
+		_, inerr := io.WriteString(stdin, password)
+		if inerr != nil {
+			log.Error(ctx, "Error writing docker password to [docker login] stdin", "error", inerr)
+		}
+	}()
+
+	err = ExecOSCmd(ctx, cmd)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func DockerImageBuild(ctx context.Context, req DockerBuildReq, opts ExecOptions) error {
+
+	if req.Creds != (Creds{}) {
+		log.Debug(ctx, "Logging into docker...", "username", req.Creds.Username)
+		err := DockerLogin(ctx, req.Creds.Username, req.Creds.Token)
+		if err != nil {
+			return errutil.Wrap(err, "Logging into docker")
+		}
+	}
 
 	cmdParts := []string{
 		"docker", "buildx", "build",
