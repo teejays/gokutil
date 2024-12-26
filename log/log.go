@@ -37,11 +37,15 @@ func parseLevel(levelStr string) slog.Level {
 }
 
 func init() {
-
 	logLevel := slog.LevelDebug // default to debug
 	if logLevelStr := os.Getenv("GOKU_LOG_LEVEL"); logLevelStr != "" {
 		logLevel = parseLevel(logLevelStr)
 	}
+	Init(logLevel)
+}
+
+func Init(logLevel slog.Level) {
+
 	fmt.Printf("Log level: %s\n", logLevel)
 
 	switch env.GetEnv() {
