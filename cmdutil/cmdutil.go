@@ -54,7 +54,7 @@ func ExecCmd(ctx context.Context, name string, req ...string) error {
 func ExecOSCmdWithOpts(ctx context.Context, cmd *exec.Cmd, opts ExecOptions) error {
 	timerStart := time.Now()
 	defer func() {
-		log.Debug(ctx, "Command execution time", "command", cmd.String(), "time", time.Since(timerStart))
+		log.Info(ctx, "Command execution time", "command", cmd.String(), "time", time.Since(timerStart))
 	}()
 
 	startOpts := StartOptions{
@@ -67,7 +67,7 @@ func ExecOSCmdWithOpts(ctx context.Context, cmd *exec.Cmd, opts ExecOptions) err
 		return fmt.Errorf("Starting cmd: %s\n%w\n%s", cmd.String(), err, cmd.Stderr)
 	}
 
-	log.Debug(ctx, "Waiting on command...")
+	log.Debug(ctx, "Waiting on command...", "command", cmd.String())
 
 	err = cmd.Wait()
 	if err != nil {
@@ -98,7 +98,7 @@ type StartOptions struct {
 }
 
 func StartOSCmd(ctx context.Context, cmd *exec.Cmd, opts StartOptions) error {
-	log.Debug(ctx, "Running command...", "command", cmd.String(), "opts", jsonutil.MustPrettyPrint(opts))
+	log.Info(ctx, "Running command...", "command", cmd.String(), "opts", jsonutil.MustPrettyPrint(opts))
 	if len(opts.ExtraEnvs) > 0 {
 		if len(cmd.Env) == 0 {
 			cmd.Env = os.Environ()
@@ -131,7 +131,7 @@ func StartOSCmd(ctx context.Context, cmd *exec.Cmd, opts StartOptions) error {
 			}
 			// Kill the command
 			hasFailed.Store(true)
-			log.Info(ctx, "While running command, found failure keyword in output. Killing the command...", "keyword", kw, "log", s, "command", cmd.String())
+			log.Warn(ctx, "While running command, found failure keyword in output. Killing the command...", "keyword", kw, "log", s, "command", cmd.String())
 
 			// Sleep for a bit to let the logs come though
 			time.Sleep(2 * time.Second)
@@ -190,7 +190,7 @@ func GetDefaultStdOut(ctx context.Context) io.Writer {
 			s = RemoveANSI(s)
 			// Strip any trailing newlines
 			s = strings.TrimRight(s, "\n")
-			log.Debug(cmdLoggerCtx, s)
+			log.Info(cmdLoggerCtx, s)
 		},
 	)
 }
@@ -248,8 +248,9 @@ func FindSed(ctx context.Context, diffs []FindSedDiff, dirPath string) error {
 	cmdParts = append(cmdParts, "{}", "+")
 
 	cmd := exec.CommandContext(ctx, cmdParts[0], cmdParts[1:]...)
-	cmd.Env = append(os.Environ(), "LC_CTYPE=C", "LANG=C")
-	err := ExecOSCmd(ctx, cmd)
+	err := ExecOSCmdWithOpts(ctx, cmd, ExecOptions{
+		ExtraEnvs: []string{"LC_CTYPE=C", "LANG=C"},
+	})
 	if err != nil {
 		return err
 	}
