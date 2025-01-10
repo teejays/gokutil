@@ -8,8 +8,8 @@ import (
 	"os"
 
 	"github.com/alexflint/go-arg"
-	"github.com/teejays/goku/pkg/printer"
 	"github.com/teejays/gokutil/errutil"
+	"github.com/teejays/gokutil/gopi/json"
 	"github.com/teejays/gokutil/log"
 )
 
@@ -27,8 +27,8 @@ type ParentArgs struct {
 	HelpSubCmd    *struct{} `arg:"subcommand:help" help:"Print the help message. Also works with -h or --help."`
 
 	// Flags
-	LogLevel string `arg:"--log-level,env:GOKU_LOG_LEVEL" default:"info" help:"Set the log level. Options: trace, debug, info, warn, error"`
-	logLevel slog.Level
+	LogLevelStr string `arg:"--log-level,env:GOKU_LOG_LEVEL" default:"info" help:"Set the log level. Options: trace, debug, info, warn, error"`
+	LogLevel    slog.Level
 }
 
 func (a *ParentArgs) GetParentArgs() ParentArgs {
@@ -37,12 +37,12 @@ func (a *ParentArgs) GetParentArgs() ParentArgs {
 
 func (a *ParentArgs) ValidateAndProcess(ctx context.Context) error {
 	// Log level
-	if a.LogLevel != "" {
-		level, err := log.ParseLevel(a.LogLevel)
+	if a.LogLevelStr != "" {
+		level, err := log.ParseLevel(a.LogLevelStr)
 		if err != nil {
 			return errutil.Wrap(err, "Parsing log level")
 		}
-		a.logLevel = level
+		a.LogLevel = level
 	}
 
 	return nil
@@ -88,7 +88,7 @@ func ParseArgs(ctx context.Context, programName string, v IArgs) error {
 		return ErrCleanExit
 	}
 
-	log.Debug(ctx, "Parsed args", "args", printer.MustPrettyPrint(v))
+	log.Debug(ctx, "Parsed args", "args", json.MustPrettyPrint(v))
 
 	return nil
 

@@ -71,5 +71,8 @@ func Decorate(msg string, Decorations ...Decoration) string {
 	for _, d := range Decorations {
 		decorationsCode += string(d)
 	}
+	if decorationsCode == "" {
+		return msg
+	}
 	return fmt.Sprintf("%s%s%s", decorationsCode, msg, RESET)
 }

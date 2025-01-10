@@ -22,7 +22,7 @@ var (
 
 var colorMap = map[slog.Level]decoration.Decoration{
 	slog.LevelDebug: decoration.FG_GRAY_LIGHT,
-	slog.LevelInfo:  decoration.FG_GREEN,
+	slog.LevelInfo:  decoration.FG_WHITE,
 	slog.LevelWarn:  decoration.FG_YELLOW,
 	slog.LevelError: decoration.FG_RED,
 }

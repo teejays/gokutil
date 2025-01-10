@@ -18,6 +18,11 @@ import (
 // Other log levels are defined in slog package, with the values of -4 (debug) to 8 (error) in increments of 4.
 var LevelTrace slog.Level = -8
 
+var _logLevel = slog.LevelDebug // default to debug
+func GetLogLevel() slog.Level {
+	return _logLevel
+}
+
 var defaultLogger LoggerI = nil
 
 func ParseLevel(levelStr string) (slog.Level, error) {
@@ -25,6 +30,7 @@ func ParseLevel(levelStr string) (slog.Level, error) {
 }
 
 func parseLevel(levelStr string) (slog.Level, error) {
+
 	switch strings.ToLower(levelStr) {
 	case "trace":
 		return LevelTrace, nil
@@ -37,7 +43,13 @@ func parseLevel(levelStr string) (slog.Level, error) {
 	case "error":
 		return slog.LevelError, nil
 	default:
-		return slog.LevelDebug, fmt.Errorf("Invalid log level: %s", levelStr)
+		// Use the slog package to parse the level
+		var lvl slog.Level
+		err := lvl.UnmarshalText([]byte(levelStr))
+		if err != nil {
+			return slog.LevelDebug, fmt.Errorf("Invalid log level: %s", levelStr)
+		}
+		return lvl, nil
 	}
 }
 
@@ -48,7 +60,7 @@ func mustParseLevel(levelStr string) slog.Level {
 }
 
 func init() {
-	logLevel := slog.LevelDebug // default to debug
+	logLevel := _logLevel
 	if logLevelStr := os.Getenv("GOKU_LOG_LEVEL"); logLevelStr != "" {
 		logLevel = mustParseLevel(logLevelStr)
 	}
@@ -78,6 +90,10 @@ func Init(logLevel slog.Level) {
 		defaultLogger = Logger{
 			logger: slog.New(clogHandler),
 		}
+	}
+
+	if _logLevel != logLevel {
+		_logLevel = logLevel
 	}
 }
 

@@ -98,7 +98,7 @@ type StartOptions struct {
 }
 
 func StartOSCmd(ctx context.Context, cmd *exec.Cmd, opts StartOptions) error {
-	log.Info(ctx, "Running command...", "command", cmd.String(), "opts", jsonutil.MustPrettyPrint(opts))
+	log.Debug(ctx, "Running command...", "command", cmd.String(), "opts", jsonutil.MustPrettyPrint(opts))
 	if len(opts.ExtraEnvs) > 0 {
 		if len(cmd.Env) == 0 {
 			cmd.Env = os.Environ()
