@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/teejays/gokutil/env"
+	"github.com/teejays/gokutil/panics"
 	"github.com/teejays/gokutil/sclog"
 )
 
@@ -19,27 +20,37 @@ var LevelTrace slog.Level = -8
 
 var defaultLogger LoggerI = nil
 
-func parseLevel(levelStr string) slog.Level {
+func ParseLevel(levelStr string) (slog.Level, error) {
+	return parseLevel(levelStr)
+}
+
+func parseLevel(levelStr string) (slog.Level, error) {
 	switch strings.ToLower(levelStr) {
 	case "trace":
-		return LevelTrace
+		return LevelTrace, nil
 	case "debug":
-		return slog.LevelDebug
+		return slog.LevelDebug, nil
 	case "info":
-		return slog.LevelInfo
+		return slog.LevelInfo, nil
 	case "warn":
-		return slog.LevelWarn
+		return slog.LevelWarn, nil
 	case "error":
-		return slog.LevelError
+		return slog.LevelError, nil
 	default:
-		panic(fmt.Sprintf("Invalid log level: %s", levelStr))
+		return slog.LevelDebug, fmt.Errorf("Invalid log level: %s", levelStr)
 	}
+}
+
+func mustParseLevel(levelStr string) slog.Level {
+	level, err := parseLevel(levelStr)
+	panics.IfError(err, "Parsing log level")
+	return level
 }
 
 func init() {
 	logLevel := slog.LevelDebug // default to debug
 	if logLevelStr := os.Getenv("GOKU_LOG_LEVEL"); logLevelStr != "" {
-		logLevel = parseLevel(logLevelStr)
+		logLevel = mustParseLevel(logLevelStr)
 	}
 	Init(logLevel)
 }
@@ -71,12 +82,14 @@ func Init(logLevel slog.Level) {
 }
 
 type LoggerI interface {
+	Trace(ctx context.Context, msg string, args ...interface{})
 	Debug(ctx context.Context, msg string, args ...interface{})
 	Info(ctx context.Context, msg string, args ...interface{})
 	Warn(ctx context.Context, msg string, args ...interface{})
 	Error(ctx context.Context, msg string, args ...interface{})
 	None(ctx context.Context, msg string, args ...interface{})
 
+	TraceWithoutCtx(msg string, args ...interface{})
 	DebugWithoutCtx(msg string, args ...interface{})
 	InfoWithoutCtx(msg string, args ...interface{})
 	WarnWithoutCtx(msg string, args ...interface{})
@@ -146,6 +159,10 @@ func GetLogger() LoggerI {
 	return defaultLogger
 }
 
+func Trace(ctx context.Context, msg string, args ...interface{}) {
+	defaultLogger.Trace(ctx, msg, args...)
+}
+
 func Debug(ctx context.Context, msg string, args ...interface{}) {
 	defaultLogger.Debug(ctx, msg, args...)
 }
@@ -164,6 +181,10 @@ func None(ctx context.Context, msg string, args ...interface{}) {
 
 func Error(ctx context.Context, msg string, args ...interface{}) {
 	defaultLogger.Error(ctx, msg, args...)
+}
+
+func TraceWithoutCtx(msg string, args ...interface{}) {
+	defaultLogger.TraceWithoutCtx(msg, args...)
 }
 
 func DebugWithoutCtx(msg string, args ...interface{}) {

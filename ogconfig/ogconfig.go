@@ -176,11 +176,13 @@ func InitializeConfigCustomFileConfig(gokuVersion string, cli *CLIConfig, fileCf
 
 }
 
+const ProjectConfigFileName = "ongoku.yaml"
+
 func LoadAppGokuYaml(appRootDir string) (FileConfig, error) {
 
-	f, err := os.Open(filepath.Join(appRootDir, "goku.yaml"))
+	f, err := os.Open(filepath.Join(appRootDir, ProjectConfigFileName))
 	if err != nil {
-		return FileConfig{}, fmt.Errorf("opening goku.yaml file: %w", err)
+		return FileConfig{}, fmt.Errorf("opening %s file: %w", ProjectConfigFileName, err)
 	}
 	defer f.Close()
 

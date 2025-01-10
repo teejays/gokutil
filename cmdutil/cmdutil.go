@@ -78,7 +78,7 @@ func ExecOSCmdWithOpts(ctx context.Context, cmd *exec.Cmd, opts ExecOptions) err
 				return errutil.Wrap(exitErr, "Command received a kill signal")
 			}
 		}
-		return errutil.Wrap(err, "Command did not run successfully")
+		return errutil.Wrap(err, "Command did not run successfully. Please see the logs for more details.")
 	}
 
 	if startOpts.RefFailureDetected.Load() {
