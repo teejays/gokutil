@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/teejays/gokutil/errutil"
 	"github.com/teejays/gokutil/naam"
 	"github.com/teejays/gokutil/panics"
 	"gopkg.in/yaml.v3"
@@ -98,9 +99,9 @@ func InitializeConfig(gokuVersion string, cli *CLIConfig) error {
 	fileCfg, err := LoadAppGokuYaml(cli.AppRootFromCurrDirPath)
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
-			return fmt.Errorf("Could not find an Ongoku app at [%s]. Make sure you are in the right directory, or specify the correct app directory using the -d flag.", cli.AppRootFromCurrDirPath)
+			return errutil.Wrap(err, "Could not find an Ongoku app at [%s]. Make sure you are in the right directory, or specify the correct app directory using the -d flag.", cli.AppRootFromCurrDirPath)
 		}
-		return fmt.Errorf("loading goku.yaml file: %w", err)
+		return fmt.Errorf("loading Ongoku config file: %w", err)
 	}
 
 	return InitializeConfigCustomFileConfig(gokuVersion, cli, fileCfg)
