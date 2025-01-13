@@ -59,17 +59,9 @@ func ParseArgs(ctx context.Context, programName string, v IArgs) error {
 
 	log.Debug(ctx, "Parsing command line args")
 
-	err = argParser.Parse(os.Args[1:])
-	if err != nil {
-		if errors.Is(err, arg.ErrHelp) {
-			argParser.WriteHelp(os.Stdout)
-			return ErrCleanExit
-		}
-		if errors.Is(err, arg.ErrVersion) {
-			fmt.Print(v.Version())
-			return ErrCleanExit
-		}
-		return err
+	parseErr := argParser.Parse(os.Args[1:])
+	if parseErr != nil && !errors.Is(parseErr, arg.ErrHelp) && !errors.Is(parseErr, arg.ErrVersion) {
+		return parseErr
 	}
 
 	if err := v.ValidateAndProcess(ctx); err != nil {
@@ -78,12 +70,12 @@ func ParseArgs(ctx context.Context, programName string, v IArgs) error {
 
 	parentArgs := v.GetParentArgs()
 
-	if parentArgs.VersionSubCmd != nil {
+	if parentArgs.VersionSubCmd != nil || errors.Is(parseErr, arg.ErrVersion) {
 		fmt.Print(v.Version())
 		return ErrCleanExit
 	}
 
-	if parentArgs.HelpSubCmd != nil {
+	if parentArgs.HelpSubCmd != nil || errors.Is(parseErr, arg.ErrHelp) {
 		argParser.WriteHelp(os.Stdout)
 		return ErrCleanExit
 	}
