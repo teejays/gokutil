@@ -190,7 +190,7 @@ func GetDefaultStdOut(ctx context.Context) io.Writer {
 			s = RemoveANSI(s)
 			// Strip any trailing newlines
 			s = strings.TrimRight(s, "\n")
-			log.Info(cmdLoggerCtx, s)
+			log.Debug(cmdLoggerCtx, s)
 		},
 	)
 }
