@@ -14,10 +14,11 @@ func (e Environment) String() string {
 }
 
 const (
-	DEV  Environment = "dev"
-	TEST Environment = "test" // For running tests
-	STG  Environment = "stage"
-	PROD Environment = "prod"
+	UNKNOWN Environment = "unknown"
+	DEV     Environment = "dev"
+	TEST    Environment = "test" // For running tests
+	STG     Environment = "stage"
+	PROD    Environment = "prod"
 )
 
 var (
@@ -36,7 +37,7 @@ func Init() {
 	case "testing", "test":
 		env = TEST
 	case "":
-		env = DEV
+		env = UNKNOWN
 	default:
 		// Could potentially error/warn
 		panics.P("Unknown APP_ENV environment variable value [%s]", os.Getenv("APP_ENV"))

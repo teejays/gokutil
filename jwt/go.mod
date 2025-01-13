@@ -4,6 +4,7 @@ go 1.23.4
 
 require (
 	github.com/stretchr/testify v1.10.0
+	github.com/teejays/gokutil/errutil v0.0.0-20241129080937-a3d0cf712dbd
 	github.com/teejays/gokutil/log v0.0.0-20250110183657-b8d5cbde594a
 )
 

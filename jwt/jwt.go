@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/teejays/gokutil/errutil"
 	"github.com/teejays/gokutil/log"
 )
 
@@ -16,6 +17,10 @@ var llog = log.GetLogger().WithHeading("JWT")
 
 const gHeaderTyp = "JWT"
 const gHeaderAlg = "HS256"
+
+var ErrMalformedToken = fmt.Errorf("malformed token")
+var ErrBadSignature = fmt.Errorf("bad signature")
+var ErrTokenTimestamp = fmt.Errorf("token is expired or not valid yet")
 
 // Header represents the header part of a JWT
 type Header struct {
@@ -67,11 +72,11 @@ func (bc *BaseClaim) VerifyTimestamps() error {
 	llog.DebugWithoutCtx("Verifying token timestamp", "expiry", bc.ExpireAt, "notBefore", bc.NotBefore, "issuedAt", bc.IssuedAt)
 
 	if bc.ExpireAt.Before(time.Now()) {
-		return fmt.Errorf("JWT has expired")
+		return errutil.Wrap(ErrTokenTimestamp, "JWT has expired")
 	}
 
 	if bc.NotBefore.After(time.Now()) {
-		return fmt.Errorf("JWT is not valid yet")
+		return errutil.Wrap(ErrTokenTimestamp, "JWT is not valid yet")
 	}
 
 	return nil
@@ -187,13 +192,12 @@ func (c *Client) VerifySignature(token string) error {
 	// Get new signature and compare
 	newSignatureB64, err := c.getSignatureBase64(tokenP.headerB64, tokenP.payloadB64)
 	if err != nil {
-		return err
+		return errutil.Wrap(ErrMalformedToken, "reading token signature")
 	}
 
 	isSame := hmac.Equal([]byte(newSignatureB64), []byte(tokenP.signatureB64))
-
 	if !isSame {
-		return fmt.Errorf("signature verification failed")
+		return errutil.Wrap(ErrBadSignature, "signature verification failed")
 	}
 
 	return nil
@@ -210,12 +214,12 @@ func (c *Client) Decode(token string, v interface{}) error {
 	// Get the paylaod
 	payloadJSON, err := base64.StdEncoding.DecodeString(tokenP.payloadB64)
 	if err != nil {
-		return err
+		return errutil.Wrap(ErrMalformedToken, "decoding payload")
 	}
 
 	err = json.Unmarshal(payloadJSON, &v)
 	if err != nil {
-		return fmt.Errorf("jwt-go: could not decode claim intom BasePayload: %v", err)
+		return errutil.Wrap(ErrMalformedToken, "could not decode claim intom BasePayload: %v", err)
 	}
 
 	return nil
@@ -231,7 +235,7 @@ func getTokenParts(token string) (partedToken, error) {
 	// Splity the token into three parts (header, payload, signature)
 	parts := strings.Split(token, ".")
 	if len(parts) != 3 {
-		return tokenP, fmt.Errorf("invalid number of jwt token part found: expected %d, got %d", 3, len(parts))
+		return tokenP, errutil.Wrap(ErrMalformedToken, "invalid number of jwt token part found: expected %d, got %d", 3, len(parts))
 	}
 
 	tokenP.headerB64 = parts[0]
@@ -248,10 +252,4 @@ func (c *Client) hash(message []byte) ([]byte, error) {
 		return nil, err
 	}
 	return hash.Sum(message), nil
-}
-
-func Example() {
-	fmt.Println("lala!")
-	// Output:
-	// lala!
 }
