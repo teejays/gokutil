@@ -69,7 +69,7 @@ func init() {
 
 func Init(logLevel slog.Level) {
 
-	fmt.Printf("Log level: %s\n", logLevel)
+	fmt.Printf("Initializing logging with level: %s\n", logLevel)
 
 	switch env.GetEnv() {
 	/*

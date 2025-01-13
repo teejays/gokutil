@@ -14,12 +14,21 @@ import (
 )
 
 func LoadGokuEnvFiles(ctx context.Context, wd string) error {
-	_env := env.GetEnv()
 
-	return LoadEnvFilesV2(ctx, []string{
+	err := LoadEnvFilesV2(ctx, []string{
+		filepath.Join(wd, ".env.goku.local"),
 		filepath.Join(wd, ".env.goku"),
+	})
+	if err != nil {
+		return errutil.Wrap(err, "Could not load goku env files")
+	}
+
+	// Read app env after loading above files since they may declare the app env
+	_env := env.GetEnv()
+	return LoadEnvFilesV2(ctx, []string{
 		filepath.Join(wd, ".env.goku."+string(_env)),
 	})
+
 }
 
 func LoadAppEnvFiles(ctx context.Context, wd string) error {

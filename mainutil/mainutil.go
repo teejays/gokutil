@@ -18,7 +18,7 @@ var ErrCleanExit = errors.New("clean exit")
 type IArgs interface {
 	Version() string
 	ValidateAndProcess(ctx context.Context) error
-	GetParentArgs() ParentArgs
+	GetParentArgs() *ParentArgs
 }
 
 type ParentArgs struct {
@@ -31,8 +31,8 @@ type ParentArgs struct {
 	LogLevel    slog.Level
 }
 
-func (a *ParentArgs) GetParentArgs() ParentArgs {
-	return *a
+func (a *ParentArgs) GetParentArgs() *ParentArgs {
+	return a
 }
 
 func (a *ParentArgs) ValidateAndProcess(ctx context.Context) error {
@@ -64,12 +64,12 @@ func ParseArgs(ctx context.Context, programName string, v IArgs) error {
 		return parseErr
 	}
 
+	// Process and validate. Parent args ValidateAndProcess should be called from within the outer ValidateAndProcess
 	if err := v.ValidateAndProcess(ctx); err != nil {
 		return errutil.Wrap(err, "Validating args")
 	}
 
 	parentArgs := v.GetParentArgs()
-
 	if parentArgs.VersionSubCmd != nil || errors.Is(parseErr, arg.ErrVersion) {
 		fmt.Print(v.Version())
 		return ErrCleanExit

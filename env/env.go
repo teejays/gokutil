@@ -21,12 +21,9 @@ const (
 	PROD    Environment = "prod"
 )
 
-var (
-	env           Environment
-	isInitialized bool
-)
-
-func Init() {
+func GetEnv() Environment {
+	// Check the APP_ENV environment variable
+	env := UNKNOWN
 	switch strings.ToLower(os.Getenv("APP_ENV")) {
 	case "production", "prod", "prd":
 		env = PROD
@@ -42,14 +39,12 @@ func Init() {
 		// Could potentially error/warn
 		panics.P("Unknown APP_ENV environment variable value [%s]", os.Getenv("APP_ENV"))
 	}
-	isInitialized = true
+
+	return env
 }
 
-func GetEnv() Environment {
-	if !isInitialized {
-		Init()
-	}
-	return env
+func SetEnv(e Environment) {
+	os.Setenv("APP_ENV", e.String())
 }
 
 func IsDev() bool {
