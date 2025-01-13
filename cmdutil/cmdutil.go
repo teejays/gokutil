@@ -54,7 +54,7 @@ func ExecCmd(ctx context.Context, name string, req ...string) error {
 func ExecOSCmdWithOpts(ctx context.Context, cmd *exec.Cmd, opts ExecOptions) error {
 	timerStart := time.Now()
 	defer func() {
-		log.Info(ctx, "Command execution time", "command", cmd.String(), "time", time.Since(timerStart))
+		log.Debug(ctx, "Command execution time", "command", cmd.String(), "time", time.Since(timerStart))
 	}()
 
 	startOpts := StartOptions{
