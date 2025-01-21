@@ -45,7 +45,7 @@ func UnmarshalJSONFromRequest[ReqT any](r *http.Request, v *ReqT) error {
 		return ErrInvalidJSON
 	}
 
-	llog.Warn(ctx, "Unmarshaled JSON", "v", v)
+	llog.Trace(ctx, "Unmarshaled JSON", "v", v)
 
 	err = validate.Struct(v)
 	if err != nil {
