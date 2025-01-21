@@ -3,16 +3,16 @@ module github.com/teejays/gokutil/cmdutil
 go 1.23.4
 
 require (
-	github.com/teejays/gokutil/errutil v0.0.0-20250113200111-25db8b855511
-	github.com/teejays/gokutil/gopi v0.0.0-20250113200111-25db8b855511
-	github.com/teejays/gokutil/log v0.0.0-20250113200111-25db8b855511
-	github.com/teejays/gokutil/sclog v0.0.0-20250113200111-25db8b855511
+	github.com/teejays/gokutil/errutil v0.0.0-20250121202708-b5a3068c5c6c
+	github.com/teejays/gokutil/gopi v0.0.0-20250121202708-b5a3068c5c6c
+	github.com/teejays/gokutil/log v0.0.0-20250121202708-b5a3068c5c6c
+	github.com/teejays/gokutil/sclog v0.0.0-20250121202708-b5a3068c5c6c
 )
 
 require (
 	github.com/Rican7/conjson v0.1.0 // indirect
-	github.com/teejays/gokutil/clog v0.0.0-20250113200111-25db8b855511 // indirect
-	github.com/teejays/gokutil/ctxutil v0.0.0-20250113200111-25db8b855511 // indirect
-	github.com/teejays/gokutil/env v0.0.0-20250113200111-25db8b855511 // indirect
-	github.com/teejays/gokutil/panics v0.0.0-20250113200111-25db8b855511 // indirect
+	github.com/teejays/gokutil/clog v0.0.0-20250121202708-b5a3068c5c6c // indirect
+	github.com/teejays/gokutil/ctxutil v0.0.0-20250121202708-b5a3068c5c6c // indirect
+	github.com/teejays/gokutil/env v0.0.0-20250121202708-b5a3068c5c6c // indirect
+	github.com/teejays/gokutil/panics v0.0.0-20250121202708-b5a3068c5c6c // indirect
 )
