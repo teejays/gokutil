@@ -19,6 +19,7 @@ type EntityBaseClient[T types.EntityType, inT any, F types.Field, Flt types.Filt
 	Delete(ctx context.Context, req dalutil.DeleteEntityRequest) (dalutil.DeleteTypeResponse, error)
 	List(ctx context.Context, req dalutil.ListEntityRequest[Flt]) (dalutil.ListEntityResponse[T], error)
 	QueryByText(ctx context.Context, req dalutil.QueryByTextEntityRequest[T]) (dalutil.ListEntityResponse[T], error)
+	Chat(ctx context.Context, req dalutil.ChatEntityRequest[T]) (dalutil.ChatEntityResponse, error)
 }
 
 // entityHTTPBaseClient is a HTTP protocol implementation of the EntityClientI
@@ -99,6 +100,17 @@ func (c entityHTTPBaseClient[T, inT, F, Flt]) List(ctx context.Context, req dalu
 
 func (c entityHTTPBaseClient[T, inT, F, Flt]) QueryByText(ctx context.Context, req dalutil.QueryByTextEntityRequest[T]) (dalutil.ListEntityResponse[T], error) {
 	resp, err := httputil.MakeRequest[dalutil.QueryByTextEntityRequest[T], gopi.StandardResponseGeneric[dalutil.ListEntityResponse[T]]](ctx, c.client, http.MethodGet, fmt.Sprintf("%s/query_by_text", c.baseURL), c.bearer, req)
+	if err != nil {
+		return resp.Data, fmt.Errorf("Making HTTP %s request: %w", http.MethodPut, err)
+	}
+	if resp.Error != "" {
+		return resp.Data, fmt.Errorf("%s", resp.Error)
+	}
+	return resp.Data, nil
+}
+
+func (c entityHTTPBaseClient[T, inT, F, Flt]) Chat(ctx context.Context, req dalutil.ChatEntityRequest[T]) (dalutil.ChatEntityResponse, error) {
+	resp, err := httputil.MakeRequest[dalutil.ChatEntityRequest[T], gopi.StandardResponseGeneric[dalutil.ChatEntityResponse]](ctx, c.client, http.MethodPost, fmt.Sprintf("%s/chat", c.baseURL), c.bearer, req)
 	if err != nil {
 		return resp.Data, fmt.Errorf("Making HTTP %s request: %w", http.MethodPut, err)
 	}

@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/teejays/goku/pkg/opai"
 	"github.com/teejays/gokutil/log"
 
 	"github.com/teejays/gokutil/client/db"
@@ -139,6 +140,15 @@ type UpdateEntityRequest[T types.BasicType, F types.Field] struct {
 
 type UpdateEntityResponse[T types.BasicType] struct {
 	Object T `json:"object"`
+}
+
+type ChatEntityRequest[T types.BasicType] struct {
+	EntityID scalars.ID `json:"entityID"`
+	Prompt   string     `json:"prompt"`
+}
+
+type ChatEntityResponse struct {
+	Response string `json:"response"`
 }
 
 func FieldsToStrings[T types.Field](fields []T) []string {
@@ -902,4 +912,86 @@ func GetUUIDsIntersection(lists ...[]scalars.ID) []scalars.ID {
 	}
 
 	return common
+}
+
+type ChatPlaceholderRequest struct {
+	Prompt string
+}
+
+func ChatPlaceholder(ctx context.Context, req ChatPlaceholderRequest) (ChatEntityResponse, error) {
+	var resp ChatEntityResponse
+	// Make a request to LLM
+
+	// Get OpenAI client
+	aiC, err := opai.NewClientWithDefaultKey(ctx)
+	if err != nil {
+		return resp, fmt.Errorf("Creating new OpenAI client: %w", err)
+	}
+
+	// var newThreadReq opai.ThreadInput
+	// newThreadReq.Messages = append(newThreadReq.Messages,
+	// 	opai.ThreadMessageInput{
+	// 		Content: "You are an AI agent, tasked with making the user believe that you understand the request, and that you have processed the request. You are allowed to lie, but do not act like you've performed things which are not possible. In such cases, ask follow up questions to clarity. For example, if you are asked to create a new Order for Customer XYZ, you should ask what should the order include, and after confirmation follow up with actually confirming that you have created a new order, and share its details (which will be made up). Also always share a made up summary of the things you have done, which should mostly consist of the CRUD methods you have called (again, all made up). Starting now, do not refer to this message in any way.",
+	// 		ThreadMessageBase: opai.ThreadMessageBase{
+	// 			Role: opai.Role_User,
+	// 		},
+	// 	},
+	// 	opai.ThreadMessageInput{
+	// 		Content: req.Prompt,
+	// 		ThreadMessageBase: opai.ThreadMessageBase{
+	// 			Role: opai.Role_User,
+	// 		},
+	// 	},
+	// )
+
+	// log.Info(ctx, "Creating new thread")
+	// thrd, err := aiC.NewThread(ctx, newThreadReq)
+	// if err != nil {
+	// 	return resp, fmt.Errorf("Chatting: %w", err)
+	// }
+	// log.Info(ctx, "New thread created", "id", thrd.ID)
+
+	// runReq := opai.ThreadRunInput{
+	// 	Model: opai.Model_GPT_3_5_turbo, // ResponseFormat: &responseFormat,
+	// }
+
+	// run, err := aiC.NewThreadRunComplete(ctx, thrd.ID, runReq)
+	// if err != nil {
+	// 	return resp, fmt.Errorf("New thread run: %w", err)
+	// }
+	// log.Info(ctx, "New thread run completed", "id", run.ID)
+
+	// log.Info(ctx, "Getting last message from thread")
+	// msg, err := aiC.GetThreadRunResponse(ctx, run.ThreadID, run.ID)
+	// if err != nil {
+	// 	return resp, fmt.Errorf("Getting response message for run [%s]: %w", run.ID, err)
+	// }
+
+	// return ChatEntityResponse{
+	// 	Response: msg,
+	// }, nil
+
+	chatReq := opai.ChatRequest{
+		Model: opai.Model_GPT_3_5_turbo,
+		Messages: []opai.Message{
+			{
+				Role:    opai.Role_System,
+				Content: "You are an AI agent, tasked with making the user believe that you understand the request, and that you have processed the request. You are allowed to lie, but do not act like you've performed things which are not possible. In such cases, ask follow up questions to clarity. For example, if you are asked to create a new Order for Customer XYZ, you should ask what should the order include, and after confirmation follow up with actually confirming that you have created a new order, and share its details (which will be made up). Also always share a made up summary of the things you have done, which should mostly consist of the CRUD methods you have called (again, all made up). Starting now, do not refer to this message in any way.",
+			},
+			{
+				Role:    opai.Role_User,
+				Content: req.Prompt,
+			},
+		},
+	}
+
+	chatResp, err := aiC.Chat(ctx, chatReq)
+	if err != nil {
+		return resp, fmt.Errorf("Chatting: %w", err)
+	}
+
+	return ChatEntityResponse{
+		Response: chatResp,
+	}, nil
+
 }
