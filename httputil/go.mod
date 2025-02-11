@@ -3,9 +3,9 @@ module github.com/teejays/gokutil/httputil
 go 1.23.4
 
 require (
-	github.com/teejays/gokutil/gopi v0.0.0-20250129221519-ecfa8ff3795b
-	github.com/teejays/gokutil/log v0.0.0-20250129221519-ecfa8ff3795b
-	github.com/teejays/gokutil/validate v0.0.0-20250129221519-ecfa8ff3795b
+	github.com/teejays/gokutil/gopi v0.0.0-20250205165855-9fd5642b1ddd
+	github.com/teejays/gokutil/log v0.0.0-20250205165855-9fd5642b1ddd
+	github.com/teejays/gokutil/validate v0.0.0-20250205165855-9fd5642b1ddd
 )
 
 require (
@@ -15,14 +15,14 @@ require (
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/go-playground/validator/v10 v10.24.0 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
-	github.com/teejays/gokutil/clog v0.0.0-20250129221519-ecfa8ff3795b // indirect
-	github.com/teejays/gokutil/ctxutil v0.0.0-20250129221519-ecfa8ff3795b // indirect
-	github.com/teejays/gokutil/env v0.0.0-20250129221519-ecfa8ff3795b // indirect
-	github.com/teejays/gokutil/errutil v0.0.0-20250129221519-ecfa8ff3795b // indirect
-	github.com/teejays/gokutil/panics v0.0.0-20250129221519-ecfa8ff3795b // indirect
-	github.com/teejays/gokutil/sclog v0.0.0-20250129221519-ecfa8ff3795b // indirect
-	golang.org/x/crypto v0.32.0 // indirect
-	golang.org/x/net v0.34.0 // indirect
+	github.com/teejays/gokutil/clog v0.0.0-20250205165855-9fd5642b1ddd // indirect
+	github.com/teejays/gokutil/ctxutil v0.0.0-20250205165855-9fd5642b1ddd // indirect
+	github.com/teejays/gokutil/env v0.0.0-20250205165855-9fd5642b1ddd // indirect
+	github.com/teejays/gokutil/errutil v0.0.0-20250205165855-9fd5642b1ddd // indirect
+	github.com/teejays/gokutil/panics v0.0.0-20250205165855-9fd5642b1ddd // indirect
+	github.com/teejays/gokutil/sclog v0.0.0-20250205165855-9fd5642b1ddd // indirect
+	golang.org/x/crypto v0.33.0 // indirect
+	golang.org/x/net v0.35.0 // indirect
 	golang.org/x/sys v0.30.0 // indirect
 	golang.org/x/text v0.22.0 // indirect
 )

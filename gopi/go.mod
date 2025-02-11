@@ -7,12 +7,12 @@ require (
 	github.com/gorilla/handlers v1.5.2
 	github.com/gorilla/mux v1.8.1
 	github.com/stretchr/testify v1.10.0
-	github.com/teejays/gokutil/errutil v0.0.0-20250129221519-ecfa8ff3795b
-	github.com/teejays/gokutil/httputil v0.0.0-20250129221519-ecfa8ff3795b
-	github.com/teejays/gokutil/log v0.0.0-20250129221519-ecfa8ff3795b
-	github.com/teejays/gokutil/panics v0.0.0-20250129221519-ecfa8ff3795b
-	github.com/teejays/gokutil/validate v0.0.0-20250129221519-ecfa8ff3795b
-	golang.org/x/net v0.34.0
+	github.com/teejays/gokutil/errutil v0.0.0-20250205165855-9fd5642b1ddd
+	github.com/teejays/gokutil/httputil v0.0.0-20250205165855-9fd5642b1ddd
+	github.com/teejays/gokutil/log v0.0.0-20250205165855-9fd5642b1ddd
+	github.com/teejays/gokutil/panics v0.0.0-20250205165855-9fd5642b1ddd
+	github.com/teejays/gokutil/validate v0.0.0-20250205165855-9fd5642b1ddd
+	golang.org/x/net v0.35.0
 	gopkg.in/go-playground/validator.v9 v9.31.0
 )
 
@@ -26,11 +26,11 @@ require (
 	github.com/kr/text v0.2.0 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
-	github.com/teejays/gokutil/clog v0.0.0-20250129221519-ecfa8ff3795b // indirect
-	github.com/teejays/gokutil/ctxutil v0.0.0-20250129221519-ecfa8ff3795b // indirect
-	github.com/teejays/gokutil/env v0.0.0-20250129221519-ecfa8ff3795b // indirect
-	github.com/teejays/gokutil/sclog v0.0.0-20250129221519-ecfa8ff3795b // indirect
-	golang.org/x/crypto v0.32.0 // indirect
+	github.com/teejays/gokutil/clog v0.0.0-20250205165855-9fd5642b1ddd // indirect
+	github.com/teejays/gokutil/ctxutil v0.0.0-20250205165855-9fd5642b1ddd // indirect
+	github.com/teejays/gokutil/env v0.0.0-20250205165855-9fd5642b1ddd // indirect
+	github.com/teejays/gokutil/sclog v0.0.0-20250205165855-9fd5642b1ddd // indirect
+	golang.org/x/crypto v0.33.0 // indirect
 	golang.org/x/sys v0.30.0 // indirect
 	golang.org/x/text v0.22.0 // indirect
 	gopkg.in/go-playground/assert.v1 v1.2.1 // indirect
