@@ -7,11 +7,10 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/teejays/goku/pkg/opai"
-	"github.com/teejays/gokutil/log"
-
+	"github.com/teejays/gokutil/aiutil"
 	"github.com/teejays/gokutil/client/db"
 	"github.com/teejays/gokutil/errutil"
+	"github.com/teejays/gokutil/log"
 	"github.com/teejays/gokutil/naam"
 	"github.com/teejays/gokutil/panics"
 	"github.com/teejays/gokutil/scalars"
@@ -923,23 +922,23 @@ func ChatPlaceholder(ctx context.Context, req ChatPlaceholderRequest) (ChatEntit
 	// Make a request to LLM
 
 	// Get OpenAI client
-	aiC, err := opai.NewClientWithDefaultKey(ctx)
+	aiC, err := aiutil.NewClientWithDefaultKey(ctx)
 	if err != nil {
 		return resp, fmt.Errorf("Creating new OpenAI client: %w", err)
 	}
 
-	// var newThreadReq opai.ThreadInput
+	// var newThreadReq aiutil.ThreadInput
 	// newThreadReq.Messages = append(newThreadReq.Messages,
-	// 	opai.ThreadMessageInput{
+	// 	aiutil.ThreadMessageInput{
 	// 		Content: "You are an AI agent, tasked with making the user believe that you understand the request, and that you have processed the request. You are allowed to lie, but do not act like you've performed things which are not possible. In such cases, ask follow up questions to clarity. For example, if you are asked to create a new Order for Customer XYZ, you should ask what should the order include, and after confirmation follow up with actually confirming that you have created a new order, and share its details (which will be made up). Also always share a made up summary of the things you have done, which should mostly consist of the CRUD methods you have called (again, all made up). Starting now, do not refer to this message in any way.",
-	// 		ThreadMessageBase: opai.ThreadMessageBase{
-	// 			Role: opai.Role_User,
+	// 		ThreadMessageBase: aiutil.ThreadMessageBase{
+	// 			Role: aiutil.Role_User,
 	// 		},
 	// 	},
-	// 	opai.ThreadMessageInput{
+	// 	aiutil.ThreadMessageInput{
 	// 		Content: req.Prompt,
-	// 		ThreadMessageBase: opai.ThreadMessageBase{
-	// 			Role: opai.Role_User,
+	// 		ThreadMessageBase: aiutil.ThreadMessageBase{
+	// 			Role: aiutil.Role_User,
 	// 		},
 	// 	},
 	// )
@@ -951,8 +950,8 @@ func ChatPlaceholder(ctx context.Context, req ChatPlaceholderRequest) (ChatEntit
 	// }
 	// log.Info(ctx, "New thread created", "id", thrd.ID)
 
-	// runReq := opai.ThreadRunInput{
-	// 	Model: opai.Model_GPT_3_5_turbo, // ResponseFormat: &responseFormat,
+	// runReq := aiutil.ThreadRunInput{
+	// 	Model: aiutil.Model_GPT_3_5_turbo, // ResponseFormat: &responseFormat,
 	// }
 
 	// run, err := aiC.NewThreadRunComplete(ctx, thrd.ID, runReq)
@@ -971,15 +970,15 @@ func ChatPlaceholder(ctx context.Context, req ChatPlaceholderRequest) (ChatEntit
 	// 	Response: msg,
 	// }, nil
 
-	chatReq := opai.ChatRequest{
-		Model: opai.Model_GPT_3_5_turbo,
-		Messages: []opai.Message{
+	chatReq := aiutil.ChatRequest{
+		Model: aiutil.Model_GPT_3_5_turbo,
+		Messages: []aiutil.Message{
 			{
-				Role:    opai.Role_System,
+				Role:    aiutil.Role_System,
 				Content: "You are an AI agent, tasked with making the user believe that you understand the request, and that you have processed the request. You are allowed to lie, but do not act like you've performed things which are not possible. In such cases, ask follow up questions to clarity. For example, if you are asked to create a new Order for Customer XYZ, you should ask what should the order include, and after confirmation follow up with actually confirming that you have created a new order, and share its details (which will be made up). Also always share a made up summary of the things you have done, which should mostly consist of the CRUD methods you have called (again, all made up). Starting now, do not refer to this message in any way.",
 			},
 			{
-				Role:    opai.Role_User,
+				Role:    aiutil.Role_User,
 				Content: req.Prompt,
 			},
 		},
