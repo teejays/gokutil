@@ -1,7 +1,7 @@
 package validate
 
 import (
-	"fmt"
+	"reflect"
 
 	validator "github.com/go-playground/validator/v10"
 	"github.com/teejays/gokutil/errutil"
@@ -15,20 +15,26 @@ func init() {
 }
 
 func Struct(data interface{}) error {
+	// If data is a struct or a pointer to a struct, or an interface with underlying struct, use V.Struct(data) otherwise pass
+	if reflect.ValueOf(data).Kind() != reflect.Struct &&
+		!(reflect.ValueOf(data).Kind() == reflect.Ptr && reflect.ValueOf(data).Elem().Kind() == reflect.Struct) &&
+		!(reflect.ValueOf(data).Kind() == reflect.Interface && reflect.ValueOf(data).Elem().Kind() == reflect.Struct) {
+		return nil
+	}
 	err := V.Struct(data)
 	if err == nil {
 		return nil
 	}
 	switch err := err.(type) {
 	case *validator.InvalidValidationError:
-		return fmt.Errorf("Failed to validate struct: %w", err)
+		return errutil.Wrap(err, "invalid data format")
 	case validator.ValidationErrors:
 		errs := errutil.NewMultiErr()
 		for _, e := range err {
-			errs.Wrap(e, "Validation Error")
+			errs.AddErr(e)
 		}
 		return errs.ErrOrNil()
 	default:
-		return fmt.Errorf("Failed to validate struct: %w", err)
+		return err
 	}
 }

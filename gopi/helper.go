@@ -217,6 +217,7 @@ func GetGenericGetHandler[ReqT, RespT any](fn func(context.Context, ReqT) (RespT
 			// Validate the request
 			err = validate.Struct(req)
 			if err != nil {
+				err = errutil.Wrap(err, "Validating the request param")
 				WriteError(w, http.StatusBadRequest, err)
 				return
 			}

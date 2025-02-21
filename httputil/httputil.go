@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/teejays/gokutil/errutil"
 	jsonutil "github.com/teejays/gokutil/gopi/json"
 	"github.com/teejays/gokutil/log"
 	"github.com/teejays/gokutil/validate"
@@ -49,7 +50,7 @@ func UnmarshalJSONFromRequest[ReqT any](r *http.Request, v *ReqT) error {
 
 	err = validate.Struct(v)
 	if err != nil {
-		return fmt.Errorf("Validation error: %w", err)
+		return errutil.Wrap(err, "Validating the request body")
 	}
 
 	return nil

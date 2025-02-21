@@ -232,9 +232,9 @@ func BatchAddType[T types.BasicType, F types.Field](ctx context.Context, conn *d
 		err := validate.Struct(elems[i])
 		if err != nil {
 			if len(elems) == 1 {
-				errs.Wrap(err, "Validation failed")
+				errs.Wrap(err, "Element being added failed validation")
 			} else {
-				errs.Wrap(err, "Validation failed for item at position [%d]", i+1)
+				errs.Wrap(err, "Element at position [%d] failed validation", i+1)
 			}
 		}
 	}
