@@ -31,17 +31,26 @@ func ValidateCondition(f Condition) error {
 		return err
 	}
 	// Min values
-	if !info.NoValues && n < 1 {
-		return fmt.Errorf("Operator '%s' expects a value, none provided", info)
-	}
-	if !info.AllowMultipleValues && !info.NoValues && n != 1 {
-		return fmt.Errorf("Operator '%s' expects one comparator value, %d provided", info, n)
-	}
-	if info.AllowMultipleValues && info.MaxNumValues > 0 && n > info.MaxNumValues {
-		return fmt.Errorf("Operator '%s' expects a max of %d values, %d provided", info, info.MaxNumValues, n)
-	}
-	if info.AllowMultipleValues && info.MinNumValues > 0 && n < info.MinNumValues {
-		return fmt.Errorf("Operator '%s' expects a min of %d values, %d provided", info, info.MinNumValues, n)
+	switch info.ValuesType {
+	case ValuesType_Zero:
+		if n > 1 {
+			return fmt.Errorf("operator [%s] does not expect a value but [%d] provided", info, n)
+		}
+	case ValuesType_One:
+		if n != 1 {
+			return fmt.Errorf("operator [%s] expects one value but [%d] provided", info, n)
+		}
+	case ValuesType_Multiple:
+		if info.MultipleValuesMin > 0 && n < info.MultipleValuesMin {
+			return fmt.Errorf("operator [%s] expects a min of [%d] values but [%d] provided", info, info.MultipleValuesMin, n)
+		}
+		if info.MultipleValuesMax > 0 && n > info.MultipleValuesMax {
+			return fmt.Errorf("operator [%s] expects a max of [%d] values but [%d] provided", info, info.MultipleValuesMax, n)
+		}
+	case ValuesType_Free:
+		// Do nothing
+	default:
+		// Do nothing
 	}
 	return nil
 }
@@ -71,6 +80,13 @@ func InjectConditionIntoSqlBuilder(f Condition, sb *goqu.SelectDataset, col stri
 	// Get Values
 	values := ListConditionValues(f)
 	log.DebugWithoutCtx("Injecting condition into SQL Builder", "Operator", info, "Column", col, "Values", values, "IsColumnArray", isColArray)
+
+	// Validate some stuff
+	err = ValidateCondition(f)
+	if err != nil {
+		return nil, err
+	}
+
 	// Handle when column is a SQL array
 	if isColArray {
 		sb := sb.Where(

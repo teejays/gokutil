@@ -116,7 +116,7 @@ func (o *Operator) FromString(str string) error {
 	case "IS_NOT_NULL":
 		*o = IS_NOT_NULL
 	default:
-		return fmt.Errorf("Unrecognized Filter Operator [%s]", str)
+		return fmt.Errorf("unrecognized filter operator [%s]", str)
 	}
 	return nil
 }
@@ -155,11 +155,22 @@ type OperatorInfo struct {
 	InjectSqlBuilderWhereCond_Huandu func(sb *sqlbuilder.SelectBuilder, col string, values ...interface{}) error
 	InjectSqlBuilderWhereCond_Goqu   func(sb *goqu.SelectDataset, col string, values ...interface{}) *goqu.SelectDataset
 
-	NoValues            bool
-	AllowMultipleValues bool
-	MinNumValues        int
-	MaxNumValues        int
+	ValuesType ValuesType
+	// DisallowValues      bool
+	// AllowMultipleValues bool
+	MultipleValuesMin int // When AllowMultipleValues is true, this is the min number of values
+	MultipleValuesMax int // When AllowMultipleValues is true, this is the max number of values
 }
+
+type ValuesType uint8
+
+const (
+	ValuesType_Zero ValuesType = iota
+	ValuesType_One
+	ValuesType_Two
+	ValuesType_Multiple
+	ValuesType_Free // do whatever
+)
 
 func (t OperatorInfo) String() string {
 	return t.Name
@@ -187,9 +198,10 @@ func (t OperatorInfo) GetSqlFormatString() string {
 
 var store = map[Operator]OperatorInfo{
 	EQUAL: {
-		Name:    "EQUAL",
-		Sign:    "==",
-		SqlSign: "=",
+		Name:       "EQUAL",
+		Sign:       "==",
+		SqlSign:    "=",
+		ValuesType: ValuesType_One,
 		InjectSqlBuilderWhereCond_Huandu: func(sb *sqlbuilder.SelectBuilder, col string, values ...interface{}) error {
 			sb.Where(sb.Equal(col, values[0]))
 			return nil
@@ -199,8 +211,9 @@ var store = map[Operator]OperatorInfo{
 		},
 	},
 	NOT_EQUAL: {
-		Name: "NOT_EQUAL",
-		Sign: "!=",
+		Name:       "NOT_EQUAL",
+		Sign:       "!=",
+		ValuesType: ValuesType_Zero,
 		InjectSqlBuilderWhereCond_Huandu: func(sb *sqlbuilder.SelectBuilder, col string, values ...interface{}) error {
 			sb.Where(sb.NotEqual(col, values[0]))
 			return nil
@@ -210,19 +223,29 @@ var store = map[Operator]OperatorInfo{
 		},
 	},
 	IN: {
-		Name:    "IN",
-		SqlSign: "IN",
+		Name:              "IN",
+		SqlSign:           "IN",
+		ValuesType:        ValuesType_Multiple,
+		MultipleValuesMin: 1,
+		MultipleValuesMax: 0,
 		InjectSqlBuilderWhereCond_Huandu: func(sb *sqlbuilder.SelectBuilder, col string, values ...interface{}) error {
+			if len(values) < 1 {
+				return fmt.Errorf("IN operator requires at least one value")
+			}
 			sb.Where(sb.In(col, values...))
 			return nil
 		},
 		InjectSqlBuilderWhereCond_Goqu: func(sb *goqu.SelectDataset, col string, values ...interface{}) *goqu.SelectDataset {
+			if len(values) < 1 {
+				return sb
+			}
 			return sb.Where(goqu.C(col).In(values))
 		},
 	},
 	GREATER_THAN: {
-		Name: "GREATER_THAN",
-		Sign: ">",
+		Name:       "GREATER_THAN",
+		Sign:       ">",
+		ValuesType: ValuesType_One,
 		InjectSqlBuilderWhereCond_Huandu: func(sb *sqlbuilder.SelectBuilder, col string, values ...interface{}) error {
 			sb.Where(sb.GreaterThan(col, values[0]))
 			return nil
@@ -232,8 +255,9 @@ var store = map[Operator]OperatorInfo{
 		},
 	},
 	GREATER_THAN_EQUAL: {
-		Name: "GREATER_THAN_EQUAL",
-		Sign: ">=",
+		Name:       "GREATER_THAN_EQUAL",
+		Sign:       ">=",
+		ValuesType: ValuesType_One,
 		InjectSqlBuilderWhereCond_Huandu: func(sb *sqlbuilder.SelectBuilder, col string, values ...interface{}) error {
 			sb.Where(sb.GreaterEqualThan(col, values[0]))
 			return nil
@@ -243,8 +267,9 @@ var store = map[Operator]OperatorInfo{
 		},
 	},
 	LESS_THAN: {
-		Name: "LESS_THAN",
-		Sign: "<",
+		Name:       "LESS_THAN",
+		Sign:       "<",
+		ValuesType: ValuesType_One,
 		InjectSqlBuilderWhereCond_Huandu: func(sb *sqlbuilder.SelectBuilder, col string, values ...interface{}) error {
 			sb.Where(sb.LessThan(col, values[0]))
 			return nil
@@ -254,8 +279,9 @@ var store = map[Operator]OperatorInfo{
 		},
 	},
 	LESS_THAN_EQUAL: {
-		Name: "LESS_THAN_EQUAL",
-		Sign: "<=",
+		Name:       "LESS_THAN_EQUAL",
+		Sign:       "<=",
+		ValuesType: ValuesType_One,
 		InjectSqlBuilderWhereCond_Huandu: func(sb *sqlbuilder.SelectBuilder, col string, values ...interface{}) error {
 			sb.Where(sb.LessEqualThan(col, values[0]))
 			return nil
@@ -265,9 +291,10 @@ var store = map[Operator]OperatorInfo{
 		},
 	},
 	LIKE: {
-		Name:    "LIKE",
-		Sign:    "",
-		SqlSign: "LIKE",
+		Name:       "LIKE",
+		Sign:       "",
+		SqlSign:    "LIKE",
+		ValuesType: ValuesType_One,
 		InjectSqlBuilderWhereCond_Huandu: func(sb *sqlbuilder.SelectBuilder, col string, values ...interface{}) error {
 			sb.Where(sb.Like(col, values[0]))
 			return nil
@@ -277,9 +304,10 @@ var store = map[Operator]OperatorInfo{
 		},
 	},
 	ILIKE: {
-		Name:    "ILIKE",
-		Sign:    "",
-		SqlSign: "ILIKE",
+		Name:       "ILIKE",
+		Sign:       "",
+		SqlSign:    "ILIKE",
+		ValuesType: ValuesType_One,
 		InjectSqlBuilderWhereCond_Huandu: func(sb *sqlbuilder.SelectBuilder, col string, values ...interface{}) error {
 			sb.Where(sb.Like(col, values[0])) // No ILike implemented?
 			return nil
@@ -289,9 +317,10 @@ var store = map[Operator]OperatorInfo{
 		},
 	},
 	NOT_LIKE: {
-		Name:                "NOT_LIKE",
-		SqlSign:             "NOT LIKE",
-		AllowMultipleValues: true,
+		Name:              "NOT_LIKE",
+		SqlSign:           "NOT LIKE",
+		ValuesType:        ValuesType_Multiple,
+		MultipleValuesMin: 1,
 		InjectSqlBuilderWhereCond_Huandu: func(sb *sqlbuilder.SelectBuilder, col string, values ...interface{}) error {
 			sb.Where(sb.NotLike(col, values[0]))
 			return nil
@@ -301,10 +330,10 @@ var store = map[Operator]OperatorInfo{
 		},
 	},
 	IS_NULL: {
-		Name:     "IS_NULL",
-		Sign:     "!=",
-		SqlSign:  "IS NULL",
-		NoValues: true,
+		Name:       "IS_NULL",
+		Sign:       "!=",
+		SqlSign:    "IS NULL",
+		ValuesType: ValuesType_Zero,
 		InjectSqlBuilderWhereCond_Huandu: func(sb *sqlbuilder.SelectBuilder, col string, values ...interface{}) error {
 			sb.Where(sb.IsNull(col))
 			return nil
@@ -314,10 +343,10 @@ var store = map[Operator]OperatorInfo{
 		},
 	},
 	IS_NOT_NULL: {
-		Name:     "IS_NOT_NULL",
-		Sign:     "",
-		SqlSign:  "IS NOT NULL",
-		NoValues: true,
+		Name:       "IS_NOT_NULL",
+		Sign:       "",
+		SqlSign:    "IS NOT NULL",
+		ValuesType: ValuesType_Zero,
 		InjectSqlBuilderWhereCond_Huandu: func(sb *sqlbuilder.SelectBuilder, col string, values ...interface{}) error {
 			sb.Where(sb.IsNotNull(col))
 			return nil

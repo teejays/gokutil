@@ -66,7 +66,7 @@ func WrapBadRequest(err error) error {
 	return WrapGerror(err).SetHTTPStatus(http.StatusBadRequest)
 }
 
-func WrapInteralError(err error) error {
+func WrapInternalError(err error) error {
 	return WrapGerror(err).SetHTTPStatus(http.StatusInternalServerError).SetExternalMsg("We're sorry, something went wrong in our system. We've alerted our team and will be looking into this.")
 }
 
