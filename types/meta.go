@@ -74,6 +74,7 @@ func (h HookType) IsReadPre() bool    { return h == HookPoint_ReadPre }
 func (h HookType) IsReadPost() bool   { return h == HookPoint_ReadPost }
 
 const (
+	HookPoint_Invalid    HookType = ""
 	HookPoint_Init       HookType = "init"
 	HookPoint_CreatePre  HookType = "create_pre"
 	HookPoint_CreatePost HookType = "create_post"

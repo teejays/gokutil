@@ -70,7 +70,7 @@ func (id ID) Validate() error {
 	if id.IsEmpty() {
 		return fmt.Errorf("ID is empty")
 	}
-	if err := id.Validate(); err != nil {
+	if err := uuid.Validate(id.String()); err != nil {
 		return err
 	}
 	return nil

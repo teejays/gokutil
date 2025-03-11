@@ -137,6 +137,9 @@ func NewBoolCondition(op Operator, values ...bool) *BoolCondition {
 	return NewGenericCondition(op, values...)
 }
 
+var False = NewBoolCondition(EQUAL, false)
+var True = NewBoolCondition(EQUAL, true)
+
 type IDCondition = GenericCondition[scalars.ID]
 
 func NewIDCondition(op Operator, values ...scalars.ID) *IDCondition {
@@ -148,6 +151,8 @@ type TimestampCondition = GenericCondition[scalars.Timestamp]
 func NewTimestampCondition(op Operator, values ...scalars.Timestamp) *TimestampCondition {
 	return NewGenericCondition(op, values...)
 }
+
+var NullTimestamp = NewTimestampCondition(IS_NULL)
 
 type DateCondition = GenericCondition[scalars.Date]
 

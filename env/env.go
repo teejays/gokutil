@@ -14,11 +14,12 @@ func (e Environment) String() string {
 }
 
 const (
-	UNKNOWN Environment = "unknown"
-	DEV     Environment = "dev"
-	TEST    Environment = "test" // For running tests
-	STG     Environment = "stage"
-	PROD    Environment = "prod"
+	UNKNOWN   Environment = "unknown"
+	LOCAL_DEV Environment = "dev_local"
+	DEV       Environment = "dev"
+	TEST      Environment = "test" // For running tests
+	STG       Environment = "stage"
+	PROD      Environment = "prod"
 )
 
 func GetEnv() Environment {
@@ -31,6 +32,8 @@ func GetEnv() Environment {
 		env = STG
 	case "development", "dev":
 		env = DEV
+	case "local", "local-dev", "local-development", "local_dev", "local_development":
+		env = LOCAL_DEV
 	case "testing", "test":
 		env = TEST
 	case "":

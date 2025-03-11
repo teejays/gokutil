@@ -2,7 +2,10 @@ module github.com/teejays/gokutil/client/file
 
 go 1.23.4
 
-require github.com/teejays/gokutil/scalars v0.0.0-20240914053048-e3c291cb9e80
+require (
+	github.com/aws/aws-sdk-go v1.55.6
+	github.com/teejays/gokutil/scalars v0.0.0-20240914053048-e3c291cb9e80
+)
 
 require (
 	github.com/Rican7/conjson v0.1.0 // indirect
@@ -13,6 +16,7 @@ require (
 	github.com/go-playground/validator/v10 v10.23.0 // indirect
 	github.com/gorilla/handlers v1.5.2 // indirect
 	github.com/gorilla/mux v1.8.1 // indirect
+	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/teejays/gokutil/clog v0.0.0-20250110122726-e9343b460a18 // indirect
 	github.com/teejays/gokutil/ctxutil v0.0.0-20250110122726-e9343b460a18 // indirect
