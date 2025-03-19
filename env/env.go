@@ -15,9 +15,10 @@ func (e Environment) String() string {
 
 const (
 	UNKNOWN   Environment = "unknown"
-	LOCAL_DEV Environment = "dev_local"
-	DEV       Environment = "dev"
-	TEST      Environment = "test" // For running tests
+	DEV       Environment = "dev"       // Any dev environments
+	DEV_LOCAL Environment = "dev_local" // Local dev
+	DEV_CLOUD Environment = "dev_cloud" // Cloud dev
+	TEST      Environment = "test"      // For running tests
 	STG       Environment = "stage"
 	PROD      Environment = "prod"
 )
@@ -33,7 +34,9 @@ func GetEnv() Environment {
 	case "development", "dev":
 		env = DEV
 	case "local", "local-dev", "local-development", "local_dev", "local_development":
-		env = LOCAL_DEV
+		env = DEV_LOCAL
+	case "cloud", "cloud-dev", "cloud-development", "cloud_dev", "cloud_development":
+		env = DEV_CLOUD
 	case "testing", "test":
 		env = TEST
 	case "":
@@ -51,5 +54,5 @@ func SetEnv(e Environment) {
 }
 
 func IsDev() bool {
-	return GetEnv() == DEV
+	return GetEnv() == DEV || GetEnv() == DEV_LOCAL || GetEnv() == DEV_CLOUD
 }

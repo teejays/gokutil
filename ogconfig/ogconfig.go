@@ -1,6 +1,7 @@
 package ogconfig
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"os"
@@ -26,6 +27,16 @@ type CLIConfig struct {
 
 func (c CLIConfig) GetAppRootPathPath() string {
 	return c.AppRootFromCurrDirPath
+}
+
+// IsModEnabled checks if a mod with the given name is enabled in the configuration
+func (cfg Config) IsModEnabled(ctx context.Context, modName naam.Name) bool {
+	for _, mod := range cfg.FileConfig.Mods {
+		if mod.Name == modName {
+			return true
+		}
+	}
+	return false
 }
 
 type HasAppRootPath interface {

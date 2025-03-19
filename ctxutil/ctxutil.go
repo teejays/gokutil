@@ -75,3 +75,7 @@ func GetValue[V any, K ContextKeyType](ctx context.Context, key K) (V, error) {
 	}
 	return val, nil
 }
+
+func UnsetValue[K ContextKeyType](ctx context.Context, key K) context.Context {
+	return context.WithValue(ctx, key, nil)
+}

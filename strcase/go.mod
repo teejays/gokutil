@@ -5,7 +5,7 @@ go 1.23.4
 require (
 	github.com/iancoleman/strcase v0.3.0
 	github.com/stretchr/testify v1.10.0
-	github.com/teejays/gokutil/panics v0.0.0-20250311143204-d08266c64a29
+	github.com/teejays/gokutil/panics v0.0.0-20250311154532-16b275e4cc95
 	golang.org/x/text v0.23.0
 )
 

@@ -58,7 +58,7 @@ type ITypeDALMeta[T types.BasicType, F types.Field] interface {
 	UpdateSubTableFields(context.Context, *db.Connection, UpdateTypeRequest[T, F], []F, T, T) (T, error) // TODO
 
 	InternalHookSavePre(ctx context.Context, elem T, now scalars.Timestamp) (T, error)
-	// InternalHookCreatePre(ctx context.Context, elem T, now scalars.Timestamp) (T, error)
+	InternalHookCreatePre(ctx context.Context, elem T, now scalars.Timestamp) (T, error)
 	// InternalHookFetchPre(ctx context.Context, elem T) (T, error)
 }
 
@@ -178,6 +178,12 @@ func BatchAddType[T types.BasicType, F types.Field](ctx context.Context, conn *d
 
 	// Make any internal changes to the data before saving and after custom hooks
 	for i := range elems {
+		// Create Pre Hook
+		elems[i], err = meta.InternalHookCreatePre(ctx, elems[i], now)
+		if err != nil {
+			return nil, fmt.Errorf("Running InternalHookCreatePre [item %d]: %w", i+1, err)
+		}
+		// Save Pre Hook
 		elems[i], err = meta.InternalHookSavePre(ctx, elems[i], now)
 		if err != nil {
 			return nil, fmt.Errorf("Running InternalHookSavePre [item %d]: %w", i+1, err)
@@ -333,8 +339,8 @@ func ListTypeByIDs[T types.BasicType, F types.Field](ctx context.Context, conn *
 	}
 
 	// Run any before save hooks
-	if fn := meta.GetHookReadPost(); fn != nil {
-		log.Info(ctx, "Running HookReadPost", "type", meta.GetTypeCommonMeta().Name)
+	if fn := meta.GetHookFetchPost(); fn != nil {
+		log.Info(ctx, "Running HookFetchPost", "type", meta.GetTypeCommonMeta().Name)
 		for i := range elems {
 			var err error
 			elems[i], err = fn(ctx, elems[i])

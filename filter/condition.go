@@ -131,7 +131,6 @@ func (f GenericCondition[T]) GetValue(i int) interface{} { return f.Values[i] }
 type StringCondition = GenericCondition[string]
 
 func NewStringCondition(op Operator, values ...string) *StringCondition {
-	log.DebugWithoutCtx("Creating new StringCondition", "Operator", op, "Values", values)
 	return NewGenericCondition(op, values...)
 }
 
