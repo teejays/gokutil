@@ -59,7 +59,7 @@ type ITypeDALMeta[T types.BasicType, F types.Field] interface {
 
 	InternalHookSavePre(ctx context.Context, elem T, now scalars.Timestamp) (T, error)
 	InternalHookCreatePre(ctx context.Context, elem T, now scalars.Timestamp) (T, error)
-	// InternalHookFetchPre(ctx context.Context, elem T) (T, error)
+	// InternalHookReadPre(ctx context.Context, elem T) (T, error)
 }
 
 // TypeCommonDALMeta
@@ -339,8 +339,8 @@ func ListTypeByIDs[T types.BasicType, F types.Field](ctx context.Context, conn *
 	}
 
 	// Run any before save hooks
-	if fn := meta.GetHookFetchPost(); fn != nil {
-		log.Info(ctx, "Running HookFetchPost", "type", meta.GetTypeCommonMeta().Name)
+	if fn := meta.GetHookReadPost(); fn != nil {
+		log.Info(ctx, "Running HookReadPost", "type", meta.GetTypeCommonMeta().Name)
 		for i := range elems {
 			var err error
 			elems[i], err = fn(ctx, elems[i])

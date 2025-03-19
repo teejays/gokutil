@@ -70,8 +70,8 @@ func (h HookType) IsSavePre() bool    { return h == HookPoint_SavePre }
 func (h HookType) IsSavePost() bool   { return h == HookPoint_SavePost }
 func (h HookType) IsDeletePre() bool  { return h == HookPoint_DeletePre }
 func (h HookType) IsDeletePost() bool { return h == HookPoint_DeletePost }
-func (h HookType) IsFetchPre() bool   { return h == HookPoint_FetchPre }
-func (h HookType) IsFetchPost() bool  { return h == HookPoint_FetchPost }
+func (h HookType) IsReadPre() bool    { return h == HookPoint_ReadPre }
+func (h HookType) IsReadPost() bool   { return h == HookPoint_ReadPost }
 
 const (
 	HookPoint_Invalid    HookType = ""
@@ -84,8 +84,8 @@ const (
 	HookPoint_SavePost   HookType = "save_post"
 	HookPoint_DeletePre  HookType = "delete_pre"
 	HookPoint_DeletePost HookType = "delete_post"
-	HookPoint_FetchPre   HookType = "fetch_pre"
-	HookPoint_FetchPost  HookType = "fetch_post"
+	HookPoint_ReadPre    HookType = "read_pre"
+	HookPoint_ReadPost   HookType = "read_post"
 )
 
 type TypeHookFunc[T BasicType] func(context.Context, T) (T, error)
@@ -101,8 +101,8 @@ type IWithHooks[T BasicType] interface {
 	SetHookSavePost(TypeHookFunc[T]) error
 	SetHookDeletePre(TypeHookFunc[T]) error
 	SetHookDeletePost(TypeHookFunc[T]) error
-	SetHookFetchPre(TypeHookFunc[T]) error
-	SetHookFetchPost(TypeHookFunc[T]) error
+	SetHookReadPre(TypeHookFunc[T]) error
+	SetHookReadPost(TypeHookFunc[T]) error
 
 	// Getters
 	GetHookInit() TypeHookFunc[T]
@@ -114,8 +114,8 @@ type IWithHooks[T BasicType] interface {
 	GetHookSavePost() TypeHookFunc[T]
 	GetHookDeletePre() TypeHookFunc[T]
 	GetHookDeletePost() TypeHookFunc[T]
-	GetHookFetchPre() TypeHookFunc[T]
-	GetHookFetchPost() TypeHookFunc[T]
+	GetHookReadPre() TypeHookFunc[T]
+	GetHookReadPost() TypeHookFunc[T]
 }
 
 type WithHooks[T BasicType] struct {
@@ -128,17 +128,17 @@ type WithHooks[T BasicType] struct {
 	SavePost   TypeHookFunc[T]
 	DeletePre  TypeHookFunc[T]
 	DeletePost TypeHookFunc[T]
-	FetchPre   TypeHookFunc[T]
-	FetchPost  TypeHookFunc[T]
+	ReadPre    TypeHookFunc[T]
+	ReadPost   TypeHookFunc[T]
 }
 
 func setHookHelper[T BasicType](fn TypeHookFunc[T], dst *TypeHookFunc[T]) error {
 	// TODO: Figure this out and document better
 	if dst == nil {
-		return fmt.Errorf("Destination pointer is nil")
+		return fmt.Errorf("destination pointer is nil")
 	}
 	if *dst != nil {
-		return fmt.Errorf("Hook already set")
+		return fmt.Errorf("hook already set")
 	}
 	*dst = fn
 	return nil
@@ -220,16 +220,16 @@ func (t *WithHooks[T]) SetHookDeletePost(fn TypeHookFunc[T]) error {
 	return nil
 }
 
-func (t *WithHooks[T]) SetHookFetchPre(fn TypeHookFunc[T]) error {
-	err := setHookHelper(fn, &t.FetchPre)
+func (t *WithHooks[T]) SetHookReadPre(fn TypeHookFunc[T]) error {
+	err := setHookHelper(fn, &t.ReadPre)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (t *WithHooks[T]) SetHookFetchPost(fn TypeHookFunc[T]) error {
-	err := setHookHelper(fn, &t.FetchPost)
+func (t *WithHooks[T]) SetHookReadPost(fn TypeHookFunc[T]) error {
+	err := setHookHelper(fn, &t.ReadPost)
 	if err != nil {
 		return err
 	}
@@ -272,12 +272,12 @@ func (t WithHooks[T]) GetHookDeletePost() TypeHookFunc[T] {
 	return t.DeletePost
 }
 
-func (t WithHooks[T]) GetHookFetchPre() TypeHookFunc[T] {
-	return t.FetchPost
+func (t WithHooks[T]) GetHookReadPre() TypeHookFunc[T] {
+	return t.ReadPost
 }
 
-func (t WithHooks[T]) GetHookFetchPost() TypeHookFunc[T] {
-	return t.FetchPost
+func (t WithHooks[T]) GetHookReadPost() TypeHookFunc[T] {
+	return t.ReadPost
 }
 
 /* * * * * *
