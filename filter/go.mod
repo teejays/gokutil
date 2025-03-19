@@ -5,9 +5,9 @@ go 1.23.4
 require (
 	github.com/doug-martin/goqu/v9 v9.19.0
 	github.com/huandu/go-sqlbuilder v1.34.0
-	github.com/teejays/gokutil/log v0.0.0-20250311154532-16b275e4cc95
-	github.com/teejays/gokutil/panics v0.0.0-20250311154532-16b275e4cc95
-	github.com/teejays/gokutil/scalars v0.0.0-20250311154532-16b275e4cc95
+	github.com/teejays/gokutil/log v0.0.0-20250319033709-dfd2699fbc65
+	github.com/teejays/gokutil/panics v0.0.0-20250319033709-dfd2699fbc65
+	github.com/teejays/gokutil/scalars v0.0.0-20250319033709-dfd2699fbc65
 )
 
 require (
@@ -17,10 +17,10 @@ require (
 	github.com/huandu/xstrings v1.5.0 // indirect
 	github.com/lib/pq v1.10.9 // indirect
 	github.com/stretchr/objx v0.5.2 // indirect
-	github.com/teejays/gokutil/clog v0.0.0-20250311154532-16b275e4cc95 // indirect
-	github.com/teejays/gokutil/ctxutil v0.0.0-20250311154532-16b275e4cc95 // indirect
-	github.com/teejays/gokutil/env v0.0.0-20250311154532-16b275e4cc95 // indirect
-	github.com/teejays/gokutil/errutil v0.0.0-20250311154532-16b275e4cc95 // indirect
-	github.com/teejays/gokutil/gopi v0.0.0-20250311154532-16b275e4cc95 // indirect
-	github.com/teejays/gokutil/sclog v0.0.0-20250311154532-16b275e4cc95 // indirect
+	github.com/teejays/gokutil/clog v0.0.0-20250319033709-dfd2699fbc65 // indirect
+	github.com/teejays/gokutil/ctxutil v0.0.0-20250319033709-dfd2699fbc65 // indirect
+	github.com/teejays/gokutil/env v0.0.0-20250319033709-dfd2699fbc65 // indirect
+	github.com/teejays/gokutil/errutil v0.0.0-20250319033709-dfd2699fbc65 // indirect
+	github.com/teejays/gokutil/gopi v0.0.0-20250319033709-dfd2699fbc65 // indirect
+	github.com/teejays/gokutil/sclog v0.0.0-20250319033709-dfd2699fbc65 // indirect
 )
