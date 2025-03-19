@@ -33,9 +33,9 @@ func GetEnv() Environment {
 		env = STG
 	case "development", "dev":
 		env = DEV
-	case "local", "local-dev", "local-development", "local_dev", "local_development":
+	case "dev-local", "dev_local", "development-local", "development_local", "local", "local-dev", "local-development", "local_dev", "local_development":
 		env = DEV_LOCAL
-	case "cloud", "cloud-dev", "cloud-development", "cloud_dev", "cloud_development":
+	case "dev-cloud", "dev_cloud", "development-cloud", "development_cloud", "cloud", "cloud-dev", "cloud-development", "cloud_dev", "cloud_development":
 		env = DEV_CLOUD
 	case "testing", "test":
 		env = TEST
