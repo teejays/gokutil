@@ -26,7 +26,7 @@ func (e *MultiErr) AddErr(err error) {
 	e.errs = append(e.errs, err)
 }
 func (e *MultiErr) AddNew(msg string, args ...interface{}) {
-	e.errs = append(e.errs, NewErrorTree(fmt.Sprintf(msg, args...), nil))
+	e.errs = append(e.errs, NewErrorTree("", fmt.Errorf(msg, args...)))
 }
 
 func (e *MultiErr) Wrap(err error, msg string, args ...interface{}) {

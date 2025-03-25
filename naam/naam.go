@@ -103,7 +103,7 @@ func cleanWords(words string) string {
 
 // String makes Name a Stringer, so Names are printed in a slightly nicer manner in print/log statements.
 func (s Name) String() string {
-	return strcase.ToPascal(s.words)
+	return strcase.ToSnake(s.words)
 }
 
 // MarshalJSON implements the `json.Marshaler` interface, so Name can be converted to a human friendly string in JSON.
