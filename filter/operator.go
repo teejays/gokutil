@@ -313,7 +313,7 @@ var store = map[Operator]OperatorInfo{
 			return nil
 		},
 		InjectSqlBuilderWhereCond_Goqu: func(sb *goqu.SelectDataset, col string, values ...interface{}) *goqu.SelectDataset {
-			return sb.Where(goqu.C(col).ILike(fmt.Sprintf("%%%s%%", values[0]))) // `%%` results in `%`
+			return sb.Where(goqu.C(col).Cast("text").ILike(fmt.Sprintf("%%%s%%", values[0]))) // `%%` results in `%`
 		},
 	},
 	NOT_LIKE: {
