@@ -51,25 +51,39 @@ var _ = []IScalar{
 
 type ID struct {
 	uuid.UUID
+	// Sometimes we're simply comparing whether an ID includes a string e.g. when searching using a part of an ID.
+	// However, goku's type safety in filters requires that ID's can only be compared with other ID's.
+	// To handle this, we store the string value of the partial ID in matchString.
+	// If matchString is populated, then the UUID field should be empty and ignored, and vice versa.
+	matchString string
 }
 
 // NewID creates a new random ID.
 func NewID() ID {
-	return ID{uuid.New()}
+	return ID{UUID: uuid.New()}
 }
 
 func (id ID) String() string {
-	return id.UUID.String()
+	if id.UUID != uuid.Nil {
+		return id.UUID.String()
+	}
+	return id.matchString
 }
 
 func (id ID) IsEmpty() bool {
-	return id.UUID == uuid.Nil
+	return id.UUID == uuid.Nil && id.matchString == ""
 }
 
 func (id ID) Validate() error {
+	// If both UUID and matchString are set, return an error
+	if id.UUID != uuid.Nil && id.matchString != "" {
+		return fmt.Errorf("ID is invalid: UUID and matchString cannot both be set")
+	}
+	// If both are empty, return an error
 	if id.IsEmpty() {
 		return fmt.Errorf("ID is empty")
 	}
+	// If UUID is invalid, return an error
 	if err := uuid.Validate(id.String()); err != nil {
 		return err
 	}
@@ -81,7 +95,7 @@ func (id *ID) ParseString(str string) error {
 	if err != nil {
 		return err
 	}
-	*id = ID{uid}
+	*id = ID{UUID: uid}
 	return nil
 }
 
@@ -191,7 +205,7 @@ func NewStaticID(hash string) ID {
 	if err != nil {
 		return ID{}
 	}
-	return ID{uid}
+	return ID{UUID: uid}
 }
 
 // NewIDFromString creates a new ID from a string. The string must be a valid UUID.
@@ -200,7 +214,11 @@ func NewIDFromString(str string) (ID, error) {
 	if err != nil {
 		return ID{}, err
 	}
-	return ID{uid}, nil
+	return ID{UUID: uid}, nil
+}
+
+func NewIDMatchString(str string) ID {
+	return ID{matchString: str}
 }
 
 /* * * * * * *
