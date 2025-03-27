@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 
 	"github.com/joho/godotenv"
 	"github.com/teejays/gokutil/env"
@@ -34,12 +35,19 @@ func LoadGokuEnvFiles(ctx context.Context, wd string) error {
 func LoadAppEnvFiles(ctx context.Context, wd string) error {
 	_env := env.GetEnv()
 
-	return LoadEnvFilesV2(ctx, []string{
+	envStr := strings.ToLower(string(_env))
+
+	files := []string{
 		filepath.Join(wd, ".env"),
-		filepath.Join(wd, ".env."+string(_env)),
+		filepath.Join(wd, ".env."+envStr),
 		filepath.Join(wd, ".env.app"),
-		filepath.Join(wd, ".env.app."+string(_env)),
-	})
+		filepath.Join(wd, ".env.app."+envStr),
+	}
+	if env.IsDev() && _env != env.DEV { // We have a diff version of dev
+		files = append(files, filepath.Join(wd, ".env.app.dev"))
+	}
+
+	return LoadEnvFilesV2(ctx, files)
 }
 
 func LoadEnvFilesMatch(ctx context.Context, wd string, patterns []string) error {
