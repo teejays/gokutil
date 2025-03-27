@@ -4,17 +4,17 @@ go 1.23.4
 
 require (
 	github.com/alexflint/go-arg v1.5.1
-	github.com/teejays/gokutil/errutil v0.0.0-20250325174834-6f7f9793cbc2
-	github.com/teejays/gokutil/gopi v0.0.0-20250325174834-6f7f9793cbc2
-	github.com/teejays/gokutil/log v0.0.0-20250325174834-6f7f9793cbc2
+	github.com/teejays/gokutil/errutil v0.0.0-20250327182246-7e4e9489b49e
+	github.com/teejays/gokutil/gopi v0.0.0-20250327182246-7e4e9489b49e
+	github.com/teejays/gokutil/log v0.0.0-20250327182246-7e4e9489b49e
 )
 
 require (
 	github.com/Rican7/conjson v0.1.0 // indirect
 	github.com/alexflint/go-scalar v1.2.0 // indirect
-	github.com/teejays/gokutil/clog v0.0.0-20250325174834-6f7f9793cbc2 // indirect
-	github.com/teejays/gokutil/ctxutil v0.0.0-20250325174834-6f7f9793cbc2 // indirect
-	github.com/teejays/gokutil/env v0.0.0-20250325174834-6f7f9793cbc2 // indirect
-	github.com/teejays/gokutil/panics v0.0.0-20250325174834-6f7f9793cbc2 // indirect
-	github.com/teejays/gokutil/sclog v0.0.0-20250325174834-6f7f9793cbc2 // indirect
+	github.com/teejays/gokutil/clog v0.0.0-20250327182246-7e4e9489b49e // indirect
+	github.com/teejays/gokutil/ctxutil v0.0.0-20250327182246-7e4e9489b49e // indirect
+	github.com/teejays/gokutil/env v0.0.0-20250327182246-7e4e9489b49e // indirect
+	github.com/teejays/gokutil/panics v0.0.0-20250327182246-7e4e9489b49e // indirect
+	github.com/teejays/gokutil/sclog v0.0.0-20250327182246-7e4e9489b49e // indirect
 )
