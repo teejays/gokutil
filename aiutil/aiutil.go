@@ -11,6 +11,8 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/invopop/jsonschema"
+
 	"github.com/teejays/gokutil/env/envutil"
 	jsonutil "github.com/teejays/gokutil/gopi/json"
 	"github.com/teejays/gokutil/log"
@@ -77,6 +79,16 @@ func (v JSONSchema) MarshalJSON() ([]byte, error) {
 func (v *JSONSchema) UnmarshalJSON(data []byte) error {
 	*v = data
 	return nil
+}
+
+func NewJSONSchemaFromStruct(v interface{}) (JSONSchema, error) {
+	js := jsonschema.Reflect(v)
+	js.Type = "object"
+	b, err := js.MarshalJSON()
+	if err != nil {
+		return nil, err
+	}
+	return JSONSchema(b), nil
 }
 
 // Response Types
