@@ -229,7 +229,13 @@ type Timestamp struct {
 	graphql.Time
 }
 
+// NewTime creates a new Timestamp from a time.Time
+// Deprecated: Use NewTimestamp instead
 func NewTime(t time.Time) Timestamp {
+	return NewTimestamp(t)
+}
+
+func NewTimestamp(t time.Time) Timestamp {
 	return Timestamp{Time: graphql.Time{Time: t}}
 }
 
