@@ -319,6 +319,7 @@ type DockerBuildReq struct {
 	DockerfilePath  string // Full path to the Dockerfile
 	DockerImageRepo string // e.g. iamteejay/goku
 	DockerImageTag  string // e.g. og-img-...
+	Labels          map[string]string
 	BuildArgs       map[string]string
 	NoPush          bool
 	Platforms       []string // e.g. linux/amd64,linux/arm64.
@@ -366,6 +367,12 @@ func DockerImageBuild(ctx context.Context, req DockerBuildReq, opts ExecOptions)
 	} else {
 		log.Warn(ctx, "No platforms specified for docker build. Using default linux/amd64,linux/arm64")
 		cmdParts = append(cmdParts, "--platform", "linux/amd64,linux/arm64")
+	}
+	for k, v := range req.Labels {
+		if k == "" || v == "" {
+			return fmt.Errorf("label key or value is empty, key: %s, value: %s", k, v)
+		}
+		cmdParts = append(cmdParts, "--label", fmt.Sprintf("%s=%s", k, v))
 	}
 	cmdParts = append(cmdParts,
 		"-t", fmt.Sprintf("%s:%s", req.DockerImageRepo, req.DockerImageTag),
