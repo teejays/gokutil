@@ -3,13 +3,13 @@ module github.com/teejays/gokutil/errutil
 go 1.23.4
 
 require (
-	github.com/teejays/gokutil/log v0.0.0-20250328145013-52d3fd7d23e9
-	github.com/teejays/gokutil/panics v0.0.0-20250328145013-52d3fd7d23e9
+	github.com/teejays/gokutil/log v0.0.0-20250403135223-39495b6433ca
+	github.com/teejays/gokutil/panics v0.0.0-20250403135223-39495b6433ca
 )
 
 require (
-	github.com/teejays/gokutil/clog v0.0.0-20250328145013-52d3fd7d23e9 // indirect
-	github.com/teejays/gokutil/ctxutil v0.0.0-20250328145013-52d3fd7d23e9 // indirect
-	github.com/teejays/gokutil/env v0.0.0-20250328145013-52d3fd7d23e9 // indirect
-	github.com/teejays/gokutil/sclog v0.0.0-20250328145013-52d3fd7d23e9 // indirect
+	github.com/teejays/gokutil/clog v0.0.0-20250403135223-39495b6433ca // indirect
+	github.com/teejays/gokutil/ctxutil v0.0.0-20250403135223-39495b6433ca // indirect
+	github.com/teejays/gokutil/env v0.0.0-20250403135223-39495b6433ca // indirect
+	github.com/teejays/gokutil/sclog v0.0.0-20250403135223-39495b6433ca // indirect
 )
