@@ -23,9 +23,11 @@ type Route struct {
 	Authenticate bool
 }
 
+type MiddlewareFunc func(next http.Handler) http.Handler
+
 type MiddlewareFuncs struct {
-	AuthMiddleware  mux.MiddlewareFunc
 	PreMiddlewares  []mux.MiddlewareFunc
+	AuthMiddleware  mux.MiddlewareFunc
 	PostMiddlewares []mux.MiddlewareFunc
 }
 
