@@ -45,6 +45,7 @@ type HasAppRootPath interface {
 
 type FileConfig struct {
 	AppName                  naam.Name      `yaml:"app_name"`
+	SemanticVersion          string         `yaml:"version"`
 	Description              string         `yaml:"description"`
 	GoModuleName             string         `yaml:"go_module_name"`
 	GokuVersionAtCreate      string         `yaml:"goku_version_at_create"`

@@ -205,7 +205,7 @@ func SetJSONHeaderMiddleware(next http.Handler) http.Handler {
 
 		// Set the header after the underlying handler has run (but only do it if it's not already set)
 		if w.Header().Get("Content-Type") == "" {
-			log.None(ctx, "Setting JSON header", "key", "Content-Type", "value", "application/json; charset=UTF-8")
+			log.Info(ctx, "Setting JSON header", "key", "Content-Type", "value", "application/json; charset=UTF-8")
 			w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 		}
 	})

@@ -99,7 +99,6 @@ func WriteResponse(w http.ResponseWriter, code int, v interface{}) {
 }
 
 func writeResponse(w http.ResponseWriter, code int, v interface{}) {
-	w.WriteHeader(code)
 
 	if v == nil {
 		return
@@ -113,11 +112,17 @@ func writeResponse(w http.ResponseWriter, code int, v interface{}) {
 	}
 
 	// Write the response
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	log.InfoWithoutCtx("[writeResponse] Content type set", "key", "Content-Type", "value", "application/json; charset=UTF-8")
+
+	w.WriteHeader(code) // Calling write header can usually mean we cannot set the headers now, so all headers must be set before this
+
 	_, err = w.Write(data)
 	if err != nil {
 		writeError(w, http.StatusInternalServerError, err)
 		return
 	}
+
 }
 
 // WriteError is a helper function to help write HTTP response
