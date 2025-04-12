@@ -21,10 +21,10 @@ github.com/rogpeppe/go-internal v1.13.1 h1:KvO1DLK/DRN07sQ1LQKScxyZJuNnedQ5/wKSR
 github.com/rogpeppe/go-internal v1.13.1/go.mod h1:uMEvuHeurkdAXX61udpOXGD/AzZDWNMNyH2VO9fmH0o=
 github.com/stretchr/testify v1.10.0 h1:Xv5erBjTwe/5IxqUQTdXv5kgmIvbHo3QQyRwhJsOfJA=
 github.com/stretchr/testify v1.10.0/go.mod h1:r2ic/lqez/lEtzL7wO/rwa5dbSLXVDPFyf8C91i36aY=
-github.com/teejays/gokutil/panics v0.0.0-20250407193956-732f1628c921 h1:Jg+vQal1IAG223utiPo7iNWzcYOBtdnaivj6/ZF2OQk=
-github.com/teejays/gokutil/panics v0.0.0-20250407193956-732f1628c921/go.mod h1:02LGenLAbivQzXEl9ZHh+9ZdfrMEbJSHtChh5U4S+w4=
-github.com/teejays/gokutil/strcase v0.0.0-20250407193956-732f1628c921 h1:q+TLdaMKmEm5pFQ8n1iqwGBHOpvckSh42+TkqHspkSQ=
-github.com/teejays/gokutil/strcase v0.0.0-20250407193956-732f1628c921/go.mod h1:6HuUqUmHo9TPHVdxMROHZ01mTjzreBhdAVXIQ2KKzdE=
+github.com/teejays/gokutil/panics v0.0.0-20250408201809-49f862302803 h1:mIFZuqE2IJsk3AmXwYz2t+vTnXuQ3otu1MHa3esTEn0=
+github.com/teejays/gokutil/panics v0.0.0-20250408201809-49f862302803/go.mod h1:02LGenLAbivQzXEl9ZHh+9ZdfrMEbJSHtChh5U4S+w4=
+github.com/teejays/gokutil/strcase v0.0.0-20250408201809-49f862302803 h1:Xls+Zco/dYTVS5kJ+FvAhfxQqEtUdckDJ8U8SbUZF5c=
+github.com/teejays/gokutil/strcase v0.0.0-20250408201809-49f862302803/go.mod h1:CRGV/B614Brwmqtm387YGYUpsZDJB0H4k1scvErAdh4=
 github.com/wk8/go-ordered-map/v2 v2.1.8 h1:5h/BUHu93oj4gIdvHHHGsScSTMijfx5PeYkE/fJgbpc=
 github.com/wk8/go-ordered-map/v2 v2.1.8/go.mod h1:5nJHM5DyteebpVlHnWMV0rPz6Zp7+xBAnxjb1X5vnTw=
 golang.org/x/text v0.24.0 h1:dd5Bzh4yt5KYA8f9CJHCP4FB4D51c2c6JvN37xJJkJ0=
