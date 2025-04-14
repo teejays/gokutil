@@ -1,6 +1,7 @@
 package validate
 
 import (
+	"fmt"
 	"reflect"
 
 	validator "github.com/go-playground/validator/v10"
@@ -29,9 +30,23 @@ func Struct(data interface{}) error {
 	case *validator.InvalidValidationError:
 		return errutil.Wrap(err, "invalid data format")
 	case validator.ValidationErrors:
+		if len(err) == 0 {
+			return nil
+		}
+		// If there is only one error, return it
+		if len(err) == 1 {
+			return err[0]
+		}
+		// If there are multiple errors, return them as a multi error
 		errs := errutil.NewMultiErr()
-		for _, e := range err {
-			errs.AddErr(e)
+		for _, e1 := range err {
+			var eNew error
+			if e1.Tag() == "required" {
+				eNew = fmt.Errorf("field [%s] is missing", e1.Field())
+			} else {
+				eNew = fmt.Errorf("field [%s] failed validation on the tag [%s]", e1.Field(), e1.Tag())
+			}
+			errs.AddErr(eNew)
 		}
 		return errs.ErrOrNil()
 	default:
