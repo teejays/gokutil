@@ -8,7 +8,7 @@ github.com/teejays/gokutil/errutil v0.0.0-20241129080937-a3d0cf712dbd h1:8J+FYBV
 github.com/teejays/gokutil/errutil v0.0.0-20241129080937-a3d0cf712dbd/go.mod h1:OvbRx5c5MkiBDefz+Bth3rD1FF+diXgMlRWB06OZJ5g=
 github.com/teejays/gokutil/log v0.0.0-20241124014017-33a80187ef14 h1:kn1D8mczEmR+bw7u4QY4qWPmhmxzPbpzwegw9lwXYkA=
 github.com/teejays/gokutil/log v0.0.0-20241124014017-33a80187ef14/go.mod h1:qIbUliYQ6EkMQ2AWNuqb9TbtbSeM8U/QRDR+SuBa/EU=
-github.com/teejays/gokutil/panics v0.0.0-20250408201809-49f862302803 h1:mIFZuqE2IJsk3AmXwYz2t+vTnXuQ3otu1MHa3esTEn0=
-github.com/teejays/gokutil/panics v0.0.0-20250408201809-49f862302803/go.mod h1:02LGenLAbivQzXEl9ZHh+9ZdfrMEbJSHtChh5U4S+w4=
+github.com/teejays/gokutil/panics v0.0.0-20250414160654-a5820ce194a4 h1:NUSXVn5OF2RquSXebh0MZzdzkTpaC+HWRkm0cYpmnoA=
+github.com/teejays/gokutil/panics v0.0.0-20250414160654-a5820ce194a4/go.mod h1:02LGenLAbivQzXEl9ZHh+9ZdfrMEbJSHtChh5U4S+w4=
 github.com/teejays/gokutil/sclog v0.0.0-20241124014017-33a80187ef14 h1:25Hbq5eEVijXCWkTRXfUaad1HJuXM+zHS1i5t+Pxvgw=
 github.com/teejays/gokutil/sclog v0.0.0-20241124014017-33a80187ef14/go.mod h1:J6HOb7YrKWaHQ4OGs+fNZlSTt0J8zZbxOCD+kzhJJXk=

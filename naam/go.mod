@@ -5,8 +5,8 @@ go 1.23.4
 require (
 	github.com/invopop/jsonschema v0.13.0
 	github.com/stretchr/testify v1.10.0
-	github.com/teejays/gokutil/panics v0.0.0-20250408201809-49f862302803
-	github.com/teejays/gokutil/strcase v0.0.0-20250408201809-49f862302803
+	github.com/teejays/gokutil/panics v0.0.0-20250414160654-a5820ce194a4
+	github.com/teejays/gokutil/strcase v0.0.0-20250414160654-a5820ce194a4
 )
 
 require (
