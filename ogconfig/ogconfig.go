@@ -206,7 +206,7 @@ func LoadAppGokuYaml(appRootDir string) (FileConfig, error) {
 	decoder.KnownFields(true)
 	err = decoder.Decode(&cgf)
 	if err != nil {
-		return FileConfig{}, fmt.Errorf("Decoding YAML: %w", err)
+		return FileConfig{}, fmt.Errorf("decoding YAML: %w", err)
 	}
 
 	return cgf, nil
