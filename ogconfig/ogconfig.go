@@ -50,6 +50,7 @@ type FileConfig struct {
 	GoModuleName             string         `yaml:"go_module_name"`
 	GokuVersionAtCreate      string         `yaml:"goku_version_at_create"`
 	SchemaDirFromAppRootPath string         `yaml:"schema_dir"`
+	EnableGithubWorkflow     bool           `yaml:"enable_github_workflow"`
 	Mods                     []ModReference `yaml:"mods"`
 	CLIOrFileConfig          `yaml:",inline"`
 }
