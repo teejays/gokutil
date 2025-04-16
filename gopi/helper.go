@@ -2,6 +2,7 @@ package gopi
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -294,4 +295,43 @@ func GetDirectRequestHandler[RespT any](fn func(context.Context, *http.Request) 
 		log.Debug(ctx, "[END] HTTP Handle DirectRequest")
 
 	}
+}
+
+type AuthorizationHeaderInfo struct {
+	Scheme string
+	Token  string
+}
+
+var ErrNoAuthorizationHeader = errors.New("no authorization header found")
+var ErrInvalidAuthorizationHeader = errors.New("authorization header has an unexpected format: it's not 'Authorization: <SCHEME> <TOKEN>'")
+
+// ExtractAuthorizationHeaderFromRequest extracts the authorization header from the HTTP request alongside the scheme and token.
+// The Authorization header value should be like: <scheme e.g. Bearer, ApiKey> <token>.
+// A non-error guarantees that the scheme and token are not empty.
+func ExtractAuthorizationHeaderFromRequest(r *http.Request) (AuthorizationHeaderInfo, error) {
+
+	// Get the authentication header
+	val := r.Header.Get("Authorization")
+	log.Debug(r.Context(), "Extracting token from HTTP request", "Authorization", val)
+	val = strings.TrimSpace(val)
+
+	// No auth header
+	if val == "" {
+		return AuthorizationHeaderInfo{}, ErrNoAuthorizationHeader
+	}
+
+	// - split by the space
+	valParts := strings.Split(val, " ")
+	if len(valParts) != 2 {
+		return AuthorizationHeaderInfo{}, errutil.Wrap(ErrInvalidAuthorizationHeader, "invalid number of parts found in authorization header: expected %d, got %d", 2, len(valParts))
+	}
+
+	if valParts[0] == "" || valParts[1] == "" {
+		return AuthorizationHeaderInfo{}, errutil.Wrap(ErrInvalidAuthorizationHeader, "empty scheme or token found in authorization header")
+	}
+
+	return AuthorizationHeaderInfo{
+		Scheme: valParts[0],
+		Token:  valParts[1],
+	}, nil
 }
