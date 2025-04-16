@@ -1,8 +1,8 @@
-github.com/teejays/gokutil/clog v0.0.0-20250414160725-cff099781c5b h1:LkE9+uMGVoNmEWI4UAHbXvjrb/kk7rKUgfyNbWusBOE=
-github.com/teejays/gokutil/clog v0.0.0-20250414160725-cff099781c5b/go.mod h1:hNo+kINeDBD0TFAXy3xxB3c9u8C2Wp4U+ZrZ8lMXp+s=
-github.com/teejays/gokutil/ctxutil v0.0.0-20250414160725-cff099781c5b h1:hseegGjsUvfJPLtBOsKHsasJAWkNc9U0TWDF09A2ccg=
-github.com/teejays/gokutil/ctxutil v0.0.0-20250414160725-cff099781c5b/go.mod h1:SY6M2KMxXxZMIswUcUO9j3MO0uQLvIXAEhoAr5q07K0=
-github.com/teejays/gokutil/env v0.0.0-20250414160725-cff099781c5b h1:yc4sHQNmKcdYDXQtTvN/Ebl3sUL1Lt6Ed/Fs3BdWVNI=
-github.com/teejays/gokutil/env v0.0.0-20250414160725-cff099781c5b/go.mod h1:BgGw/PNfk8kCspxiJh6vfgrn10AcVUCkNfGSYoAKKs4=
-github.com/teejays/gokutil/panics v0.0.0-20250414160725-cff099781c5b h1:XMDu9gm/dCEbNb5sEYJAWA3qpO0Qz6+SyHIxh1/eEGU=
-github.com/teejays/gokutil/panics v0.0.0-20250414160725-cff099781c5b/go.mod h1:02LGenLAbivQzXEl9ZHh+9ZdfrMEbJSHtChh5U4S+w4=
+github.com/teejays/gokutil/clog v0.0.0-20250416195509-991cc543d73a h1:58z6hh/zGpCrugYfKCOJq2uIU/CTASvCGGqzHc1r2i8=
+github.com/teejays/gokutil/clog v0.0.0-20250416195509-991cc543d73a/go.mod h1:hNo+kINeDBD0TFAXy3xxB3c9u8C2Wp4U+ZrZ8lMXp+s=
+github.com/teejays/gokutil/ctxutil v0.0.0-20250416195509-991cc543d73a h1:ZhNYRpj0ap4MjEsymWAg4ig6uCJYjFTkRifCFR4WZ3Y=
+github.com/teejays/gokutil/ctxutil v0.0.0-20250416195509-991cc543d73a/go.mod h1:7zpIBQS294FiiMxVePbjJQoDSLpcxF1vwSvOu0G39mk=
+github.com/teejays/gokutil/env v0.0.0-20250416195509-991cc543d73a h1:70pnXQ/DHhYmg6oa6ZM9djU8TMWQQaFuLn7Bh/BFZMk=
+github.com/teejays/gokutil/env v0.0.0-20250416195509-991cc543d73a/go.mod h1:ao59cQeb1n3OO7kbTT8LPLGK7/oBXblWCn1sSX4GHjQ=
+github.com/teejays/gokutil/panics v0.0.0-20250416195509-991cc543d73a h1:E5Q+VSNVv4HtOX3BLjHdU/3ZjsPchWExZ2mRr56WK4Y=
+github.com/teejays/gokutil/panics v0.0.0-20250416195509-991cc543d73a/go.mod h1:02LGenLAbivQzXEl9ZHh+9ZdfrMEbJSHtChh5U4S+w4=
