@@ -318,6 +318,11 @@ func (t Timestamp) Equal(other Timestamp) bool {
 	return t.Time.Equal(other.Time.Time)
 }
 
+func (t Timestamp) IsBeforeNow() bool {
+	now := NewTimestampNow()
+	return t.Time.Time.Before(now.Time.Time)
+}
+
 /* * * * * * *
  * Date
 * * * * * * */
