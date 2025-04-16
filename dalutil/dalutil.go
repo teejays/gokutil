@@ -288,6 +288,42 @@ func BatchAddType[T types.BasicType, F types.Field](ctx context.Context, conn *d
 		}
 	}
 
+	// Run any after save hooks
+	if fn := meta.GetHookSavePost(); fn != nil {
+		log.Info(ctx, "Running HookSavePost", "type", meta.GetTypeCommonMeta().Name)
+		for i := range elems {
+			var err error
+			elems[i], err = fn(ctx, elems[i])
+			if err != nil {
+				if len(elems) == 1 {
+					return nil, fmt.Errorf("HookSavePost failed: %w", err)
+				} else {
+					return nil, fmt.Errorf("HookSavePost failed for item index [%d]: %w", i, err)
+				}
+			}
+		}
+	} else {
+		log.Debug(ctx, "No HookSavePost found", "type", meta.GetTypeCommonMeta().Name, "meta", meta)
+	}
+
+	// Run any after create hooks
+	if fn := meta.GetHookCreatePost(); fn != nil {
+		log.Info(ctx, "Running HookCreatePost", "type", meta.GetTypeCommonMeta().Name)
+		for i := range elems {
+			var err error
+			elems[i], err = fn(ctx, elems[i])
+			if err != nil {
+				if len(elems) == 1 {
+					return nil, fmt.Errorf("HookCreatePost failed: %w", err)
+				} else {
+					return nil, fmt.Errorf("HookCreatePost failed for item index [%d]: %w", i, err)
+				}
+			}
+		}
+	} else {
+		log.Debug(ctx, "No HookCreatePost found", "type", meta.GetTypeCommonMeta().Name, "meta", meta)
+	}
+
 	return elems, nil
 
 }
