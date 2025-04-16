@@ -25,6 +25,10 @@ func (e *MultiErr) IsNil() bool {
 func (e *MultiErr) AddErr(err error) {
 	e.errs = append(e.errs, err)
 }
+func (e *MultiErr) AddErrs(errs ...error) {
+	e.errs = append(e.errs, errs...)
+}
+
 func (e *MultiErr) AddNew(msg string, args ...interface{}) {
 	e.errs = append(e.errs, NewErrorTree("", fmt.Errorf(msg, args...)))
 }
