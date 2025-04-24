@@ -4,9 +4,9 @@ go 1.23.4
 
 require (
 	github.com/invopop/jsonschema v0.13.0
-	github.com/teejays/gokutil/env v0.0.0-20250416201941-49f97ee03495
-	github.com/teejays/gokutil/gopi v0.0.0-20250416201941-49f97ee03495
-	github.com/teejays/gokutil/log v0.0.0-20250416201941-49f97ee03495
+	github.com/teejays/gokutil/env v0.0.0-20250416202003-6e164b8ddcf8
+	github.com/teejays/gokutil/gopi v0.0.0-20250416202003-6e164b8ddcf8
+	github.com/teejays/gokutil/log v0.0.0-20250416202003-6e164b8ddcf8
 )
 
 require (
@@ -15,11 +15,11 @@ require (
 	github.com/buger/jsonparser v1.1.1 // indirect
 	github.com/joho/godotenv v1.5.1 // indirect
 	github.com/mailru/easyjson v0.9.0 // indirect
-	github.com/teejays/gokutil/clog v0.0.0-20250416201941-49f97ee03495 // indirect
-	github.com/teejays/gokutil/ctxutil v0.0.0-20250416201941-49f97ee03495 // indirect
-	github.com/teejays/gokutil/errutil v0.0.0-20250416201941-49f97ee03495 // indirect
-	github.com/teejays/gokutil/panics v0.0.0-20250416201941-49f97ee03495 // indirect
-	github.com/teejays/gokutil/sclog v0.0.0-20250416201941-49f97ee03495 // indirect
+	github.com/teejays/gokutil/clog v0.0.0-20250416202003-6e164b8ddcf8 // indirect
+	github.com/teejays/gokutil/ctxutil v0.0.0-20250416202003-6e164b8ddcf8 // indirect
+	github.com/teejays/gokutil/errutil v0.0.0-20250416202003-6e164b8ddcf8 // indirect
+	github.com/teejays/gokutil/panics v0.0.0-20250416202003-6e164b8ddcf8 // indirect
+	github.com/teejays/gokutil/sclog v0.0.0-20250416202003-6e164b8ddcf8 // indirect
 	github.com/wk8/go-ordered-map/v2 v2.1.8 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
