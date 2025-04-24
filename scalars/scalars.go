@@ -712,6 +712,14 @@ func (v Money) Validate() error {
 		return fmt.Errorf("is empty")
 	}
 
+	// cannot be negative
+	if v.whole < 0 {
+		return fmt.Errorf("whole value [%d] cannot be negative", v.whole)
+	}
+	if v.decimal < 0 {
+		return fmt.Errorf("decimal value [%d] cannot be negative", v.decimal)
+	}
+	// decimal must be between 0 and 99
 	if v.decimal > 99 {
 		return fmt.Errorf("decimal value [%d] is out of range [0-99]", v.decimal)
 	}
@@ -856,6 +864,37 @@ func NewMoneyFromString(str string) (Money, error) {
 
 	return NewMoney(whole, decimal)
 }
+
+func (v *Money) adjust() {
+	if v.decimal > 99 {
+		v.whole += v.decimal / 100
+		v.decimal = v.decimal % 100
+	}
+}
+
+func (v Money) GetWhole() uint {
+	return v.whole
+}
+
+func (v Money) GetDecimal() uint {
+	return v.decimal
+}
+
+func (v Money) ToFloat32() float32 {
+	return float32(v.whole) + float32(v.decimal)/100
+}
+
+func (v Money) ToFloat64() float64 {
+	return float64(v.whole) + float64(v.decimal)/100
+}
+
+func (v Money) Add(other Money) (Money, error) {
+	new := Money{whole: v.whole + other.whole, decimal: v.decimal + other.decimal}
+	new.adjust()
+	return new, nil
+}
+
+// Not adding sub method because it can be tricky to handle negative values
 
 /* * * * * * *
 * Link
