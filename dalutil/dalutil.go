@@ -80,7 +80,8 @@ func (m TypeCommonDALMeta[T, F]) GetDatabaseColumns() []string {
 }
 
 type EntityAddRequest[T any] struct {
-	Object T `json:"object"`
+	Object      T          `json:"object"`
+	HardcodedID scalars.ID `json:"hardcodedID"`
 }
 
 type EntityBatchAddRequest[T any] struct {
